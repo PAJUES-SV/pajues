@@ -83,8 +83,12 @@ nav{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;
 .webtoon-content img:last-of-type{border-radius:3px 3px 10px 10px}
 .webtoon-end-card{width:100%;margin-top:16px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px 24px;text-align:center}
 .webtoon-end-card p{color:var(--muted2);font-size:11px;margin-bottom:4px;font-weight:400}
-.webtoon-end-card strong{font-family:'Noto Sans KR',sans-serif;font-weight:400;color:var(--muted);font-size:13px;display:block;margin-bottom:0}
-.webtoon-end-card .end-divider{width:28px;height:2px;background:var(--border);margin:12px auto 0;border-radius:2px}
+.webtoon-end-card strong{font-family:'Noto Sans KR',sans-serif;font-weight:400;color:var(--muted);font-size:13px;display:block;margin-bottom:20px}
+.webtoon-nav-btns{display:flex;align-items:center;justify-content:center;gap:8px}
+.webtoon-nav-btn{padding:8px 20px;border-radius:20px;border:1px solid var(--border);background:#fff;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;font-family:'NanumSquare',sans-serif;transition:all 0.15s}
+.webtoon-nav-btn:hover{background:var(--text);color:#fff;border-color:var(--text)}
+.webtoon-nav-btn.disabled{opacity:0.3;pointer-events:none}
+.webtoon-nav-btn.center{background:var(--text);color:#fff;border-color:var(--text)}
 
 /* ── ESG ── */
 .esg-wrap{max-width:100%;margin:0 auto;padding:24px 24px 0}
@@ -179,7 +183,7 @@ footer p{font-size:12px;color:var(--muted2)}
       목록으로
     </button>
     <div class="webtoon-topbar-title" id="webtoonTitle"></div>
-    <div class="webtoon-page-count" id="webtoonCount"></div>
+    <div style="width:60px"></div>
   </div>
   <div class="webtoon-content" id="webtoonContent"></div>
 </div>
@@ -303,8 +307,11 @@ function showPage(id, btn) {
 function openWebtoon(issue) {
   const viewer = document.getElementById('webtoonViewer');
   const content = document.getElementById('webtoonContent');
+  const idx = issues.indexOf(issue);
+  const prevIssue = issues[idx - 1] || null; // 더 최신호
+  const nextIssue = issues[idx + 1] || null; // 더 이전호
+
   document.getElementById('webtoonTitle').textContent = issue.label + ' 파주ES SV Brief';
-  document.getElementById('webtoonCount').textContent = issue.slides.length + '장';
   content.innerHTML = '';
   issue.slides.forEach(file => {
     const img = document.createElement('img');
@@ -312,12 +319,17 @@ function openWebtoon(issue) {
     img.alt = issue.label;
     content.appendChild(img);
   });
+
   const end = document.createElement('div');
   end.className = 'webtoon-end-card';
   end.innerHTML = `
     <p>파주에너지서비스 경영지원팀</p>
     <strong>${issue.label} 파주ES SV Brief</strong>
-    <div class="end-divider"></div>`;
+    <div class="webtoon-nav-btns">
+      <button class="webtoon-nav-btn ${!prevIssue ? 'disabled' : ''}" onclick="openWebtoon(issues[${idx - 1}]); return false;">← 다음화</button>
+      <button class="webtoon-nav-btn center" onclick="closeWebtoon()">목록으로</button>
+      <button class="webtoon-nav-btn ${!nextIssue ? 'disabled' : ''}" onclick="openWebtoon(issues[${idx + 1}]); return false;">이전화 →</button>
+    </div>`;
   content.appendChild(end);
   viewer.classList.add('open');
   viewer.scrollTop = 0;
