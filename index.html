@@ -412,16 +412,22 @@ async function openWebtoon(issue) {
         <p>파주에너지서비스 경영지원팀</p>
         <strong>${issue.label} 파주ES SV Brief</strong>
       </div>
-      <button class="heart-btn ${liked ? 'liked' : ''}" style="flex-shrink:0;width:52px;justify-content:center" onclick="toggleHeart(event, '${issue.folder}')">
+      <button class="heart-btn ${liked ? 'liked' : ''}" id="webtoon-heart-btn" style="flex-shrink:0;width:52px;justify-content:center">
         <span class="heart-icon">${liked ? '❤️' : '🤍'}</span>
         <span class="heart-count">${count}</span>
       </button>
     </div>
     <div class="webtoon-nav-btns">
-      <button class="webtoon-nav-btn ${!prevIssue ? 'disabled' : ''}" onclick="openWebtoon(issues[${idx - 1}])">← 다음화</button>
+      <button class="webtoon-nav-btn ${!prevIssue ? 'disabled' : ''}" id="btn-prev">← 다음화</button>
       <button class="webtoon-nav-btn center" onclick="closeWebtoon()">목록으로</button>
-      <button class="webtoon-nav-btn ${!nextIssue ? 'disabled' : ''}" onclick="openWebtoon(issues[${idx + 1}])">이전화 →</button>
+      <button class="webtoon-nav-btn ${!nextIssue ? 'disabled' : ''}" id="btn-next">이전화 →</button>
     </div>`;
+  content.appendChild(end);
+
+  // addEventListener로 이벤트 연결
+  document.getElementById('webtoon-heart-btn').addEventListener('click', e => toggleHeart(e, issue.folder));
+  if (prevIssue) document.getElementById('btn-prev').addEventListener('click', () => openWebtoon(prevIssue));
+  if (nextIssue) document.getElementById('btn-next').addEventListener('click', () => openWebtoon(nextIssue));
   content.appendChild(end);
   viewer.classList.add('open');
   viewer.scrollTop = 0;
