@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>파주ES · 사회공헌 아카이브</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/moonspam/NanumSquare@2.0/nanumsquare.css" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1c6e47;--teal:#38b2a0;
+  --accent:#1c6e47;
+  --text:#111111;--muted:#888;--muted2:#bbb;
+  --border:#ebebeb;--bg:#ffffff;--bg2:#f7f7f7;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* ── NAV ── */
+nav{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.nav-inner{max-width:1140px;margin:0 auto;padding:0 32px;display:flex;align-items:center;height:60px}
+.nav-logo{display:flex;align-items:center;text-decoration:none;margin-right:48px;padding-right:48px;border-right:1px solid var(--border)}
+.logo-wordmark{display:flex;flex-direction:column;line-height:1}
+.logo-main{font-family:'NanumSquare',sans-serif;font-weight:800;font-size:14.5px;color:var(--text);letter-spacing:-0.3px}
+.logo-sub{font-size:9px;color:var(--muted2);letter-spacing:0.1em;margin-top:3px;text-transform:uppercase}
+.nav-tabs{display:flex;gap:6px}
+.nav-tab{padding:7px 16px;font-size:13px;color:var(--muted);cursor:pointer;border:1px solid transparent;border-radius:20px;background:none;transition:all 0.15s;font-family:'NanumSquare',sans-serif;font-weight:700;letter-spacing:-0.2px}
+.nav-tab:hover{color:var(--text);background:var(--bg2)}
+.nav-tab.active{color:#fff;background:var(--text);border-color:var(--text)}
+
+/* ── PAGES ── */
+.page{display:none}
+.page.active{display:block}
+
+/* ── PAGE HEADER ── */
+.page-head{max-width:1140px;margin:0 auto;padding:48px 32px 32px;border-bottom:1px solid var(--border)}
+.page-head-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:24px}
+.page-eyebrow{font-size:11px;font-weight:700;letter-spacing:0.12em;color:var(--accent);margin-bottom:10px;text-transform:uppercase}
+.page-head h1{font-family:'NanumSquare',sans-serif;font-weight:800;font-size:34px;color:var(--text);letter-spacing:-1px;line-height:1.1}
+.page-head-desc{font-size:14px;color:var(--muted);margin-top:10px;line-height:1.6}
+.stat-pill{display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:24px;padding:8px 18px;flex-shrink:0}
+.stat-num{font-family:'NanumSquare',sans-serif;font-weight:800;font-size:20px;color:var(--text)}
+.stat-sep{width:1px;height:18px;background:var(--border)}
+.stat-label{font-size:11px;color:var(--muted);letter-spacing:0.05em}
+
+/* ── FILTER ── */
+.filter-wrap{max-width:1140px;margin:0 auto;padding:24px 32px 0;display:flex;align-items:center;gap:8px}
+.filter-label{font-size:11px;font-weight:700;color:var(--muted2);letter-spacing:0.1em;margin-right:4px}
+.year-btn{padding:5px 16px;border-radius:20px;border:1px solid var(--border);background:#fff;font-size:12.5px;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.15s;font-family:'NanumSquare',sans-serif}
+.year-btn:hover{border-color:#ccc;color:var(--text)}
+.year-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
+
+/* ── GRID ── */
+.grid-wrap{max-width:1140px;margin:0 auto;padding:24px 32px 80px}
+.grid-meta{font-size:12px;color:var(--muted2);margin-bottom:20px}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:24px}
+
+.brief-card{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;cursor:pointer;transition:all 0.2s}
+.brief-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,0.08);border-color:#ddd}
+.card-thumb{width:100%;aspect-ratio:1;overflow:hidden;position:relative;background:#f2f2f2}
+.card-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.3s ease}
+.brief-card:hover .card-thumb img{transform:scale(1.04)}
+.new-badge{position:absolute;top:12px;left:12px;background:var(--text);color:#fff;font-size:9.5px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:0.05em}
+.card-month-chip{position:absolute;bottom:10px;right:10px;background:rgba(255,255,255,0.88);backdrop-filter:blur(6px);color:var(--text);font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:10px;font-family:'NanumSquare',sans-serif}
+.card-info{padding:16px 18px 18px}
+.card-title{font-family:'NanumSquare',sans-serif;font-weight:800;font-size:13px;color:var(--text);margin-bottom:5px;line-height:1.45}
+.card-sub{font-size:11.5px;color:var(--muted);line-height:1.5}
+.card-arrow{display:inline-flex;align-items:center;gap:3px;margin-top:10px;font-size:11px;font-weight:700;color:var(--accent);font-family:'NanumSquare',sans-serif}
+
+/* ── WEBTOON VIEWER ── */
+.webtoon-overlay{display:none;position:fixed;inset:0;background:#fff;z-index:200;overflow-y:auto}
+.webtoon-overlay.open{display:block}
+.webtoon-topbar{position:sticky;top:0;background:rgba(255,255,255,0.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:10;padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.webtoon-back{display:flex;align-items:center;gap:5px;background:none;border:none;color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:'NanumSquare',sans-serif;padding:8px 0;transition:opacity 0.2s}
+.webtoon-back:hover{opacity:0.5}
+.webtoon-back svg{width:15px;height:15px}
+.webtoon-topbar-title{font-family:'NanumSquare',sans-serif;font-weight:800;font-size:13px;color:var(--text);position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap}
+.webtoon-page-count{font-size:12px;color:var(--muted2);font-weight:700;font-family:'NanumSquare',sans-serif}
+.webtoon-content{max-width:680px;margin:0 auto;padding:32px 16px 80px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.webtoon-content img{width:100%;display:block;border-radius:3px}
+.webtoon-content img:first-child{border-radius:10px 10px 3px 3px}
+.webtoon-content img:last-of-type{border-radius:3px 3px 10px 10px}
+.webtoon-end-card{width:100%;margin-top:16px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px 24px;text-align:center}
+.webtoon-end-card p{color:var(--muted2);font-size:11px;margin-bottom:4px;font-weight:400}
+.webtoon-end-card strong{font-family:'Noto Sans KR',sans-serif;font-weight:400;color:var(--muted);font-size:13px;display:block;margin-bottom:0}
+.webtoon-end-card .end-divider{width:28px;height:2px;background:var(--border);margin:12px auto 0;border-radius:2px}
+
+/* ── ESG ── */
+.esg-wrap{max-width:1140px;margin:0 auto;padding:40px 32px 60px}
+.esg-header{margin-bottom:22px}
+.esg-header h1{font-family:'NanumSquare',sans-serif;font-weight:800;font-size:22px;margin-bottom:5px}
+.esg-header p{font-size:13px;color:var(--muted)}
+.esg-frame-wrap{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.esg-frame-wrap iframe{width:100%;height:85vh;border:none;display:block}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--border);padding:24px 32px;text-align:center}
+footer p{font-size:12px;color:var(--muted2)}
+
+@media(max-width:680px){
+  .page-head{padding:32px 20px 24px}
+  .page-head h1{font-size:26px}
+  .stat-pill{display:none}
+  .filter-wrap,.grid-wrap{padding-left:20px;padding-right:20px}
+  .card-grid{grid-template-columns:repeat(2,1fr);gap:14px}
+  .webtoon-topbar-title{display:none}
+  .webtoon-content{padding:16px 8px 60px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#" onclick="showPage('sv', document.querySelector('.nav-tab'));return false;">
+      <div class="logo-wordmark">
+        <span class="logo-main">파주에너지서비스</span>
+        <span class="logo-sub">Social Value Archive</span>
+      </div>
+    </a>
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showPage('sv',this)">파주ES SV Brief</button>
+      <button class="nav-tab" onclick="showPage('esg',this)">ESG 성과 리포트</button>
+    </div>
+  </div>
+</nav>
+
+<!-- SV BRIEF 페이지 -->
+<div class="page active" id="page-sv">
+  <div class="page-head">
+    <div class="page-head-inner">
+      <div class="page-head-left">
+        <div class="page-eyebrow">Social Value Brief</div>
+        <h1>파주ES SV Brief</h1>
+        <p class="page-head-desc">파주에너지서비스가 지역사회와 함께 만들어가는 사회공헌활동을 전합니다</p>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-num" id="statTotal">5</span>
+        <span class="stat-sep"></span>
+        <span class="stat-label">총 발행호수</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-wrap">
+    <span class="filter-label">YEAR</span>
+    <button class="year-btn active" onclick="filterYear('all',this)">전체</button>
+    <button class="year-btn" onclick="filterYear('2026',this)">2026년</button>
+    <button class="year-btn" onclick="filterYear('2025',this)">2025년</button>
+  </div>
+
+  <div class="grid-wrap">
+    <div class="grid-meta" id="gridMeta"></div>
+    <div class="card-grid" id="cardGrid"></div>
+  </div>
+</div>
+
+<!-- ESG 페이지 -->
+<div class="page" id="page-esg">
+  <div class="esg-wrap">
+    <div class="esg-header">
+      <h1>ESG 성과 리포트</h1>
+      <p>파주에너지서비스의 환경·사회·지배구조 성과를 담았습니다</p>
+    </div>
+    <div class="esg-frame-wrap">
+      <iframe src="pajues_esg_2025.html" title="ESG 성과 리포트 2025"></iframe>
+    </div>
+  </div>
+</div>
+
+<!-- 웹툰 뷰어 -->
+<div class="webtoon-overlay" id="webtoonViewer">
+  <div class="webtoon-topbar">
+    <button class="webtoon-back" onclick="closeWebtoon()">
+      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 3L5 8L10 13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      목록으로
+    </button>
+    <div class="webtoon-topbar-title" id="webtoonTitle"></div>
+    <div class="webtoon-page-count" id="webtoonCount"></div>
+  </div>
+  <div class="webtoon-content" id="webtoonContent"></div>
+</div>
+
+<footer>
+  <p>© 파주에너지서비스 경영지원팀</p>
+</footer>
+
+<script>
+// ════════════════════════════════════════════════════════
+// 새 호 추가할 때 여기에만 추가하면 됩니다
+// slides 배열에 이미지 파일명 순서대로 넣어주세요
+// ════════════════════════════════════════════════════════
+const BASE = 'https://pajues-sv.github.io/pajues_sv-brief/issues';
+
+const issues = [
+  {
+    year:'2026', month:'03',
+    label:'2026년 3월',
+    title:'작은 지원이 만든 변화',
+    isNew:true,
+    folder:'2026-03',
+    slides:['01.jpg','02.jpg','03.jpg','04.jpg','05.jpg','06.png','07.jpg']
+  },
+  {
+    year:'2026', month:'02',
+    label:'2026년 2월',
+    title:'행복나눔반찬사업 이야기',
+    isNew:false,
+    folder:'2026-02',
+    slides:['01.jpg','02.jpg','03.jpg','04.jpg','05.jpg']
+  },
+  {
+    year:'2026', month:'01',
+    label:'2026년 1월',
+    title:'겨울 한가운데서 전한 작은 응원',
+    isNew:false,
+    folder:'2026-01',
+    slides:['01.jpg','02.jpg','03.jpg','04.jpg','05.jpg']
+  },
+  {
+    year:'2025', month:'07',
+    label:'2025년 7월',
+    title:'파주ES와 함께 만드는 시원한 여름',
+    isNew:false,
+    folder:'2025-07',
+    slides:['01.jpg','02.jpg','03.jpg','04.jpg']
+  },
+  {
+    year:'2025', month:'06',
+    label:'2025년 6월',
+    title:'우리 함께한 반찬나눔 이야기',
+    isNew:false,
+    folder:'2025-06',
+    slides:['01.jpg','02.jpg','03.jpg','04.jpg','05.jpg','06.jpg']
+  }
+];
+
+// ════════════════════════════════════════════════════════
+// 이하 수정 불필요
+// ════════════════════════════════════════════════════════
+function imgUrl(issue, file) {
+  return `${BASE}/${issue.folder}/${file}`;
+}
+
+function renderGrid(yearFilter) {
+  const grid = document.getElementById('cardGrid');
+  const meta = document.getElementById('gridMeta');
+  grid.innerHTML = '';
+  const filtered = yearFilter === 'all' ? issues : issues.filter(i => i.year === yearFilter);
+  meta.textContent = `총 ${filtered.length}개`;
+  document.getElementById('statTotal').textContent = issues.length;
+  filtered.forEach(issue => {
+    const card = document.createElement('div');
+    card.className = 'brief-card';
+    card.onclick = () => openWebtoon(issue);
+    card.innerHTML = `
+      <div class="card-thumb">
+        <img src="${imgUrl(issue, issue.slides[0])}" alt="${issue.label}" loading="lazy">
+        ${issue.isNew ? '<span class="new-badge">NEW</span>' : ''}
+        <span class="card-month-chip">${issue.month}월호</span>
+      </div>
+      <div class="card-info">
+        <div class="card-title">${issue.label} 파주ES SV Brief</div>
+        <div class="card-sub">${issue.title}</div>
+        <div class="card-arrow">읽기 →</div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+function filterYear(year, btn) {
+  document.querySelectorAll('.year-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid(year);
+}
+
+function showPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function openWebtoon(issue) {
+  const viewer = document.getElementById('webtoonViewer');
+  const content = document.getElementById('webtoonContent');
+  document.getElementById('webtoonTitle').textContent = issue.label + ' 파주ES SV Brief';
+  document.getElementById('webtoonCount').textContent = issue.slides.length + '장';
+  content.innerHTML = '';
+  issue.slides.forEach(file => {
+    const img = document.createElement('img');
+    img.src = imgUrl(issue, file);
+    img.alt = issue.label;
+    content.appendChild(img);
+  });
+  const end = document.createElement('div');
+  end.className = 'webtoon-end-card';
+  end.innerHTML = `
+    <p>파주에너지서비스 경영지원팀</p>
+    <strong>${issue.label} 파주ES SV Brief</strong>
+    <div class="end-divider"></div>`;
+  content.appendChild(end);
+  viewer.classList.add('open');
+  viewer.scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+}
+
+function closeWebtoon() {
+  document.getElementById('webtoonViewer').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeWebtoon();
+});
+
+renderGrid('all');
+</script>
+</body>
+</html>
