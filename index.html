@@ -328,9 +328,27 @@ async function toggleHeart(e, folder) {
     }
   } catch(e) {}
 
-  const activeYear = document.querySelector('.year-btn.active');
-  const year = activeYear?.textContent === '전체' ? 'all' : activeYear?.textContent.replace('년','');
-  renderGrid(year || 'all');
+  // 뷰어가 열려있으면 뷰어 안 하트 버튼만 업데이트, 아니면 그리드 갱신
+  const viewer = document.getElementById('webtoonViewer');
+  if (viewer.classList.contains('open')) {
+    const btn = document.getElementById('webtoon-heart-btn');
+    if (btn && btn.dataset.folder === folder) {
+      const newLiked2 = localStorage.getItem('heart_' + folder) === '1';
+      // Supabase에서 최신 count 가져오기
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/hearts?folder=eq.${folder}&select=count`, {
+        headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+      });
+      const d = await r.json();
+      const newCount2 = d[0]?.count || 0;
+      btn.className = 'heart-btn' + (newLiked2 ? ' liked' : '');
+      btn.querySelector('.heart-icon').textContent = newLiked2 ? '❤️' : '🤍';
+      btn.querySelector('.heart-count').textContent = newCount2;
+    }
+  } else {
+    const activeYear = document.querySelector('.year-btn.active');
+    const year = activeYear?.textContent === '전체' ? 'all' : activeYear?.textContent.replace('년','');
+    renderGrid(year || 'all');
+  }
 }
 
 async function renderGrid(yearFilter) {
