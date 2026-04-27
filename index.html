@@ -448,7 +448,6 @@ async function openWebtoon(issue) {
   const nextBtn = document.getElementById('btn-next');
   if (prevIssue && prevBtn) prevBtn.onclick = () => openWebtoon(prevIssue);
   if (nextIssue && nextBtn) nextBtn.onclick = () => openWebtoon(nextIssue);
-  content.appendChild(end);
   viewer.classList.add('open');
   viewer.scrollTop = 0;
   document.body.style.overflow = 'hidden';
