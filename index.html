@@ -442,8 +442,6 @@ async function openWebtoon(issue) {
     </div>`;
   content.appendChild(end);
 
-  const heartBtn = document.getElementById('webtoon-heart-btn');
-  heartBtn.onclick = function(e) { toggleHeart(e, this.dataset.folder); };
   const prevBtn = document.getElementById('btn-prev');
   const nextBtn = document.getElementById('btn-next');
   if (prevIssue && prevBtn) prevBtn.onclick = () => openWebtoon(prevIssue);
@@ -460,6 +458,14 @@ function closeWebtoon() {
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeWebtoon();
+});
+
+// 뷰어 전체에 클릭 이벤트 위임
+document.getElementById('webtoonViewer').addEventListener('click', function(e) {
+  const heartBtn = e.target.closest('#webtoon-heart-btn');
+  if (heartBtn) {
+    toggleHeart(e, heartBtn.dataset.folder);
+  }
 });
 
 renderGrid('all');
