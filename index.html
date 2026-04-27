@@ -81,16 +81,25 @@ nav{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;
 .webtoon-content img{width:100%;display:block;border-radius:3px}
 .webtoon-content img:first-child{border-radius:10px 10px 3px 3px}
 .webtoon-content img:last-of-type{border-radius:3px 3px 10px 10px}
-.webtoon-end-card{width:100%;margin-top:16px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:28px 24px;text-align:center}
-.webtoon-end-card p{color:var(--muted2);font-size:11px;margin-bottom:4px;font-weight:400}
-.webtoon-end-card strong{font-family:'Noto Sans KR',sans-serif;font-weight:400;color:var(--muted);font-size:13px;display:block;margin-bottom:20px}
+.webtoon-end-card{width:100%;margin-top:16px;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:20px 24px}
+.webtoon-end-top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
+.webtoon-end-card p{color:var(--muted2);font-size:11px;margin-bottom:3px;font-weight:400;text-align:center}
+.webtoon-end-card strong{font-family:'Noto Sans KR',sans-serif;font-weight:400;color:var(--muted);font-size:13px;display:block;text-align:center}
 .webtoon-nav-btns{display:flex;align-items:center;justify-content:center;gap:8px}
 .webtoon-nav-btn{padding:8px 20px;border-radius:20px;border:1px solid var(--border);background:#fff;font-size:12px;font-weight:700;color:var(--text);cursor:pointer;font-family:'NanumSquare',sans-serif;transition:all 0.15s}
 .webtoon-nav-btn:hover{background:var(--text);color:#fff;border-color:var(--text)}
 .webtoon-nav-btn.disabled{opacity:0.3;pointer-events:none}
 .webtoon-nav-btn.center{background:var(--text);color:#fff;border-color:var(--text)}
 
-/* ── ESG ── */
+/* ── HEART BTN ── */
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+.heart-btn{display:flex;align-items:center;gap:5px;background:none;border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:'NanumSquare',sans-serif;transition:all 0.15s}
+.heart-btn:hover{border-color:#ff6b6b;color:#ff6b6b}
+.heart-btn.liked{border-color:#ff6b6b;color:#ff6b6b;background:#fff5f5}
+.heart-btn .heart-icon{font-size:13px;transition:transform 0.2s}
+.heart-btn.liked .heart-icon{transform:scale(1.2)}
+.webtoon-heart{margin-top:16px}
+.webtoon-heart .heart-btn{font-size:13px;padding:8px 20px}
 .esg-wrap{max-width:100%;margin:0 auto;padding:24px 24px 0}
 .esg-header{margin-bottom:22px}
 .esg-header h1{font-family:'NanumSquare',sans-serif;font-weight:800;font-size:22px;margin-bottom:5px}
@@ -197,6 +206,8 @@ footer p{font-size:12px;color:var(--muted2)}
 // 새 호 추가할 때 여기에만 추가하면 됩니다
 // slides 배열에 이미지 파일명 순서대로 넣어주세요
 // ════════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://qacbzixkdonoghjdhsop.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhY2J6aXhrZG9ub2doamRoc29wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjc3MTEsImV4cCI6MjA5Mjg0MzcxMX0.jczYyDVNLLPbTigTAOYCODKdRMHQKJpHc8hLti8lV5U';
 const BASE = 'https://pajues-sv.github.io/pajues/issues';
 
 const issues = [
@@ -265,17 +276,79 @@ function imgUrl(issue, file) {
   return `${BASE}/${issue.folder}/${file}`;
 }
 
-function renderGrid(yearFilter) {
+// ── Supabase 하트 ──
+async function fetchHearts() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/hearts?select=folder,count`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    const data = await res.json();
+    const map = {};
+    data.forEach(r => map[r.folder] = r.count);
+    return map;
+  } catch(e) { return {}; }
+}
+
+async function toggleHeart(e, folder) {
+  e.stopPropagation();
+  const liked = localStorage.getItem('heart_' + folder) === '1';
+  const newLiked = !liked;
+  localStorage.setItem('heart_' + folder, newLiked ? '1' : '0');
+
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/hearts?folder=eq.${folder}&select=count`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    const data = await res.json();
+
+    if (data.length === 0) {
+      await fetch(`${SUPABASE_URL}/rest/v1/hearts`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal'
+        },
+        body: JSON.stringify({ folder, count: 1 })
+      });
+    } else {
+      const current = data[0].count;
+      const newCount = newLiked ? current + 1 : Math.max(0, current - 1);
+      await fetch(`${SUPABASE_URL}/rest/v1/hearts?folder=eq.${folder}`, {
+        method: 'PATCH',
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=minimal'
+        },
+        body: JSON.stringify({ count: newCount })
+      });
+    }
+  } catch(e) {}
+
+  const activeYear = document.querySelector('.year-btn.active');
+  const year = activeYear?.textContent === '전체' ? 'all' : activeYear?.textContent.replace('년','');
+  renderGrid(year || 'all');
+}
+
+async function renderGrid(yearFilter) {
   const grid = document.getElementById('cardGrid');
   const meta = document.getElementById('gridMeta');
   grid.innerHTML = '';
   const filtered = yearFilter === 'all' ? issues : issues.filter(i => i.year === yearFilter);
   meta.textContent = `총 ${filtered.length}개`;
   document.getElementById('statTotal').textContent = issues.length;
+
+  const heartMap = await fetchHearts();
+
   filtered.forEach(issue => {
     const card = document.createElement('div');
     card.className = 'brief-card';
     card.onclick = () => openWebtoon(issue);
+    const liked = localStorage.getItem('heart_' + issue.folder) === '1';
+    const count = heartMap[issue.folder] || 0;
     card.innerHTML = `
       <div class="card-thumb">
         <img src="${imgUrl(issue, issue.slides[0])}" alt="${issue.label}" loading="lazy">
@@ -285,7 +358,13 @@ function renderGrid(yearFilter) {
       <div class="card-info">
         <div class="card-title">${issue.label} 파주ES SV Brief</div>
         <div class="card-sub">${issue.title}</div>
-        <div class="card-arrow">읽기 →</div>
+        <div class="card-footer">
+          <div class="card-arrow">읽기 →</div>
+          <button class="heart-btn ${liked ? 'liked' : ''}" data-folder="${issue.folder}" onclick="toggleHeart(event, '${issue.folder}')">
+            <span class="heart-icon">${liked ? '❤️' : '🤍'}</span>
+            <span class="heart-count">${count}</span>
+          </button>
+        </div>
       </div>`;
     grid.appendChild(card);
   });
@@ -304,12 +383,12 @@ function showPage(id, btn) {
   btn.classList.add('active');
 }
 
-function openWebtoon(issue) {
+async function openWebtoon(issue) {
   const viewer = document.getElementById('webtoonViewer');
   const content = document.getElementById('webtoonContent');
   const idx = issues.indexOf(issue);
-  const prevIssue = issues[idx - 1] || null; // 더 최신호
-  const nextIssue = issues[idx + 1] || null; // 더 이전호
+  const prevIssue = issues[idx - 1] || null;
+  const nextIssue = issues[idx + 1] || null;
 
   document.getElementById('webtoonTitle').textContent = issue.label + ' 파주ES SV Brief';
   content.innerHTML = '';
@@ -320,15 +399,28 @@ function openWebtoon(issue) {
     content.appendChild(img);
   });
 
+  const heartMap = await fetchHearts();
+  const liked = localStorage.getItem('heart_' + issue.folder) === '1';
+  const count = heartMap[issue.folder] || 0;
+
   const end = document.createElement('div');
   end.className = 'webtoon-end-card';
   end.innerHTML = `
-    <p>파주에너지서비스 경영지원팀</p>
-    <strong>${issue.label} 파주ES SV Brief</strong>
+    <div class="webtoon-end-top">
+      <div style="width:52px"></div>
+      <div style="flex:1;text-align:center">
+        <p>파주에너지서비스 경영지원팀</p>
+        <strong>${issue.label} 파주ES SV Brief</strong>
+      </div>
+      <button class="heart-btn ${liked ? 'liked' : ''}" style="flex-shrink:0;width:52px;justify-content:center" onclick="toggleHeart(event, '${issue.folder}')">
+        <span class="heart-icon">${liked ? '❤️' : '🤍'}</span>
+        <span class="heart-count">${count}</span>
+      </button>
+    </div>
     <div class="webtoon-nav-btns">
-      <button class="webtoon-nav-btn ${!prevIssue ? 'disabled' : ''}" onclick="openWebtoon(issues[${idx - 1}]); return false;">← 다음화</button>
+      <button class="webtoon-nav-btn ${!prevIssue ? 'disabled' : ''}" onclick="openWebtoon(issues[${idx - 1}])">← 다음화</button>
       <button class="webtoon-nav-btn center" onclick="closeWebtoon()">목록으로</button>
-      <button class="webtoon-nav-btn ${!nextIssue ? 'disabled' : ''}" onclick="openWebtoon(issues[${idx + 1}]); return false;">이전화 →</button>
+      <button class="webtoon-nav-btn ${!nextIssue ? 'disabled' : ''}" onclick="openWebtoon(issues[${idx + 1}])">이전화 →</button>
     </div>`;
   content.appendChild(end);
   viewer.classList.add('open');
