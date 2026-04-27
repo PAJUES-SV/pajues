@@ -105,7 +105,7 @@ nav{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;
 .esg-header h1{font-family:'NanumSquare',sans-serif;font-weight:800;font-size:22px;margin-bottom:5px}
 .esg-header p{font-size:13px;color:var(--muted)}
 .esg-frame-wrap{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden}
-.esg-frame-wrap iframe{width:100%;height:calc(100vh - 120px);border:none;display:block}
+.esg-frame-wrap iframe{width:100%;height:auto;min-height:600px;border:none;display:block}
 
 /* ── FOOTER ── */
 footer{border-top:1px solid var(--border);padding:24px 32px;text-align:center}
@@ -182,7 +182,7 @@ footer p{font-size:12px;color:var(--muted2)}
   </div>
   <div style="max-width:100%;padding:24px 32px 0">
     <div class="esg-frame-wrap">
-      <iframe src="pajues_esg_2025.html" title="ESG 성과 리포트 2025"></iframe>
+      <iframe src="pajues_esg_2025.html" title="ESG 성과 리포트 2025" id="esgFrame" scrolling="no" onload="resizeEsgFrame()"></iframe>
     </div>
   </div>
 </div>
@@ -459,6 +459,15 @@ async function openWebtoon(issue) {
 function closeWebtoon() {
   document.getElementById('webtoonViewer').classList.remove('open');
   document.body.style.overflow = '';
+}
+
+function resizeEsgFrame() {
+  const frame = document.getElementById('esgFrame');
+  if (!frame) return;
+  try {
+    const height = frame.contentWindow.document.documentElement.scrollHeight;
+    frame.style.height = height + 'px';
+  } catch(e) {}
 }
 
 document.addEventListener('keydown', e => {
