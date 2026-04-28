@@ -16,7 +16,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:#EDEFED;color:#1A1A1A;min-
 .banner::after{content:'';position:absolute;bottom:-20px;left:20px;width:120px;height:120px;border-radius:50%;background:rgba(0,184,148,0.1)}
 .b-inner{max-width:620px;margin:0 auto;position:relative;z-index:1}
 .b-tag{font-family:'NanumSquare',sans-serif;font-weight:700;font-size:9.5px;color:rgba(255,255,255,0.55);letter-spacing:0.12em;margin-bottom:4px}
-.b-title{font-family:'NanumSquare',sans-serif;font-weight:800;font-size:14px;color:#fff;line-height:1.55;margin-bottom:16px}
+.b-title{font-family:'NanumSquare',sans-serif;font-weight:800;font-size:18px;color:#fff;line-height:1.45;margin-bottom:10px}
 
 /* ─── 배터리 ─── */
 .bat-goal{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:7px}
@@ -268,6 +268,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:#EDEFED;color:#1A1A1A;min-
 const SB_URL='https://qacbzixkdonoghjdhsop.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhY2J6aXhrZG9ub2doamRoc29wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjc3MTEsImV4cCI6MjA5Mjg0MzcxMX0.jczYyDVNLLPbTigTAOYCODKdRMHQKJpHc8hLti8lV5U';
 const MAX_KWH=30000;
+const CAMPAIGN=1; // ← 2차 때 2로 변경
 const sb=async(p,o={})=>fetch(SB_URL+p,{...o,headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`,'Content-Type':'application/json',...(o.headers||{})}});
 
 let nick='',curRound=null,questions=[],curQ=0,score=0,answered=false;
@@ -304,7 +305,7 @@ async function qStartNick(){
   if(!val){showErr('닉네임을 입력해주세요.');return;}
   if(val.length<2){showErr('2자 이상 입력해주세요.');return;}
   nick=val;
-  const r=await sb(`/rest/v1/quiz_results?nickname=eq.${encodeURIComponent(nick)}&select=round,score`);
+  const r=await sb(`/rest/v1/quiz_results?nickname=eq.${encodeURIComponent(nick)}&campaign=eq.${CAMPAIGN}&select=round,score`);
   const data=await r.json();
   myResults={};data.forEach(d=>myResults[d.round]=d.score);
   document.getElementById('q-sec-nick').style.display='none';
@@ -326,7 +327,7 @@ function qResetNick(){
 async function loadRounds(){
   const list=document.getElementById('q-roundList');
   list.innerHTML='<div class="q-loading">불러오는 중...</div>';
-  const r=await sb('/rest/v1/quiz_questions?select=round&order=round.asc');
+  const r=await sb(`/rest/v1/quiz_questions?select=round&campaign=eq.${CAMPAIGN}&order=round.asc`);
   const data=await r.json();
   const rounds=[...new Set(data.map(d=>d.round))];
   if(!rounds.length){list.innerHTML='<div class="q-empty">아직 등록된 문제가 없어요.</div>';return;}
@@ -345,7 +346,7 @@ async function loadRounds(){
 
 async function startRound(round){
   curRound=round;curQ=0;score=0;answered=false;
-  const r=await sb(`/rest/v1/quiz_questions?round=eq.${round}&order=q_order.asc`);
+  const r=await sb(`/rest/v1/quiz_questions?round=eq.${round}&campaign=eq.${CAMPAIGN}&order=q_order.asc`);
   const data=await r.json();
   questions=data.map(d=>({text:d.question,options:d.options,answer:d.answer}));
   document.getElementById('q-sec-rounds').classList.remove('active');
@@ -393,7 +394,7 @@ async function finish(){
   clearInterval(timerIv);elapsed=Math.floor((Date.now()-startTime)/1000);
   try{
     await sb('/rest/v1/quiz_results',{method:'POST',headers:{Prefer:'return=minimal'},
-      body:JSON.stringify({nickname:nick,round:curRound,score,elapsed_seconds:elapsed})});
+      body:JSON.stringify({nickname:nick,round:curRound,score,elapsed_seconds:elapsed,campaign:CAMPAIGN})});
     myResults[curRound]=score;
   }catch(e){console.error(e);}
   document.getElementById('q-sec-quiz').classList.remove('active');
@@ -425,14 +426,14 @@ function qGoRoundList(){
 }
 
 async function fetchBattery(){
-  try{const r=await sb('/rest/v1/quiz_results?select=score');const all=await r.json();updateBattery(all.reduce((s,d)=>s+d.score,0)*10);}catch(e){}
+  try{const r=await sb(`/rest/v1/quiz_results?select=score&campaign=eq.${CAMPAIGN}`);const all=await r.json();updateBattery(all.reduce((s,d)=>s+d.score,0)*10);}catch(e){}
 }
 
 async function qLoadRank(type,btnEl){
   document.querySelectorAll('.rk-tab').forEach(b=>b.classList.remove('active'));
   if(btnEl)btnEl.classList.add('active');
   document.getElementById('q-rkList').innerHTML='<div class="q-loading">불러오는 중...</div>';
-  const r=await sb('/rest/v1/quiz_results?select=nickname,score,elapsed_seconds,round');
+  const r=await sb(`/rest/v1/quiz_results?select=nickname,score,elapsed_seconds,round&campaign=eq.${CAMPAIGN}`);
   const all=await r.json();
   updateBattery(all.reduce((s,d)=>s+d.score,0)*10);
   let data;
