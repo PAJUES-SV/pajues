@@ -95,6 +95,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:#EDEFED;color:#1A1A1A;min-
 .opt{background:#fff;border-radius:13px;box-shadow:0 1px 8px rgba(0,0,0,0.06);padding:13px 16px;cursor:pointer;font-size:13px;color:#1A1A1A;display:flex;align-items:center;gap:11px;transition:all 0.15s;border:1.5px solid transparent}
 .opt:hover{border-color:#2ecc8f;background:#F0FBF7;transform:translateX(2px)}
 .opt.correct{border-color:#1a7a52;background:#E6F7F3;color:#1a7a52;box-shadow:none}
+.opt.selected{border-color:#1a7a52;background:#E6F7F3;color:#1a7a52;box-shadow:none}
+.opt.selected .opt-n{background:#1a7a52;border-color:#1a7a52;color:#fff}
 .opt.wrong{border-color:#E53E3E;background:#FEF2F2;color:#E53E3E;box-shadow:none}
 .opt.dimmed{border-color:#e0e0e0;background:#f8f8f8;color:#AAA;box-shadow:none}
 .opt.dimmed .opt-n{border-color:#ddd;color:#CCC}
@@ -272,7 +274,7 @@ const MAX_KWH=30000;
 const CAMPAIGN=1; // ← 2차 때 2로 변경
 const sb=async(p,o={})=>fetch(SB_URL+p,{...o,headers:{apikey:SB_KEY,Authorization:`Bearer ${SB_KEY}`,'Content-Type':'application/json',...(o.headers||{})}});
 
-let nick='',curRound=null,questions=[],curQ=0,score=0,answered=false;
+let nick='',curRound=null,questions=[],curQ=0,score=0,_ans=false,selectedIdx=-1;
 let startTime=null,elapsed=0,timerIv=null,myResults={};
 
 function updateBattery(kwh){
@@ -346,7 +348,7 @@ async function loadRounds(){
 }
 
 async function startRound(round){
-  curRound=round;curQ=0;score=0;answered=false;
+  curRound=round;curQ=0;score=0;_ans=false;
   const r=await sb(`/rest/v1/quiz_questions?round=eq.${round}&campaign=eq.${CAMPAIGN}&order=q_order.asc`);
   const data=await r.json();
   questions=data.map(d=>({text:d.question,options:d.options,answer:d.answer}));
@@ -361,7 +363,7 @@ async function startRound(round){
 }
 
 function renderQ(){
-  const q=questions[curQ];answered=false;
+  const q=questions[curQ];_ans=false;selectedIdx=-1;
   document.getElementById('q-progBar').style.width=`${((curQ+1)/questions.length)*100}%`;
   document.getElementById('q-qNum').textContent=`문제 ${curQ+1} / ${questions.length}`;
   document.getElementById('q-qText').textContent=`Q${curQ+1}. ${q.text}`;
@@ -376,16 +378,30 @@ function renderQ(){
 }
 
 function selectOpt(idx){
-  if(answered)return;answered=true;
-  const q=questions[curQ];const ok=idx===q.answer;if(ok)score+=10;
-  document.querySelectorAll('#q-opts .opt').forEach((o,i)=>{
-    if(i===idx)o.classList.add('selected');
-  });
+  if(_ans)return;
+  // 이전 선택 초기화
+  document.querySelectorAll('#q-opts .opt').forEach(o=>o.classList.remove('selected'));
+  // 새로 선택
+  document.querySelectorAll('#q-opts .opt')[idx].classList.add('selected');
+  selectedIdx = idx;
+  // 다음 버튼 표시
   const btn=document.getElementById('q-nextBtn');btn.classList.add('show');
   btn.textContent=curQ<questions.length-1?'다음 문제 →':'결과 보기 →';
 }
 
-function qNextQ(){curQ++;if(curQ<questions.length)renderQ();else finish();}
+function qNextQ(){
+  // 다음 버튼 누를 때 정답 확정
+  if(selectedIdx>=0){
+    _ans=true;
+    const q=questions[curQ];
+    const ok=selectedIdx===q.answer;
+    if(ok)score+=10;
+  }
+  selectedIdx=-1;
+  _ans=false;
+  curQ++;
+  if(curQ<questions.length)renderQ();else finish();
+}
 
 async function finish(){
   clearInterval(timerIv);elapsed=Math.floor((Date.now()-startTime)/1000);
