@@ -88,8 +88,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:#EDEFED;color:#1A1A1A;min-
 .q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .q-rbadge{font-family:'NanumSquare',sans-serif;font-weight:800;font-size:10px;background:#E6F7F3;color:#1a7a52;padding:3px 11px;border-radius:20px}
 .q-num{font-family:'NanumSquare',sans-serif;font-weight:800;font-size:11px;color:#2ecc8f}
-.q-timer{font-family:'NanumSquare',sans-serif;font-weight:800;font-size:11px;color:#666}
-.q-timer.urgent{color:#E53E3E}
+
 .q-card{background:#fff;border-radius:18px;box-shadow:0 2px 14px rgba(0,0,0,0.07);padding:22px;margin-bottom:12px}
 .q-text{font-family:'NanumSquare',sans-serif;font-weight:800;font-size:14px;line-height:1.65;color:#1A1A1A}
 .opts{display:flex;flex-direction:column;gap:9px}
@@ -97,6 +96,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:#EDEFED;color:#1A1A1A;min-
 .opt:hover{border-color:#2ecc8f;background:#F0FBF7;transform:translateX(2px)}
 .opt.correct{border-color:#1a7a52;background:#E6F7F3;color:#1a7a52;box-shadow:none}
 .opt.wrong{border-color:#E53E3E;background:#FEF2F2;color:#E53E3E;box-shadow:none}
+.opt.dimmed{border-color:#e0e0e0;background:#f8f8f8;color:#AAA;box-shadow:none}
+.opt.dimmed .opt-n{border-color:#ddd;color:#CCC}
 .opt-n{width:27px;height:27px;border-radius:50%;border:1.5px solid #C8E8DC;display:flex;align-items:center;justify-content:center;font-family:'NanumSquare',sans-serif;font-weight:800;font-size:10px;flex-shrink:0;color:#1a7a52}
 .opt.correct .opt-n{background:#1a7a52;border-color:#1a7a52;color:#fff}
 .opt.wrong .opt-n{background:#E53E3E;border-color:#E53E3E;color:#fff}
@@ -224,7 +225,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:#EDEFED;color:#1A1A1A;min-
       <div class="q-meta">
         <div class="q-rbadge" id="q-rbadge"></div>
         <div class="q-num" id="q-qNum">문제 1 / 3</div>
-        <div class="q-timer" id="q-timer">⏱ 0초</div>
+  
       </div>
       <div class="q-card"><div class="q-text" id="q-qText"></div></div>
       <div class="opts" id="q-opts"></div>
@@ -355,9 +356,6 @@ async function startRound(round){
   startTime=Date.now();elapsed=0;clearInterval(timerIv);
   timerIv=setInterval(()=>{
     elapsed=Math.floor((Date.now()-startTime)/1000);
-    const el=document.getElementById('q-timer');
-    el.textContent=`⏱ ${elapsed}초`;
-    el.className='q-timer'+(elapsed>90?' urgent':'');
   },500);
   renderQ();
 }
@@ -381,8 +379,7 @@ function selectOpt(idx){
   if(answered)return;answered=true;
   const q=questions[curQ];const ok=idx===q.answer;if(ok)score+=10;
   document.querySelectorAll('#q-opts .opt').forEach((o,i)=>{
-    if(i===idx&&ok)o.classList.add('correct');
-    else if(i===idx&&!ok)o.classList.add('wrong');
+    if(i===idx)o.classList.add('selected');
   });
   const btn=document.getElementById('q-nextBtn');btn.classList.add('show');
   btn.textContent=curQ<questions.length-1?'다음 문제 →':'결과 보기 →';
