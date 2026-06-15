@@ -25,6 +25,7 @@ body{font-family:'NeoDunggeunmo','DGM2',monospace;color:var(--txt);background:va
   letter-spacing:0;line-height:1.5;image-rendering:pixelated}
 img,canvas{image-rendering:pixelated}
 #app{max-width:480px;margin:0 auto;height:100vh;height:100dvh;position:relative;overflow:hidden;overscroll-behavior:none;
+  display:flex;flex-direction:column;
   padding-top:env(safe-area-inset-top);padding-bottom:calc(46px + env(safe-area-inset-bottom));
   padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);
   box-sizing:border-box;background:#9aab55}
@@ -102,18 +103,18 @@ p{margin:5px 0}
 .npcLine b{color:var(--blue)}
 .npcLine .f{flex-shrink:0;line-height:0}
 /* 취임 화면: 대사 줄들 컴팩트 + 버튼 항상 보이게 */
-#scr-story.on{display:flex;flex-direction:column;height:auto;max-height:calc(100dvh - 96px);padding:8px 12px 12px;overflow:hidden}
-#scr-story .pnl{padding:8px 10px;margin:0;flex:0 1 auto;min-height:0;overflow:hidden}
-#scr-story .npcLine{margin-top:4px;padding:4px 8px;font-size:11px;align-items:center}
-#scr-story .npcLine .f img{width:20px !important;height:20px !important}
-#scr-story #storyFace{margin:2px 0 !important}
-#scr-story #storyFace img{width:40px !important;height:40px !important}
-#scr-story #storyTitle{font-size:15px !important;margin:4px 0 !important}
-#scr-story #storyText{font-size:11px !important;margin:3px 0 !important;line-height:1.35}
-#scr-story #storyBtnWrap{margin-top:10px;flex-shrink:0}
+#scr-story.on{display:flex;flex-direction:column;flex:1;min-height:0;padding:12px 14px 16px;overflow:hidden}
+#scr-story .pnl{padding:14px;margin:0;flex:1 1 auto;min-height:0;overflow-y:auto}
+#scr-story .npcLine{margin-top:6px;padding:8px 10px;font-size:13px;align-items:center}
+#scr-story .npcLine .f img{width:32px !important;height:32px !important}
+#scr-story #storyFace{margin:6px 0 !important}
+#scr-story #storyFace img{width:72px !important;height:72px !important}
+#scr-story #storyTitle{font-size:20px !important;margin:8px 0 !important}
+#scr-story #storyText{font-size:13px !important;margin:6px 0 !important;line-height:1.5}
+#scr-story #storyBtnWrap{margin-top:14px;flex-shrink:0}
 /* 연차 브리핑 화면도 한 화면에 + START 항상 보이게 */
-#scr-main.on{display:flex;flex-direction:column;height:auto;max-height:calc(100dvh - 96px);padding:8px 12px 12px;overflow:hidden}
-#scr-main #scene{flex-shrink:0;max-height:120px;width:100%;object-fit:contain}
+#scr-main.on{display:flex;flex-direction:column;flex:1;min-height:0;padding:8px 12px 12px;overflow:hidden}
+#scr-main #scene{flex:1 1 auto;max-height:260px;width:100%;object-fit:contain}
 #scr-main .brief{flex:0 1 auto;min-height:0;overflow-y:auto;margin-top:8px}
 #scr-main .brief p{font-size:12px}
 #scr-main .brief h2{font-size:16px;margin:5px 0 3px}
@@ -665,7 +666,7 @@ function confirmChar(){
   $('#storyFace').innerHTML=sprIMG(S.charKey,3);
   $('#storyTitle').textContent=`${S.nick} 대표, JH에너지 취임!`;
   $('#storyText').textContent='JH에너지 신임 대표이사로 취임했습니다! 주주사 싸와디코의 기대와 주민들의 시선 속, 10년 임기 동안 피카시티를 밝혀 "에너지 황제"가 되어보세요!';
-  hud(true);setHUD();show('#scr-story');}
+  hud(false);show('#scr-story');}  // 취임 화면은 HUD 없이 풀스크린
 
 /* ===================== 연차 데이터 ===================== */
 const YEARS={
@@ -717,7 +718,7 @@ function toMain(){
     popup(pixelEmoji('🎮',4),'게임 방법 — '+y.t,
       `🎯 <b>목표</b><br>${tu.g}<br><br>👆 <b>조작</b><br>${tu.c}<br><br>💡 <b>꿀팁</b><br>${tu.t}`,
       [{t:'▶ 시작!',c:'gold',fn:()=>y.run()}]);};
-  show('#scr-main');startScene();}
+  hud(true);setHUD();show('#scr-main');startScene();}
 function finishGame(res){
   if(window.__finishing)return;window.__finishing=true;
   setTimeout(()=>{window.__finishing=false;},1200);
