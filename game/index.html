@@ -123,6 +123,9 @@ p{margin:5px 0}
 
 /* 게임 공통 */
 #game{min-height:300px}
+#acTopBar{display:flex;align-items:center;height:34px;margin-bottom:8px;flex-shrink:0}
+#acBackBtn{padding:6px 12px;font-size:12px;background:#23262e;color:#fff;border:2px solid #f4d35e;border-radius:6px;box-shadow:2px 2px 0 rgba(0,0,0,.4);cursor:pointer}
+#acBackBtn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 rgba(0,0,0,.4)}
 .gtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:14px;
   text-shadow:1px 1px 0 var(--dark);color:#fff}
 .timer{padding:3px 10px;background:var(--dark);border:2px solid var(--bd)}
@@ -481,7 +484,7 @@ p{margin:5px 0}
     </div>
   </section>
 
-  <section id="scr-game" class="screen"><div id="game"></div></section>
+  <section id="scr-game" class="screen"><div id="acTopBar" style="display:none"><button id="acBackBtn" onclick="exitArcadeGame()">◀ 목록</button></div><div id="game"></div></section>
 
   <section id="scr-result" class="screen">
     <div class="resultFace" id="resFace"></div>
@@ -619,8 +622,26 @@ const ARCADE=[
   {y:9,n:'행복 반찬나눔',spr:'banchan',fn:'g9'},
 ];
 let arcadeMode=false;
+/* === 미니게임 모드: 안전 종료를 위한 타이머/RAF 추적 === */
+const __oST=window.setTimeout,__oSI=window.setInterval,__oRAF=window.requestAnimationFrame;
+let __arcT=[],__arcI=[],__arcR=[],__arcTrk=false;
+window.setTimeout=function(f,d){const id=__oST(f,d);if(__arcTrk)__arcT.push(id);return id;};
+window.setInterval=function(f,d){const id=__oSI(f,d);if(__arcTrk)__arcI.push(id);return id;};
+window.requestAnimationFrame=function(f){const id=__oRAF(f);if(__arcTrk)__arcR.push(id);return id;};
+function arcadeTrkStart(){__arcTrk=true;__arcT=[];__arcI=[];__arcR=[];}
+function arcadeTrkStop(){__arcTrk=false;
+  __arcT.forEach(id=>{try{clearTimeout(id);}catch(e){}});
+  __arcI.forEach(id=>{try{clearInterval(id);}catch(e){}});
+  __arcR.forEach(id=>{try{cancelAnimationFrame(id);}catch(e){}});
+  __arcT=[];__arcI=[];__arcR=[];}
+function exitArcadeGame(){
+  arcadeTrkStop();
+  const g=$('#game');if(g)g.innerHTML='';
+  $('#acTopBar').style.display='none';
+  arcadeMode=false;openArcade();}
 function openArcade(){
   arcadeMode=false; // 선택 화면에서는 아직 게임 시작 전
+  $('#acTopBar').style.display='none';
   // 기본 캐릭터 자동 세팅(아케이드는 캐릭터 선택 스킵)
   if(!S.charKey){S.charKey='cat';S.nick='플레이어';}
   const grid=$('#arcadeGrid');
@@ -642,15 +663,22 @@ function startArcadeGame(fn){
   if(!S.charKey){S.charKey='cat';S.nick='플레이어';}
   S.year=ARCADE.find(a=>a.fn===fn).y;
   window.__lastArcadeFn=fn;
-  hud(true);setHUD();
+  hud(false);  // 미니게임 모드: HUD 숨김
+  $('#acTopBar').style.display='flex';
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
   document.querySelector('#scr-game').classList.add('on');
+  arcadeTrkStart();
   window[fn]&&window[fn]();
 }
 function toModeSelect(){hud(false);show('#scr-mode');}
 function backToTitle(){hud(false);show('#scr-title');}
 window.toModeSelect=toModeSelect;
-function goChar(){
+const DEFAULT_STATE={year:1,cash:100,esg:50,morale:50,trust:50,charKey:null,nick:'사장님',
+  spa:null,hobbang:false,carbonShort:0,fails:0,landmark:false,minwonDown:false,history:[]};
+function loadSaveData(){try{const sv=localStorage.getItem('pikaSave');if(!sv)return null;
+  const d=JSON.parse(sv);if(d&&d.charKey&&d.year>1&&d.year<=9)return d;}catch(e){}return null;}
+function resetState(){Object.assign(S,JSON.parse(JSON.stringify(DEFAULT_STATE)));}
+function openCharSelect(){
   const g=$('#charGrid');g.innerHTML='';
   Object.entries(CHARS).forEach(([k,c])=>{
     const d=document.createElement('div');d.className='charCard';
@@ -658,6 +686,15 @@ function goChar(){
     d.onclick=()=>{S.charKey=k;document.querySelectorAll('.charCard').forEach(e=>e.classList.remove('sel'));d.classList.add('sel');};
     g.appendChild(d);});
   hud(false);show('#scr-char');}
+function goChar(){
+  const d=loadSaveData();
+  if(d){
+    popup(sprIMG(d.charKey,3),'이어서 하시겠어요?',
+      `<b class="gold">${d.nick||'사장님'}</b> 대표님의 저장된 기록이 있어요.<br>『<b class="gold">${d.year}년차</b>』부터 이어서 할 수 있어요.<br><span class="dim" style="font-size:11px">※ 새로 시작하면 기존 기록은 사라져요.</span>`,
+      [{t:'▶ 이어하기',c:'green',fn:()=>{Object.assign(S,d);hud(true);setHUD();toMain();}},
+       {t:'새로 시작',c:'gold',fn:()=>{try{localStorage.removeItem('pikaSave');}catch(e){}resetState();openCharSelect();}}]);
+    return;}
+  resetState();openCharSelect();}
 function confirmChar(){
   if(!S.charKey){popup(pixelEmoji('⚠️',3),'잠깐!','동물 사장님을 먼저 골라주세요!');return;}
   const nick=$('#nickInput').value.trim();
@@ -712,7 +749,7 @@ function toMain(){
     <h2>${S.year}년차 — ${y.t}</h2><p>${y.d}</p>
     <div class="npcLine"><span class="f">${avatarOf(y.npc[0])}</span><span><b>${y.npc[1]}:</b> ${y.npc[2]}</span></div>`+
     (y.extra||[]).map(e=>`<div class="npcLine"><span class="f">${avatarOf(e[0])}</span><span><b>${e[1]}:</b> ${e[2]}</span></div>`).join('');
-  $('#playBtn').onclick=()=>{cancelAnimationFrame(sceneRAF);show('#scr-game');$('#game').innerHTML='';
+  $('#playBtn').onclick=()=>{cancelAnimationFrame(sceneRAF);$('#acTopBar').style.display='none';show('#scr-game');$('#game').innerHTML='';
     const tu=TUTS[S.year];
     popup(pixelEmoji('🎮',4),'게임 방법 — '+y.t,
       `🎯 <b>목표</b><br>${tu.g}<br><br>👆 <b>조작</b><br>${tu.c}<br><br>💡 <b>꿀팁</b><br>${tu.t}`,
@@ -744,13 +781,19 @@ function finishGame(res){
     dl.appendChild(pr);}
   const wrap=$('#resBtnWrap');
   if(arcadeMode){
+    arcadeTrkStop();  // 자기 종료 시점에도 잔여 타이머 정리
+    $('#acTopBar').style.display='none';
     // 미니게임 모드: 다시하기 + 목록으로 (매번 새로 그려 버튼 유실 방지)
     const lastFn=window.__lastArcadeFn;
     wrap.innerHTML=`<button class="btn primary" id="acRetry"><span class="btxt">다시하기</span></button>
       <button class="btn ghost" id="acList" style="margin-left:8px">목록으로</button>`;
     $('#acRetry').onclick=()=>{arcadeMode=true;S.cash=100;S.esg=50;S.morale=50;S.trust=50;
-      hud(true);setHUD();document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
-      document.querySelector('#scr-game').classList.add('on');window[lastFn]&&window[lastFn]();};
+      hud(false);  // 미니게임 모드: HUD 숨김
+      $('#acTopBar').style.display='flex';
+      document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+      document.querySelector('#scr-game').classList.add('on');
+      arcadeTrkStart();
+      window[lastFn]&&window[lastFn]();};
     $('#acList').onclick=()=>{arcadeMode=false;openArcade();};
   }else{
     // 캠페인: NEXT 버튼을 매번 새로 생성(아케이드 이후에도 유실되지 않게)
@@ -1922,15 +1965,7 @@ hud(false);
   x.fillStyle='rgba(255,255,255,.85)';
   x.fillRect(100,22,4,3);x.fillRect(118,20,5,4);x.fillRect(104,16,3,3);
 })();
-try{const sv=localStorage.getItem('pikaSave');
-  if(sv){const d=JSON.parse(sv);
-    if(d&&d.year>1&&d.year<=9&&d.charKey){
-      const host=document.querySelector('#scr-title .center');
-      const br=document.createElement('div');br.style.height='8px';host.appendChild(br);
-      const btn=document.createElement('button');btn.className='btn green';
-      btn.textContent='▶ 이어하기 ('+d.year+'년차부터)';
-      btn.onclick=()=>{Object.assign(S,d);setHUD();toMain();};
-      host.appendChild(btn);}}}catch(e){}
+/* 이어하기는 커리어 모드 진입 시 goChar()에서 팝업으로 안내 */
 
 $('#lineup').innerHTML=['cat','bear','fox','dog'].map(k=>`<span class="lu" style="line-height:0">${sprIMG(k,2)}</span>`).join('');
 document.querySelectorAll('.npcLine[data-npc]').forEach(el=>{
