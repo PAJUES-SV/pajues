@@ -1124,11 +1124,11 @@ function g5(){
   // 발판: 대부분 좌우로 움직임. 캐릭터는 발판에 실려 같이 이동.
   let platforms=[{x:W/2-70,y:H-44,w:140,t:'n',vx:0}];
   let pxx=W/2-18,py=H-44-44,vy=0,onP=platforms[0],topY=H-44;
-  G.innerHTML=`<div class="gtop"><span>최고 SMP <b class="gold" id="g5s">60</b>원</span><span>기회 <b class="gold" id="g5lv2">3</b></span></div>
-  <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;color:#fff;text-shadow:1px 1px 0 var(--dark)">
-    <span id="g5lv" title="기회">❤️❤️❤️</span><span>예상손익 <b id="g5pp" class="gold">-</b></span><span>연료비 <b class="redT">${fuel}원</b></span></div>
+  G.innerHTML=`<div class="gtop" style="max-width:360px;margin-left:auto;margin-right:auto"><span>최고 SMP <b class="gold" id="g5s">60</b>원</span><span id="g5lv" title="기회">❤️❤️❤️</span></div>
+  <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:6px;color:#fff;text-shadow:1px 1px 0 var(--dark);max-width:360px;margin-left:auto;margin-right:auto">
+    <span>예상손익 <b id="g5pp" class="gold">-</b></span><span>연료비 <b class="redT">${fuel}원</b></span></div>
   <canvas id="g5cv" width="${W}" height="${H}" style="touch-action:none;width:100%;max-width:360px;display:block;margin:0 auto"></canvas>
-  <div class="pnl2 gmsg" id="g5msg"></div>`;
+  <div class="pnl2 gmsg" id="g5msg" style="max-width:360px;margin-left:auto;margin-right:auto"></div>`;
   function msg(t){$('#g5msg').innerHTML=t;}
   msg(`👆 <b class="gold">탭하면 점프!</b> 공중에서 한 번 더 탭하면 2단 점프! 빠르게 움직이는 발판에 올라타며 위로 오르세요!`);
   const cv=$('#g5cv'),x=cv.getContext('2d');x.imageSmoothingEnabled=false;
@@ -1191,7 +1191,7 @@ function g5(){
     if(!milH&&sp2>fuel+60){milH=true;msg('🚀 고고도 진입! <span style="color:#9fd89a">흑우현:</span> "이 기세 그대로!!"');}
     const dead=(py+44>=surge)||(py>H+8);
     if(dead&&inv<=0){
-      lives--;const hh='❤️'.repeat(Math.max(0,lives))+'🖤'.repeat(3-Math.max(0,lives));$('#g5lv').textContent=hh;{const e=$('#g5lv2');if(e)e.textContent=Math.max(0,lives);}
+      lives--;const hh='❤️'.repeat(Math.max(0,lives))+'🖤'.repeat(3-Math.max(0,lives));$('#g5lv').textContent=hh;
       if(lives<=0){settle(py>H+8?'😱 추락! 최고 고도로 정산한다.':'⚡ 트립! 최고 고도로 정산한다.');return;}
       surge=Math.min(H-20,surge+130);inv=80;vy=0;
       const cand=platforms.filter(p=>p.y>py&&p.y<H-20).sort((a,b)=>a.y-b.y)[0]||platforms.sort((a,b)=>a.y-b.y)[0];
