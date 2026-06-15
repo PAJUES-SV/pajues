@@ -1,0 +1,30 @@
+{
+  "name": "파워타이쿤: 피카시티",
+  "short_name": "파워타이쿤",
+  "description": "JH에너지 신임 대표이사가 되어 10년간 피카시티를 밝혀라!",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1d2438",
+  "theme_color": "#1d2438",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
