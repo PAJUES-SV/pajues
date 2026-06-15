@@ -360,15 +360,15 @@ p{margin:5px 0}
 .btn .bsub{font-size:10px;opacity:.85;font-weight:600;letter-spacing:0}
 .btn.wide{width:100%;max-width:280px}
 .btn::after{content:none !important}
-#arcadeGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:2px}
+#arcadeGrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:2px}
 .arcadeCard{background:linear-gradient(#2a3450,#222a42);border:2px solid #3a4565;border-radius:10px;
-  padding:10px 6px;text-align:center;cursor:pointer;transition:transform .06s,border-color .06s}
+  padding:8px 4px;text-align:center;cursor:pointer;transition:transform .06s,border-color .06s}
 .arcadeCard:active{transform:scale(.96)}
 .arcadeCard:hover{border-color:var(--gold)}
-.acIc{line-height:0;margin-bottom:5px;height:52px;display:flex;align-items:center;justify-content:center}
-.acIc img{width:48px !important;height:48px !important;object-fit:contain;image-rendering:pixelated}
-.acName{font-size:13px;color:#fff;font-weight:700;margin-bottom:2px}
-.acYear{font-size:10px;color:#9aa6c4}
+.acIc{line-height:0;margin-bottom:3px;height:38px;display:flex;align-items:center;justify-content:center}
+.acIc img{width:34px !important;height:34px !important;object-fit:contain;image-rendering:pixelated}
+.acName{font-size:11px;color:#fff;font-weight:700;margin-bottom:1px;word-break:keep-all}
+.acYear{font-size:9px;color:#9aa6c4}
 #popText,.tutBody,.gmsg,.dialogBox,#g3talk{word-break:keep-all;overflow-wrap:break-word}
 #popText b,.gmsg b{white-space:nowrap}
 .btn.primary .btxt{font-size:18px;font-weight:700;letter-spacing:1px}
@@ -440,11 +440,11 @@ p{margin:5px 0}
       <button class="btn ghost wide" style="margin-top:6px" onclick="backToTitle()">◀ 뒤로</button>
     </div>
   </section>
-  <section id="scr-arcade" class="screen">
-    <h2 class="center" style="font-size:19px;color:#fff;text-shadow:2px 2px 0 var(--dark);margin:6px 0">🎮 미니게임 모드</h2>
-    <p class="center dim" style="font-size:12px;margin-bottom:8px">원하는 게임을 골라 자유롭게 플레이! (랭킹 미집계)</p>
+  <section id="scr-arcade" class="screen" style="padding-bottom:14px">
+    <h2 class="center" style="font-size:17px;color:#fff;text-shadow:2px 2px 0 var(--dark);margin:2px 0 4px">🎮 미니게임 모드</h2>
+    <p class="center dim" style="font-size:11px;margin-bottom:6px">원하는 게임을 골라 자유롭게 플레이! (랭킹 미집계)</p>
     <div id="arcadeGrid"></div>
-    <div class="center" style="margin-top:12px"><button class="btn gold" onclick="backToTitle()">◀ 타이틀로</button></div>
+    <div class="center" style="margin-top:8px"><button class="btn gold" onclick="backToTitle()">◀ 타이틀로</button></div>
   </section>
   <section id="scr-char" class="screen">
     <h2 class="center" style="font-size:20px;color:#fff;text-shadow:2px 2px 0 var(--dark)">대표이사 취임 준비</h2>
