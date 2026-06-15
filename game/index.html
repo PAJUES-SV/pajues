@@ -760,7 +760,7 @@ function toMain(){
   hud(true);setHUD();show('#scr-main');startScene();}
 function finishGame(res){
   if(window.__finishing)return;window.__finishing=true;
-  setTimeout(()=>{window.__finishing=false;},1200);
+  __oST(()=>{window.__finishing=false;},1200); // 원본 ST 사용 → arcadeTrkStop에 안 죽음
   try{
   S.history.push({y:S.year,cash:S.cash,esg:S.esg,morale:S.morale,trust:S.trust});
   if(!res.ok)S.fails++;
@@ -790,7 +790,7 @@ function finishGame(res){
     const lastFn=window.__lastArcadeFn;
     wrap.innerHTML=`<button class="btn primary" id="acRetry"><span class="btxt">다시하기</span></button>
       <button class="btn ghost" id="acList" style="margin-left:8px">목록으로</button>`;
-    $('#acRetry').onclick=()=>{arcadeMode=true;S.cash=100;S.esg=50;S.morale=50;S.trust=50;
+    $('#acRetry').onclick=()=>{window.__finishing=false;arcadeMode=true;S.cash=100;S.esg=50;S.morale=50;S.trust=50;
       hud(false);  // 미니게임 모드: HUD 숨김
       $('#acTopBar').style.display='flex';
       document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
