@@ -688,13 +688,16 @@ function openCharSelect(){
   hud(false);show('#scr-char');}
 function goChar(){
   const d=loadSaveData();
-  if(d){
-    popup(sprIMG(d.charKey,3),'이어서 하시겠어요?',
-      `<b class="gold">${d.nick||'사장님'}</b> 대표님의 저장된 기록이 있어요.<br>『<b class="gold">${d.year}년차</b>』부터 이어서 할 수 있어요.<br><span class="dim" style="font-size:11px">※ 새로 시작하면 기존 기록은 사라져요.</span>`,
-      [{t:'▶ 이어하기',c:'green',fn:()=>{Object.assign(S,d);hud(true);setHUD();toMain();}},
-       {t:'새로 시작',c:'gold',fn:()=>{try{localStorage.removeItem('pikaSave');}catch(e){}resetState();openCharSelect();}}]);
-    return;}
-  resetState();openCharSelect();}
+  const btns=d
+    ? [{t:'▶ 이어하기',c:'green',fn:()=>{Object.assign(S,d);hud(true);setHUD();toMain();}},
+       {t:'새로 시작',c:'gold',fn:()=>{try{localStorage.removeItem('pikaSave');}catch(e){}resetState();openCharSelect();}}]
+    : [{t:'새로 시작',c:'gold',fn:()=>{resetState();openCharSelect();}}];
+  const desc=d
+    ? `<b class="gold">${d.nick||'사장님'}</b> 대표님의 저장 기록이 있어요.<br>『<b class="gold">${d.year}년차</b>』부터 이어서 할 수 있어요.<br><span class="dim" style="font-size:11px">※ 새로 시작하면 기존 기록은 사라져요.</span>`
+    : `저장된 기록이 없어요.<br>새로 시작해서 JH에너지 대표이사로 취임하세요!`;
+  const face=d?sprIMG(d.charKey,3):pixelEmoji('⚡',3);
+  popup(face,'커리어 모드',desc,btns);
+}
 function confirmChar(){
   if(!S.charKey){popup(pixelEmoji('⚠️',3),'잠깐!','동물 사장님을 먼저 골라주세요!');return;}
   const nick=$('#nickInput').value.trim();
