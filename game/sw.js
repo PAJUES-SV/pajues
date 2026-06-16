@@ -1,5 +1,5 @@
 // 파워타이쿤: 피카시티 - Service Worker
-const CACHE_NAME = 'pikacity-v13';
+const CACHE_NAME = 'pikacity-v14';
 const ASSETS = [
   './index.html',
   './manifest.webmanifest',

@@ -537,6 +537,55 @@ function pixelEmoji(e,scale=3){
 const NPCSPR={'🐐':'goat','🐊':'croc','😤':'wolf','🌺':'eleph','🐯':'tiger','🐰':'rabbit','👨‍🦱':'tiger','👩‍💼':'rabbit','🐂':'blackbull','🦒':'giraffe','🦆':'duck','🦓':'zebra',"croctable2": "croctable2"};
 function avatarOf(e){const n=NPCSPR[e];return n?sprIMG(n,1.5):pixelEmoji(e,3);}
 
+/* ===================== 이모지 → 픽셀아트 전역 통일 ===================== */
+// em 기준 크기(주변 글자 크기에 맞춰 자동 확대/축소)
+const EMO_STY='height:1.05em;width:auto;vertical-align:-0.15em;image-rendering:pixelated;display:inline-block';
+function emoSpr(name){return '<img src="'+spr(name).toDataURL()+'" alt="" draggable="false" style="'+EMO_STY+'">';}
+function pxI(vw,vh,parts){let g='';for(const p of parts){g+='<g fill="'+p[0]+'">';for(const r of p[1])g+='<rect x="'+r[0]+'" y="'+r[1]+'" width="'+r[2]+'" height="'+r[3]+'"/>';g+='</g>';}
+  return '<svg viewBox="0 0 '+vw+' '+vh+'" shape-rendering="crispEdges" style="height:1.05em;width:auto;vertical-align:-0.15em;display:inline-block">'+g+'</svg>';}
+function heartIco(c){return pxI(11,8,[[c,[[1,0,3,1],[7,0,3,1],[0,1,11,1],[0,2,11,1],[1,3,9,1],[2,4,7,1],[3,5,5,1],[4,6,3,1],[5,7,1,1]]]]);}
+const ICO={
+  trophy:pxI(11,10,[['#f4c850',[[2,0,7,1],[1,1,9,1],[1,2,9,1],[2,3,7,1],[0,2,1,2],[10,2,1,2],[3,4,5,1],[4,5,3,1],[4,6,3,1]]],['#8a6a3a',[[3,7,5,1],[2,8,7,2]]]]),
+  bulb:pxI(9,11,[['#f4d35e',[[3,0,3,1],[2,1,5,1],[1,2,7,1],[1,3,7,1],[1,4,7,1],[2,5,5,1],[3,6,3,1]]],['#888780',[[3,7,3,1],[3,8,3,1],[3,9,3,2]]]]),
+  fire:pxI(9,10,[['#e8923f',[[4,0,1,1],[3,1,3,1],[3,2,4,1],[2,3,5,1],[2,4,6,1],[1,5,7,1],[1,6,7,1],[2,7,5,1],[3,8,3,1]]],['#f4d35e',[[4,4,2,1],[3,5,3,1],[3,6,3,1],[4,7,1,1]]]]),
+  spark:pxI(9,9,[['#f4d35e',[[4,0,1,9],[0,4,9,1],[2,2,1,1],[6,2,1,1],[2,6,1,1],[6,6,1,1]]]]),
+  burst:pxI(9,9,[['#ffce3a',[[4,0,1,9],[0,4,9,1],[1,1,1,1],[7,1,1,1],[1,7,1,1],[7,7,1,1],[2,2,1,1],[6,2,1,1],[2,6,1,1],[6,6,1,1]]]]),
+  check:pxI(11,9,[['#3f7d4e',[[2,4,2,2],[3,5,2,2],[4,6,2,2],[5,5,2,2],[6,4,2,2],[7,3,2,2],[8,2,2,2]]]]),
+  xmark:pxI(9,9,[['#c84a3a',[[0,0,2,2],[2,2,2,2],[3,3,2,2],[5,5,2,2],[7,7,2,2],[7,0,2,2],[5,2,2,2],[2,5,2,2],[0,7,2,2]]]]),
+  target:pxI(11,11,[['#c84a3a',[[1,1,9,9]]],['#ffffff',[[3,3,5,5]]],['#c84a3a',[[4,4,3,3]]]]),
+  heartR:heartIco('#e0524a'), heartK:heartIco('#3a3a44')
+};
+// 게임 스프라이트로 바꿀 이모지
+const EMO_SPR={'⚡':'bolt','🗑':'trash','🐘':'thaiele','🌺':'thaiele','🐐':'goat','🐊':'croc','😤':'wolf',
+  '🐯':'tiger','🐰':'rabbit','🐂':'blackbull','🦒':'giraffe','🦆':'duck','🦓':'zebra','🐄':'cow',
+  '💰':'icCash','🌿':'icEsg','😊':'icMor','🏛':'icTru'};
+// 손수 그린 픽셀 아이콘으로 바꿀 이모지
+const EMO_SVG={'❤':ICO.heartR,'🖤':ICO.heartK,'🏆':ICO.trophy,'💡':ICO.bulb,'🔥':ICO.fire,
+  '✨':ICO.spark,'🎉':ICO.spark,'🎊':ICO.spark,'💥':ICO.burst,'✅':ICO.check,'❌':ICO.xmark,'🎯':ICO.target};
+// 변환 대상 이모지 목록(화살표·기호 ▶◀↑↓←→★ 등은 텍스트 그대로 둠)
+const EMO_LIST=['⚡','🗑','🐘','🌺','🐐','🐊','😤','🐯','🐰','🐂','🦒','🦆','🦓','🐄','💰','🌿','😊','🏛','🎯','👆','💡','💥','📈','💨','📢','🔥','✅','✨','🚀','🖤','😱','🍺','🥲','💦','🍻','🔧','🔍','📡','🔴','📋','🔩','⛽','❌','👣','☁','🎉','🎊','🌫','🍱','👋','🧊','🌐','📱','📰','🏆','❤','⚠','✍','☀','📅','🎮','👔'];
+const EMORE=new RegExp(EMO_LIST.join('|'),'gu');
+const EMOTEST=new RegExp(EMO_LIST.join('|'),'u');
+function emoPixGlyph(m){const c=document.createElement('canvas');c.width=16;c.height=16;
+  const x=c.getContext('2d');x.font='13px serif';x.textBaseline='middle';x.textAlign='center';x.fillText(m,8,9);
+  return '<img src="'+c.toDataURL()+'" alt="" draggable="false" style="height:1.1em;width:1.1em;vertical-align:-0.15em;image-rendering:pixelated;display:inline-block">';}
+function emoPix(m){return EMO_SPR[m]?emoSpr(EMO_SPR[m]):EMO_SVG[m]?EMO_SVG[m]:emoPixGlyph(m);}
+function pixify(html){if(typeof html!=='string')return html;
+  return html.replace(/(<[^>]*>)|([^<]+)/g,(f,tag,txt)=>tag?tag:txt.replace(EMORE,emoPix));}
+// innerHTML이 그려질 때 자동 픽셀화(코드 내 innerHTML 읽기 없음 → 안전)
+(function(){const d=Object.getOwnPropertyDescriptor(Element.prototype,'innerHTML');
+  Object.defineProperty(Element.prototype,'innerHTML',{configurable:true,
+    get(){return d.get.call(this);},
+    set(v){d.set.call(this,(typeof v==='string')?pixify(v):v);}});})();
+// 이미 정적으로 그려진 텍스트도 1회 픽셀화
+function pixifyDOM(root){const skip={SCRIPT:1,STYLE:1,TITLE:1,CANVAS:1};
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode(n){const p=n.parentNode;
+    if(!p||skip[p.nodeName])return NodeFilter.FILTER_REJECT;
+    return EMOTEST.test(n.nodeValue)?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT;}});
+  const arr=[];while(w.nextNode())arr.push(w.currentNode);
+  arr.forEach(n=>{const s=document.createElement('span');s.innerHTML=pixify(n.nodeValue);n.parentNode.replaceChild(s,n);});}
+try{pixifyDOM(document.body);}catch(e){}
+
 /* ===================== 상태 ===================== */
 const S={year:1,cash:100,esg:50,morale:50,trust:50,charKey:null,nick:'사장님',
   spa:null,hobbang:false,carbonShort:0,fails:0,landmark:false,minwonDown:false,history:[]};
@@ -552,7 +601,7 @@ function setHUD(){$('#hYear').textContent=Math.min(S.year,10);$('#hCash').textCo
   const w=(v,m)=>Math.max(3,Math.min(100,v/m*100))+'%';
   $('#bCash').style.width=w(S.cash,300);$('#bEsg').style.width=w(S.esg,100);
   $('#bMor').style.width=w(S.morale,100);$('#bTru').style.width=w(S.trust,100);
-  if(S.nick)$('#hNick').textContent='👔 '+S.nick;}
+  if(S.nick)$('#hNick').innerHTML='👔 '+S.nick;}
 function clamp(v){return Math.max(0,Math.min(100,Math.round(v)));}
 const PERK={fox:'cash',dog:'esg',cat:'morale',bear:'trust'};
 function perkBonus(stat,base){
@@ -1074,9 +1123,10 @@ function g4(){
   <div class="prog"><i id="g4p"></i><b>GOAL</b></div>
   <canvas id="g4cv" width="360" height="276"></canvas>
   <div class="pnl2 gmsg" id="g4msg"></div>
-  <div class="gdock"><button id="g4jump" class="gjump" aria-label="점프">⬆</button><span class="gdhint">버튼 또는 화면 어디든 탭 = 점프</span></div>`;
+  <div class="gdock"><button id="g4jump" class="gjump" aria-label="점프"><svg viewBox="0 0 14 12" width="46" height="40" shape-rendering="crispEdges" style="display:block"><g fill="#0d1120" transform="translate(0.9,1)"><rect x="5" y="0" width="3" height="1"/><rect x="4" y="1" width="5" height="1"/><rect x="3" y="2" width="7" height="1"/><rect x="2" y="3" width="9" height="1"/><rect x="1" y="4" width="11" height="1"/><rect x="0" y="5" width="13" height="1"/><rect x="4" y="6" width="5" height="5"/></g><g fill="#ffffff"><rect x="5" y="0" width="3" height="1"/><rect x="4" y="1" width="5" height="1"/><rect x="3" y="2" width="7" height="1"/><rect x="2" y="3" width="9" height="1"/><rect x="1" y="4" width="11" height="1"/><rect x="0" y="5" width="13" height="1"/><rect x="4" y="6" width="5" height="5"/></g></svg></button><span class="gdhint">버튼 또는 화면 어디든 탭 = 점프</span></div>`;
   function msg(t){$('#g4msg').innerHTML=t;}
-  msg('발전소 부지를 가로질러 정문까지! 🗑 쓰레기와 폐드럼을 뛰어넘어라! (아래 버튼 또는 화면 탭 = 점프)');
+  const ic=(n,s=1.4)=>`<span style="display:inline-block;vertical-align:middle;line-height:0">${sprIMG(n,s)}</span>`;  // 인라인 픽셀 아이콘
+  msg(`발전소 부지를 가로질러 정문까지! ${ic('trash')} 쓰레기와 폐드럼을 뛰어넘어라! (아래 버튼 또는 화면 탭 = 점프)`);
   const cv=$('#g4cv'),x=cv.getContext('2d');x.imageSmoothingEnabled=false;
   // === 화면/물리 상수 (시뮬레이션으로 클리어 가능 검증) ===
   const W=360,H=276,GY=206,DUR=1500;
@@ -1147,10 +1197,12 @@ function g4(){
       const lay=Math.min(1,age/5),ang=-1.15*lay;                                     // 발 기준 뒤로 꽈당
       x.save();x.translate(CX+CW/2,GY);x.rotate(ang);x.drawImage(ps,-CW/2,-CH,CW,CH);x.restore();
       drawBurst(CX+CW-2,GY-CH*0.42,age);                                              // 충돌 별폭발
-      const hx=CX+CW/2-4,hy=GY-CH+6;                                                  // 머리 위 기절 별
-      x.textAlign='center';x.textBaseline='middle';x.font='15px sans-serif';
-      for(let i=0;i<3;i++){const a=age*0.2+i*2.1;x.fillStyle=i%2?'#f4d35e':'#ffffff';
-        x.fillText('★',hx+Math.cos(a)*16,hy+Math.sin(a)*7);}
+      const hx=CX+CW/2-4,hy=GY-CH+6;                                                  // 머리 위 기절 별(픽셀 트윙클)
+      for(let i=0;i<3;i++){const a=age*0.2+i*2.1,sxp=(hx+Math.cos(a)*16)|0,syp=(hy+Math.sin(a)*7)|0;
+        x.fillStyle=i%2?'#f4d35e':'#ffffff';const u=2;
+        x.fillRect(sxp-u,syp-u*3,u,u*6);x.fillRect(sxp-u*3,syp-u,u*6,u);   // 십자
+        x.fillRect(sxp-u*2,syp-u*2,u,u);x.fillRect(sxp+u,syp-u*2,u,u);     // 대각 반짝
+        x.fillRect(sxp-u*2,syp+u,u,u);x.fillRect(sxp+u,syp+u,u,u);}
       if(age<22){x.textBaseline='alphabetic';x.font='bold 26px sans-serif';          // "꽈당!" 만화 텍스트
         x.lineWidth=5;x.lineJoin='round';x.strokeStyle='#0d1120';x.strokeText('꽈당!',CX+CW+40,GY-CH);
         x.fillStyle='#ffe34d';x.fillText('꽈당!',CX+CW+40,GY-CH);}
@@ -1168,7 +1220,7 @@ function g4(){
       if(stun===0){py=0;vy=0;onG=true;msg('다시 달려요!');}
       raf=requestAnimationFrame(loop);return;}
     frame++;$('#g4p').style.width=Math.min(100,frame/DUR*100)+'%';
-    if(milestones[frame])msg('🏃 '+milestones[frame]);
+    if(milestones[frame])msg(ic(S.charKey||'cat',0.7)+' '+milestones[frame]);
     if(!onG){vy+=GRAV;py+=vy;if(py>=0){py=0;vy=0;onG=true;}}
     if(frame>=nextSpawn&&frame<DUR-130){
       obs.push({x:W+10,t:Math.random()<0.5?'trash':'drum',hit:false});
@@ -1182,14 +1234,14 @@ function g4(){
           o.hit=true;hits++;stun=STUN;
           $('#g4hit').textContent='충돌 '+hits;
           $('#g4hit').classList.add('low');setTimeout(()=>$('#g4hit').classList.remove('low'),350);
-          msg('💥 '+(o.t==='trash'?'쓰레기봉투':'폐드럼')+'에 부딪혔다!');}}});
+          msg(ic(o.t)+' '+(o.t==='trash'?'쓰레기봉투':'폐드럼')+'에 부딪혔다!');}}});
     drawScene(false);
     if(frame>=DUR){finish();return;}
     raf=requestAnimationFrame(loop);}
   raf=requestAnimationFrame(loop);
   function finish(){
     done=true;cancelAnimationFrame(raf);
-    const meet=`<div class="center" style="line-height:0;margin:6px 0"><canvas id="sawCv" width="240" height="104" style="width:min(86%,260px);image-rendering:pixelated;border:2px solid #20242c;border-radius:8px;background:#0d1120"></canvas><div style="font-size:14px;color:var(--gold);text-shadow:1px 1px 0 var(--dark);margin-top:8px">🐘 "<b>사와디캅~! 어메이징!</b>"</div></div>`;
+    const meet=`<div class="center" style="line-height:0;margin:6px 0"><canvas id="sawCv" width="240" height="104" style="width:min(86%,260px);image-rendering:pixelated;border:2px solid #20242c;border-radius:8px;background:#0d1120"></canvas><div style="font-size:14px;color:var(--gold);text-shadow:1px 1px 0 var(--dark);margin-top:8px">${ic('thaiele',1.1)} "<b>사와디캅~! 어메이징!</b>"</div></div>`;
     let res,dd;
     if(hits===0){dd=applyDelta({trust:15,cash:30});
       res={ok:true,title:'퍼펙트 의전!',desc:meet+'무결점 달리기로 제시간 도착! 싸와디코: "사와디캅~! 어메이징 스피드! 추가 투자를 결정했어요!"'};}
@@ -1322,7 +1374,7 @@ function g5(){
       for(let zx=0;zx<=W;zx+=20)x.lineTo(zx,surge+(((zx/20)+(frame>>2))%2?-3:3));
       x.stroke();
       x.font='13px serif';x.textAlign='center';x.fillStyle='#fff';
-      if(surge<H-24)x.fillText('⚡ 과열 전류 ⚡',W/2,Math.min(surge+18,H-8));}
+      if(surge<H-24){const wy=Math.min(surge+18,H-8);x.fillText('과열 전류',W/2,wy);const bw=x.measureText('과열 전류').width;x.drawImage(spr('bolt'),(W/2-bw/2-13)|0,(wy-10)|0,9,9);x.drawImage(spr('bolt'),(W/2+bw/2+4)|0,(wy-10)|0,9,9);}}
     // 플레이어
     const ps=spr(S.charKey||'cat');
     if(inv>0&&(frame>>1)%2)x.globalAlpha=0.4;
@@ -1404,7 +1456,7 @@ function g6(){
     x.shadowColor='#6ab0e0';x.shadowBlur=10;
     x.strokeStyle='#8ad0f0';x.lineWidth=2;x.strokeRect(46,16,208,34);
     x.fillStyle='#bfe6f8';x.font='bold 16px sans-serif';x.textAlign='center';x.textBaseline='middle';
-    x.fillText('JH에너지 회식 🍻',150,34);x.shadowBlur=0;x.textBaseline='alphabetic';
+    x.fillText('JH에너지 회식',150,34);x.shadowBlur=0;x.textBaseline='alphabetic';
     // 펜던트 조명 2개 + 빛
     [64,236].forEach(lx=>{x.strokeStyle='#5a4a36';x.lineWidth=2;x.beginPath();x.moveTo(lx,50);x.lineTo(lx,68);x.stroke();
       x.fillStyle='#2a2a32';x.fillRect(lx-11,68,22,7);
@@ -1768,7 +1820,7 @@ function g8(){
     x.fillStyle='#56622e';x.fillRect(0,196,240,2);
     x.font='17px serif';x.textAlign='center';
     items.forEach(it=>{
-      if(it.t==='c'){x.font='22px serif';x.textAlign='center';x.fillText('🌿',it.x,it.y);}
+      if(it.t==='c'){const im=spr('icEsg');x.drawImage(im,(it.x-15)|0,(it.y-15)|0,30,30);}
       else{const im=spr('carbon');x.drawImage(im,it.x-16,it.y-22,32,32);}});
     const ps=spr(S.charKey||'cat');
     if(flash>0){flash--;if(flash%2)x.globalAlpha=0.35;}
@@ -1867,7 +1919,7 @@ function g9(){
     if(hitFlash>0){
       x.strokeStyle='#ff4a3a';x.lineWidth=4;x.strokeRect(2,2,236,246);
       x.font='28px serif';x.textAlign='center';
-      x.fillText('💥',pxr+16,166+18);
+      {const bx=pxr+16,by=166+18;x.fillStyle='#ffce3a';x.fillRect(bx-2,by-14,4,28);x.fillRect(bx-14,by-2,28,4);x.fillRect(bx-9,by-9,4,4);x.fillRect(bx+5,by-9,4,4);x.fillRect(bx-9,by+5,4,4);x.fillRect(bx+5,by+5,4,4);}
       x.fillStyle='rgba(255,74,58,.18)';x.fillRect(0,0,240,250);}
     if(over)return;
     raf=requestAnimationFrame(loop);}
