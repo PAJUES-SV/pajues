@@ -172,14 +172,30 @@
   .ostab{padding:7px 18px;border-radius:20px;border:none;background:none;cursor:pointer;
     font-family:'NanumSquare',sans-serif;font-weight:700;font-size:13px;color:var(--muted);transition:all .15s}
   .ostab.on{background:var(--text);color:#fff}
-  .steps{display:none;grid-template-columns:repeat(4,1fr);gap:14px}
+  .steps{display:none;grid-template-columns:repeat(3,1fr);gap:14px}
   .steps.on{display:grid}
-  .stp .n{width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;
-    font-family:'NanumSquare',sans-serif;font-weight:800;font-size:13px;
-    display:flex;align-items:center;justify-content:center;margin-bottom:10px}
-  .stp .x{font-size:13px;line-height:1.5;color:var(--text)}
-  .stp .x b{display:inline-block;background:#eef6f1;color:var(--green);font-weight:700;padding:1px 7px;border-radius:6px;font-size:12px}
-  @media(max-width:620px){.steps.on{grid-template-columns:1fr 1fr}}
+  .stp .n{width:30px;height:30px;border-radius:50%;background:var(--green);color:#fff;
+    font-family:'NanumSquare',sans-serif;font-weight:800;font-size:14px;
+    display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+  .stp .x{font-size:15px;line-height:1.6;color:var(--text)}
+  .stp .x b{display:inline-block;background:#eef6f1;color:var(--green);font-weight:700;padding:2px 8px;border-radius:6px;font-size:14px}
+  .ostip{grid-column:1/-1;font-size:12px;color:var(--muted);line-height:1.55;margin-top:6px;padding:10px 14px;background:var(--bg2);border-radius:10px}
+  .ostip b{color:var(--text);font-weight:700}
+  @media(max-width:620px){
+    .home-add{padding:22px 18px}
+    .ostabs{margin-bottom:18px}
+    /* 단계가 3개뿐이라 2열로 깔면 빈칸·어색한 줄바꿈이 생겨 → 1열 가로 카드로 */
+    .steps.on{grid-template-columns:1fr;gap:10px}
+    .stp{
+      display:flex;align-items:flex-start;gap:14px;
+      background:var(--bg2);border:1px solid var(--border);
+      border-radius:12px;padding:15px 16px;
+    }
+    .stp .n{margin-bottom:0;flex-shrink:0;width:32px;height:32px;font-size:15px}
+    .stp .x{font-size:16px;line-height:1.6}
+    .stp .x b{font-size:15px}
+    .ostip{font-size:13px;line-height:1.6;margin-top:2px;background:#fff}
+  }
 
   footer{border-top:1px solid var(--border);padding:24px 0;text-align:center;margin-top:20px}
   footer p{color:var(--muted2);font-size:12px}
@@ -259,9 +275,9 @@
 
     <section style="padding-top:0">
       <div class="sec-head">
-        <div class="sec-eyebrow">Install</div>
-        <h2>홈 화면에 추가하기</h2>
-        <p>한 번 추가하면 앱처럼 아이콘을 눌러 바로 플레이할 수 있어요.</p>
+        <div class="sec-eyebrow">Mobile Play</div>
+        <h2>스마트폰으로 더 편하게 플레이</h2>
+        <p>이 게임은 모바일에 최적화되어 있어요. 한 번 홈 화면에 추가해두면 다음부턴 QR 찾을 필요 없이 <b>아이콘 한 탭으로 풀스크린 게임</b>이 바로 시작됩니다.</p>
       </div>
       <div class="home-add">
         <div class="ostabs">
@@ -269,16 +285,16 @@
           <button class="ostab" data-os="ios">🍎 아이폰</button>
         </div>
         <div class="steps on" data-os="and">
-          <div class="stp"><div class="n">1</div><div class="x">QR 스캔 또는 <b>게임 시작</b>으로 게임 열기</div></div>
-          <div class="stp"><div class="n">2</div><div class="x">크롬 오른쪽 위 <b>⋮ 메뉴</b> 누르기</div></div>
-          <div class="stp"><div class="n">3</div><div class="x"><b>홈 화면에 추가</b> 선택</div></div>
-          <div class="stp"><div class="n">4</div><div class="x"><b>추가</b> 누르면 아이콘 생성 완료</div></div>
+          <div class="stp"><div class="n">1</div><div class="x">화면 하단 <b>⋮ 메뉴</b> 누르기</div></div>
+          <div class="stp"><div class="n">2</div><div class="x"><b>+ 현재 페이지 추가</b><br>→ <b>홈 화면</b> 선택</div></div>
+          <div class="stp"><div class="n">3</div><div class="x"><b>추가</b> 누르면 홈 화면에 <b>⚡피카시티</b> 아이콘 생성</div></div>
+          <div class="ostip">💡 안드로이드 폰은 QR 스캔 시 보통 <b>삼성 인터넷</b>으로 열려요. 크롬 사용자라면 우상단 <b>⋮</b> → <b>홈 화면에 추가</b> 한 번이면 끝나요.</div>
         </div>
         <div class="steps" data-os="ios">
-          <div class="stp"><div class="n">1</div><div class="x">QR 스캔 또는 <b>게임 시작</b>으로 게임 열기 (사파리)</div></div>
-          <div class="stp"><div class="n">2</div><div class="x">화면 아래 <b>공유 📤</b> 버튼 누르기</div></div>
-          <div class="stp"><div class="n">3</div><div class="x">메뉴 내려 <b>홈 화면에 추가</b> 선택</div></div>
-          <div class="stp"><div class="n">4</div><div class="x">오른쪽 위 <b>추가</b> 누르면 완료</div></div>
+          <div class="stp"><div class="n">1</div><div class="x">화면 하단 <b>공유 📤</b> 버튼 누르기</div></div>
+          <div class="stp"><div class="n">2</div><div class="x">메뉴 내려 <b>홈 화면에 추가</b> 선택</div></div>
+          <div class="stp"><div class="n">3</div><div class="x">우상단 <b>추가</b> 누르면 홈 화면에 <b>⚡피카시티</b> 아이콘 생성</div></div>
+          <div class="ostip">💡 아이폰은 반드시 <b>사파리</b>에서 열어야 작동해요. 카카오톡·메시지 등 다른 앱에서 링크를 열었다면 우상단 <b>⋮</b> → <b>Safari로 열기</b>를 먼저 눌러주세요.</div>
         </div>
       </div>
     </section>
