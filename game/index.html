@@ -250,6 +250,14 @@ p{margin:5px 0}
 .blk2 .fl{position:absolute;left:2px;top:2px;font-size:10px;background:rgba(13,17,32,.82);color:#fff;padding:0 3px;line-height:1.5;z-index:2}
 .blk2.ghost{outline:2px solid var(--gold)}
 #g4cv{width:100%;display:block;border:2px solid var(--bd);box-shadow:0 0 0 2px var(--dark);background:#28406b;touch-action:manipulation}
+/* 점프 버튼: C안 아케이드 원형 + 가운데 정렬 도크 */
+.gdock{display:flex;flex-direction:column;align-items:center;width:100%;margin:12px 0 0}
+.gdhint{font-size:12px;color:var(--bd);opacity:.85;text-shadow:1px 1px 0 var(--dark);margin-top:8px;text-align:center}
+.gjump{width:86px;height:86px;flex:0 0 auto;border-radius:50%;background:#e06352;border:3px solid var(--bd);
+  box-shadow:0 0 0 3px var(--dark),0 6px 0 var(--dark);color:#fff;font-size:32px;line-height:1;
+  display:flex;align-items:center;justify-content:center;text-shadow:1px 1px 0 var(--dark);
+  cursor:pointer;font-family:inherit;padding:0}
+.gjump:active{transform:translateY(4px);box-shadow:0 0 0 3px var(--dark),0 2px 0 var(--dark)}
 .prog{position:relative;height:14px;border:2px solid var(--bd);background:var(--dark);margin-bottom:8px}
 .prog i{position:absolute;left:0;top:0;bottom:0;background:var(--gold);width:0}
 .prog b{position:absolute;right:4px;top:-2px;font-size:10px;color:#fff}
@@ -1064,42 +1072,118 @@ function g4(){
   const G=$('#game');
   G.innerHTML=`<div class="gtop"><span>싸와디캅! 출동!</span><span class="timer" id="g4hit">충돌 0</span></div>
   <div class="prog"><i id="g4p"></i><b>GOAL</b></div>
-  <canvas id="g4cv" width="300" height="170"></canvas>
+  <canvas id="g4cv" width="360" height="276"></canvas>
   <div class="pnl2 gmsg" id="g4msg"></div>
-  <p class="center dim" style="margin-top:6px;font-size:12px">👆 화면을 탭하면 점프!</p>`;
+  <div class="gdock"><button id="g4jump" class="gjump" aria-label="점프">⬆</button><span class="gdhint">버튼 또는 화면 어디든 탭 = 점프</span></div>`;
   function msg(t){$('#g4msg').innerHTML=t;}
-  msg('발전소 부지를 가로질러 정문까지! 🗑 쓰레기와 폐드럼을 뛰어넘어라! (화면 탭 = 점프)');
+  msg('발전소 부지를 가로질러 정문까지! 🗑 쓰레기와 폐드럼을 뛰어넘어라! (아래 버튼 또는 화면 탭 = 점프)');
   const cv=$('#g4cv'),x=cv.getContext('2d');x.imageSmoothingEnabled=false;
-  const GY=136,DUR=1500;
-  let frame=0,hits=0,done=false,raf=null,py=0,vy=0,onG=true,obs=[],nextSpawn=60;
-  function jump(){if(done)return;if(onG){vy=-6.4;onG=false;}}
+  // === 화면/물리 상수 (시뮬레이션으로 클리어 가능 검증) ===
+  const W=360,H=276,GY=206,DUR=1500;
+  const SPD=2.7, CX=52, CW=54, CH=66, OSC=3.4;   // 캐릭터/장애물 크기
+  const JV=-8.6, GRAV=0.4;                        // 점프력/중력 (최고높이≈92px)
+  const charL=CX+8, charR=CX+CW-8;               // 캐릭터 충돌박스(살짝 관대)
+  const HORIZON=128, STUN=34;                     // 하늘/땅 경계, 꽈당 멈춤 길이
+  let frame=0,hits=0,done=false,raf=null,py=0,vy=0,onG=true,obs=[],nextSpawn=60,stun=0;
+  // 배경 장식: 하늘 구름 + 원경 나무(느리게 흘러 시차감)
+  let clouds=[{x:50,y:16,s:1.1},{x:175,y:42,s:0.8},{x:300,y:24,s:1.3}];
+  let bgtrees=[{x:18,sc:1.35},{x:86,sc:1.1},{x:150,sc:1.45}];   // 원경 정지 나무(작게)
+  // 캐릭터 흰색 실루엣 — 정전(blackout) 연출용으로 미리 생성
+  const ps=spr(S.charKey||'cat');
+  const whiteSil=(function(){const c=document.createElement('canvas');c.width=ps.width;c.height=ps.height;
+    const cx=c.getContext('2d');cx.imageSmoothingEnabled=false;cx.drawImage(ps,0,0);
+    cx.globalCompositeOperation='source-in';cx.fillStyle='#ffffff';cx.fillRect(0,0,c.width,c.height);return c;})();
+  function jump(){if(done||stun>0)return;if(onG){vy=JV;onG=false;}}
   cv.addEventListener('pointerdown',e=>{e.preventDefault();jump();});
+  $('#g4jump').addEventListener('pointerdown',e=>{e.preventDefault();jump();});
   setTimeout(()=>{const G2=$('#game');if(G2)G2.addEventListener('pointerdown',ev=>{if(ev.target.closest('canvas')||ev.target.id==='game')jump();});},0);
   const milestones={700:'절반 왔다! 계속 달려!',1250:'저기 정문에 싸와디코가 보인다!!'};
+
+  // 픽셀 구름
+  function drawCloud(cxp,cyp,s){
+    const u=6*s;x.fillStyle='#f2f8ff';
+    x.fillRect(cxp+u,cyp,u*3,u*2);
+    x.fillRect(cxp,cyp+u,u*6,u*2);
+    x.fillRect(cxp+u*2,cyp-u,u*2,u*2);
+    x.fillStyle='#d6e8f6';x.fillRect(cxp,cyp+u*2.7,u*6,u*0.7);
+  }
+  // 충돌 별 폭발(꽈당 임팩트)
+  function drawBurst(bx,by,age){
+    const k=Math.max(0,1-age/10),R=14+age*2.6;if(k<=0)return;
+    x.save();x.translate(bx,by);x.globalAlpha=k;
+    x.fillStyle='#ffce3a';x.beginPath();
+    for(let i=0;i<12;i++){const a=i*Math.PI/6,r=(i%2?R*0.42:R);x.lineTo(Math.cos(a)*r,Math.sin(a)*r);}
+    x.closePath();x.fill();
+    x.fillStyle='#fff7d0';x.beginPath();
+    for(let i=0;i<12;i++){const a=i*Math.PI/6,r=(i%2?R*0.22:R*0.55);x.lineTo(Math.cos(a)*r,Math.sin(a)*r);}
+    x.closePath();x.fill();x.restore();x.globalAlpha=1;
+  }
+
+  function drawScene(crash){
+    const age=crash?(STUN-stun):0;
+    let sx=0,sy=0; if(crash&&age<8){sx=(Math.random()*8-4)|0;sy=(Math.random()*6-3)|0;}  // 화면 흔들림
+    x.save();x.translate(sx,sy);
+    // 하늘(2단 톤)
+    x.fillStyle='#7ec0ea';x.fillRect(-6,0,W+12,HORIZON);
+    x.fillStyle='#a8d8f2';x.fillRect(-6,HORIZON-26,W+12,26);
+    // 구름
+    clouds.forEach(c=>drawCloud(c.x,c.y,c.s));
+    // 풀밭(지평선 아래만)
+    for(let ty=HORIZON;ty<H;ty+=16)for(let tx=-16;tx<W+16;tx+=16)
+      x.drawImage(spr(((((tx/16)|0)+ty/16)%2)?'grass0':'grass1'),tx,ty);
+    // 원경 나무(작게·높게·정지 — 쓰레기/드럼 라인과 안 겹침)
+    bgtrees.forEach(t=>{const s=spr('tree2'),w=s.width*t.sc,h=s.height*t.sc;
+      x.drawImage(s,t.x|0,152-h,w,h);});
+    // 발전소(랜드마크, 하나만)
+    x.drawImage(spr('plant'),W-156,GY-100,150,100);
+    // 달리는 바닥
+    x.fillStyle='#7e8f43';x.fillRect(-6,GY,W+12,H-GY);
+    x.fillStyle='#56622e';x.fillRect(-6,GY,W+12,3);
+    // 장애물
+    obs.forEach(o=>{const s=spr(o.t);x.drawImage(s,o.x|0,GY-s.height*OSC,s.width*OSC,s.height*OSC);});
+    // 캐릭터
+    if(crash){
+      if(age<2){x.fillStyle='rgba(255,255,255,.5)';x.fillRect(-6,0,W+12,H);}        // 임팩트 흰 플래시
+      const lay=Math.min(1,age/5),ang=-1.15*lay;                                     // 발 기준 뒤로 꽈당
+      x.save();x.translate(CX+CW/2,GY);x.rotate(ang);x.drawImage(ps,-CW/2,-CH,CW,CH);x.restore();
+      drawBurst(CX+CW-2,GY-CH*0.42,age);                                              // 충돌 별폭발
+      const hx=CX+CW/2-4,hy=GY-CH+6;                                                  // 머리 위 기절 별
+      x.textAlign='center';x.textBaseline='middle';x.font='15px sans-serif';
+      for(let i=0;i<3;i++){const a=age*0.2+i*2.1;x.fillStyle=i%2?'#f4d35e':'#ffffff';
+        x.fillText('★',hx+Math.cos(a)*16,hy+Math.sin(a)*7);}
+      if(age<22){x.textBaseline='alphabetic';x.font='bold 26px sans-serif';          // "꽈당!" 만화 텍스트
+        x.lineWidth=5;x.lineJoin='round';x.strokeStyle='#0d1120';x.strokeText('꽈당!',CX+CW+40,GY-CH);
+        x.fillStyle='#ffe34d';x.fillText('꽈당!',CX+CW+40,GY-CH);}
+    }else{
+      const bobY=onG&&(frame>>3)%2?-2:0;
+      x.drawImage(ps,CX,GY-CH+py+bobY,CW,CH);
+    }
+    x.restore();
+  }
+
   function loop(){
+    // === 정전(스턴): 멈춤 + 흰색 깜빡임 ===
+    if(stun>0){
+      stun--;drawScene(true);
+      if(stun===0){py=0;vy=0;onG=true;msg('다시 달려요!');}
+      raf=requestAnimationFrame(loop);return;}
     frame++;$('#g4p').style.width=Math.min(100,frame/DUR*100)+'%';
     if(milestones[frame])msg('🏃 '+milestones[frame]);
-    if(!onG){vy+=0.32;py+=vy;if(py>=0){py=0;vy=0;onG=true;}}
+    if(!onG){vy+=GRAV;py+=vy;if(py>=0){py=0;vy=0;onG=true;}}
     if(frame>=nextSpawn&&frame<DUR-130){
-      obs.push({x:310,t:Math.random()<0.5?'trash':'drum',hit:false});
-      nextSpawn=frame+55+Math.floor(Math.random()*55);}
-    obs.forEach(o=>o.x-=2.3);obs=obs.filter(o=>o.x>-24);
-    obs.forEach(o=>{
-      const oh=(o.t==='trash'?10:12)*2;
-      if(!o.hit&&o.x<78&&o.x+24>50){
-        if(GY+py>GY-oh+5){o.hit=true;hits++;$('#g4hit').textContent='충돌 '+hits;
+      obs.push({x:W+10,t:Math.random()<0.5?'trash':'drum',hit:false});
+      nextSpawn=frame+60+Math.floor(Math.random()*60);}
+    obs.forEach(o=>o.x-=SPD);obs=obs.filter(o=>o.x>-40);
+    clouds.forEach(c=>{c.x-=0.3;if(c.x<-80)c.x=W+10+Math.random()*40;});          // 구름만 천천히
+    obs.forEach(o=>{const OW=34, oL=o.x, oR=o.x+OW;
+      if(!o.hit&&oR>charL&&oL<charR){
+        const oh=(o.t==='drum'?33:27);
+        if(GY+py>GY-oh+6){
+          o.hit=true;hits++;stun=STUN;
+          $('#g4hit').textContent='충돌 '+hits;
           $('#g4hit').classList.add('low');setTimeout(()=>$('#g4hit').classList.remove('low'),350);
-          msg('💥 아얏! '+(o.t==='trash'?'쓰레기봉투':'폐드럼')+'에 걸려 넘어졌다!');}}});
-    for(let ty=0;ty<170;ty+=16)for(let tx=0;tx<300;tx+=16)
-      x.drawImage(spr(((tx/16+ty/16)%2)?'grass0':'grass1'),tx,ty);
-    x.drawImage(spr('plant'),196,54,90,60);
-    x.fillStyle='#7e8f43';x.fillRect(0,GY,300,34);
-    x.fillStyle='#56622e';x.fillRect(0,GY,300,2);
-    obs.forEach(o=>{const s=spr(o.t);
-      x.drawImage(s,o.x|0,GY-s.height*2.6,s.width*2.6,s.height*2.6);});
-    const ps=spr(S.charKey||'cat');
-    const bobY=onG&&(frame>>3)%2?-1:0;
-    x.drawImage(ps,46,GY-52+py+bobY,42,52);
+          msg('💥 '+(o.t==='trash'?'쓰레기봉투':'폐드럼')+'에 부딪혔다!');}}});
+    drawScene(false);
     if(frame>=DUR){finish();return;}
     raf=requestAnimationFrame(loop);}
   raf=requestAnimationFrame(loop);
