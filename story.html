@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>파워타이쿤: 피카시티 — 탄생 스토리</title>
+<style>
+  :root{
+    --dark:#1d2438;--panel:#2a3450;--panel2:#222a42;
+    --bd:#3a4565;--gold:#f4d35e;--green:#7ec97a;
+    --blue:#7fa8d0;--pink:#f2a0b4;--red:#ff9c8e;--purple:#9a7ad0;
+    --txt:#d4ddf2;--dim:#90a0c2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden}
+  body{
+    background:var(--dark);color:var(--txt);
+    font-family:'Segoe UI','Noto Sans KR',system-ui,sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;
+    background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.08) 0 1px,transparent 1px 4px);
+  }
+
+  /* ── Deck framework ── */
+  .deck{position:fixed;inset:0;overflow:hidden}
+  .track{
+    display:flex;height:100%;width:100%;
+    transition:transform .55s cubic-bezier(.22,1,.36,1);
+    will-change:transform
+  }
+  .slide{
+    flex:0 0 100vw;height:100vh;overflow-y:auto;
+    padding:56px 32px 96px;scrollbar-width:thin;
+    scrollbar-color:var(--bd) transparent
+  }
+  .slide::-webkit-scrollbar{width:8px}
+  .slide::-webkit-scrollbar-thumb{background:var(--bd);border-radius:4px}
+  .slide-inner{max-width:1080px;margin:0 auto}
+
+  /* ── Nav controls ── */
+  .nav-btn{
+    position:fixed;top:50%;transform:translateY(-50%);
+    width:52px;height:52px;border-radius:50%;
+    background:rgba(42,52,80,.85);border:1px solid var(--bd);
+    color:#fff;font-size:22px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    z-index:50;transition:all .2s;backdrop-filter:blur(6px)
+  }
+  .nav-btn:hover{background:var(--gold);color:var(--dark);border-color:var(--gold);transform:translateY(-50%) scale(1.08)}
+  .nav-btn:disabled{opacity:.25;cursor:not-allowed}
+  .nav-btn:disabled:hover{background:rgba(42,52,80,.85);color:#fff;border-color:var(--bd);transform:translateY(-50%)}
+  .nav-prev{left:24px}
+  .nav-next{right:24px}
+
+  .counter{
+    position:fixed;top:24px;right:32px;z-index:50;
+    font-size:13px;color:var(--dim);letter-spacing:2px;
+    background:rgba(42,52,80,.7);padding:8px 14px;border-radius:20px;
+    border:1px solid var(--bd);backdrop-filter:blur(6px);font-weight:700
+  }
+  .counter .cur{color:var(--gold)}
+
+  .dots{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+    display:flex;gap:9px;z-index:50;
+    background:rgba(42,52,80,.7);padding:10px 16px;border-radius:20px;
+    border:1px solid var(--bd);backdrop-filter:blur(6px)
+  }
+  .dot{
+    width:9px;height:9px;border-radius:50%;background:var(--bd);
+    cursor:pointer;transition:all .25s;border:0;padding:0
+  }
+  .dot:hover{background:var(--dim)}
+  .dot.on{background:var(--gold);width:24px;border-radius:5px}
+
+  .hint{
+    position:fixed;bottom:24px;right:32px;z-index:50;
+    font-size:11px;color:var(--dim);letter-spacing:1px;
+    background:rgba(42,52,80,.55);padding:7px 12px;border-radius:14px;
+    border:1px solid var(--bd);backdrop-filter:blur(6px)
+  }
+
+  /* ── Hero / cover slide ── */
+  .slide.cover{
+    position:relative;
+    background:
+      radial-gradient(ellipse at center, #2a3450 0%, #1d2438 55%, #0d1120 100%);
+  }
+  .stars{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+  .star{
+    position:absolute;background:#fff;
+    animation:twinkle 3s infinite alternate;image-rendering:pixelated
+  }
+  @keyframes twinkle{0%{opacity:.15}100%{opacity:1}}
+  .hero{
+    text-align:center;min-height:calc(100vh - 152px);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    position:relative;z-index:1
+  }
+  .hero .eyebrow{
+    font-size:14px;color:var(--gold);letter-spacing:4px;
+    text-transform:uppercase;margin-bottom:18px;font-weight:700;
+    font-family:'Consolas','D2Coding',monospace
+  }
+  .hero h1{
+    font-size:72px;color:#fff;letter-spacing:1px;margin-bottom:14px;
+    font-weight:800;line-height:1.2
+  }
+  .hero .sub{font-size:20px;color:var(--dim);margin-bottom:32px;letter-spacing:1px}
+  .pika-canvas{
+    image-rendering:pixelated;margin:8px 0 28px;
+    filter:drop-shadow(0 0 18px rgba(244,211,94,.18))
+  }
+  .maker{
+    display:inline-block;background:rgba(42,52,80,.85);border:2px solid var(--bd);
+    border-radius:14px;padding:14px 32px;text-align:center;backdrop-filter:blur(4px)
+  }
+  .maker .label{font-size:13px;color:var(--dim);margin-bottom:6px;letter-spacing:1px}
+  .maker .org{font-size:20px;color:#fff;font-weight:700}
+  .maker .org .name{color:var(--gold)}
+  .hero-cta{
+    margin-top:36px;font-size:13px;color:var(--dim);
+    letter-spacing:2px;text-transform:uppercase
+  }
+  .hero-cta .arrow{color:var(--gold);font-weight:700;margin-left:8px;animation:bounceX 1.4s infinite}
+  @keyframes bounceX{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
+
+  /* ── Section head ── */
+  .sec-head{margin-bottom:28px;border-left:5px solid var(--gold);padding-left:20px}
+  .sec-head .kicker{
+    font-size:13px;color:var(--gold);letter-spacing:3px;
+    text-transform:uppercase;font-weight:700;margin-bottom:6px
+  }
+  .sec-head h2{font-size:34px;color:#fff;font-weight:800;line-height:1.25}
+
+  /* ── Panels ── */
+  .panel{
+    background:var(--panel);border:1px solid var(--bd);border-radius:14px;
+    padding:22px 24px;margin-bottom:16px
+  }
+  .panel.alt{background:var(--panel2)}
+  .panel p{font-size:16px;word-break:keep-all}
+  .tag{
+    display:inline-block;font-size:12px;font-weight:700;border-radius:6px;
+    padding:4px 12px;margin-bottom:12px;
+    background:rgba(244,211,94,.15);color:var(--gold);border:1px solid var(--gold)
+  }
+  .tag.g{background:rgba(126,201,122,.15);color:var(--green);border-color:var(--green)}
+  .tag.p{background:rgba(242,160,180,.15);color:var(--pink);border-color:var(--pink)}
+  .highlight{color:var(--gold);font-weight:700}
+  .green{color:var(--green);font-weight:700}
+
+  /* ── Card grids ── */
+  .grid{display:grid;gap:16px}
+  .grid.c2{grid-template-columns:repeat(2,1fr)}
+  .grid.c3{grid-template-columns:repeat(3,1fr)}
+  .card{
+    background:var(--panel);border:1px solid var(--bd);border-radius:14px;
+    padding:22px;text-align:center
+  }
+  .card .icon{font-size:34px;display:block;margin-bottom:10px}
+  .card .num{font-size:30px;color:var(--gold);font-weight:800;line-height:1}
+  .card .ctitle{font-size:17px;color:#fff;font-weight:700;margin:8px 0 6px}
+  .card .cdesc{font-size:14px;color:var(--dim);word-break:keep-all}
+
+  /* ── Chips ── */
+  .chips{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    font-size:13px;border-radius:20px;padding:5px 14px;font-weight:600;
+    border:1px solid var(--bd);color:var(--txt)
+  }
+  .chip.gold{color:var(--gold);border-color:var(--gold)}
+  .chip.g{color:var(--green);border-color:var(--green)}
+  .chip.b{color:var(--blue);border-color:var(--blue)}
+  .chip.p{color:var(--pink);border-color:var(--pink)}
+  .chip.pu{color:var(--purple);border-color:var(--purple)}
+
+  /* ── Chat bubbles ── */
+  .chat{display:flex;flex-direction:column;gap:12px}
+  .bubble{max-width:78%;padding:14px 18px;border-radius:16px;font-size:15px;line-height:1.55}
+  .bubble .who{font-size:12px;color:var(--dim);margin-bottom:5px;font-weight:700}
+  .bubble.me{align-self:flex-end;background:#2f6e4f;border:1px solid #3f8a64;border-bottom-right-radius:4px}
+  .bubble.me .who{color:#bdf0d2}
+  .bubble.ai{align-self:flex-start;background:var(--panel);border:1px solid var(--bd);border-bottom-left-radius:4px}
+  .bubble.ai .who{color:var(--gold)}
+  .bubble b{color:var(--gold)}
+  .chat-note{font-size:14px;color:var(--dim);text-align:center;margin-top:14px;font-style:italic}
+
+  /* ── Code block ── */
+  .code{
+    background:#0d1120;border:1px solid var(--bd);border-radius:10px;
+    padding:16px 18px;font-family:'Consolas','D2Coding',monospace;
+    font-size:14px;line-height:1.8;color:#7fc87a;overflow-x:auto;margin-top:8px
+  }
+  .code .cm{color:#90a0c2}
+  .code .hl{color:var(--gold)}
+  .code .fn{color:var(--blue)}
+
+  /* ── Prompt tips ── */
+  .prompt-box{
+    background:#0d1120;border:1px solid var(--bd);border-radius:12px;
+    padding:18px 20px;font-size:15px;line-height:1.8;margin-top:8px
+  }
+  .prompt-box .key{font-weight:700}
+  .prompt-box .bad{color:var(--red)}
+  .prompt-box .good{color:var(--green)}
+
+  /* ── Timeline ── */
+  .timeline{position:relative;margin-left:8px;padding-left:30px;border-left:2px solid var(--bd)}
+  .tl-item{position:relative;padding-bottom:26px}
+  .tl-item:last-child{padding-bottom:0}
+  .tl-dot{
+    position:absolute;left:-39px;top:2px;width:14px;height:14px;border-radius:50%;
+    border:3px solid var(--dark)
+  }
+  .tl-date{font-size:14px;color:var(--gold);font-weight:700;margin-bottom:4px}
+  .tl-txt{font-size:15px;word-break:keep-all}
+  .tl-txt .muted{color:var(--dim)}
+
+  /* ── Mini game grid ── */
+  .games{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .gcell{
+    background:var(--panel);border:1px solid var(--bd);border-radius:14px;
+    padding:18px 14px;text-align:center
+  }
+  .gcell .gi{font-size:32px}
+  .gcell .gy{font-size:12px;color:var(--dim);margin-top:6px}
+  .gcell .gn{font-size:15px;color:#fff;font-weight:700;margin-top:3px;word-break:keep-all;line-height:1.35}
+
+  /* ── Closing ── */
+  .closing{text-align:center;padding:40px 24px;margin-top:32px;
+    background:var(--panel);border:1px solid var(--bd);border-radius:16px}
+  .closing p{font-size:17px;word-break:keep-all;line-height:1.9}
+  .closing .small{font-size:14px;color:var(--dim)}
+  .big-num{font-size:52px;color:var(--gold);font-weight:800;line-height:1}
+
+  /* ── Compact variant (for slides with many chat bubbles) ── */
+  .slide.tight .sec-head{margin-bottom:18px}
+  .slide.tight .sec-head h2{font-size:30px}
+  .slide.tight .chat{gap:8px}
+  .slide.tight .bubble{
+    padding:10px 14px;font-size:14px;line-height:1.5;max-width:74%
+  }
+  .slide.tight .bubble .who{font-size:11px;margin-bottom:3px}
+  .slide.tight .chat-note{margin-top:10px;font-size:13px}
+  .slide.tight .cap{margin-bottom:10px !important}
+
+  /* ── Responsive ── */
+  @media(max-width:760px){
+    .slide{padding:40px 18px 96px}
+    .hero h1{font-size:40px}
+    .hero .sub{font-size:16px}
+    .grid.c3,.grid.c2,.games{grid-template-columns:1fr}
+    .bubble{max-width:90%}
+    .sec-head h2{font-size:24px}
+    .nav-btn{width:44px;height:44px;font-size:18px}
+    .nav-prev{left:10px}.nav-next{right:10px}
+    .counter{right:14px;top:14px;font-size:11px;padding:6px 10px}
+    .hint{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="deck">
+  <div class="track" id="track">
+
+    <!-- ── SLIDE 1: COVER ── -->
+    <section class="slide cover">
+      <div class="stars" id="stars"></div>
+      <div class="slide-inner">
+        <div class="hero">
+          <div class="eyebrow">⚡ POWER TYCOON : PIKA CITY</div>
+          <h1>탄생 스토리</h1>
+          <div class="sub">AI와 함께 게임을 만든 이야기</div>
+          <canvas id="pikaCanvas" class="pika-canvas" width="440" height="120"></canvas>
+          <div class="maker">
+            <div class="label">만든 사람</div>
+            <div class="org">파주ES <span class="name">이지혜</span></div>
+          </div>
+          <div class="hero-cta">시작하기<span class="arrow">→</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SLIDE 2: BACKGROUND ── -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="sec-head">
+          <div class="kicker">Background</div>
+          <h2>파주에너지서비스 AI Study</h2>
+        </div>
+        <div class="panel">
+          <span class="tag">배경</span>
+          <p>파주ES에서 AI를 실제 업무에 적용하는 스터디에 참여 중.
+          단순한 공부가 아닌 <span class="highlight">AI로 실제 배포·사용 가능한 결과물</span>을 만드는 것을 목표로 함.</p>
+        </div>
+        <p style="font-size:14px;color:var(--gold);margin:18px 0 12px;font-weight:700">이미 만든 것들</p>
+        <div class="grid c3">
+          <div class="card">
+            <span class="icon">📰</span>
+            <div class="ctitle">대관대민 Portal</div>
+            <div class="cdesc">데일리 뉴스브리핑<br>인물 AI 분석<br>관계 관리 DB</div>
+          </div>
+          <div class="card">
+            <span class="icon">🌱</span>
+            <div class="ctitle">SV·ESG 아카이브</div>
+            <div class="cdesc">SV 카드뉴스 아카이브<br>ESG 성과 리포트</div>
+          </div>
+          <div class="card">
+            <span class="icon">📊</span>
+            <div class="ctitle">ESG 인포그래픽</div>
+            <div class="cdesc">2025 성과 보고서<br>인터랙티브 HTML</div>
+          </div>
+        </div>
+        <div class="panel alt" style="margin-top:16px">
+          <div style="font-size:13px;color:var(--dim);margin-bottom:4px">사용 도구</div>
+          <div class="chips">
+            <span class="chip gold">Claude API</span>
+            <span class="chip b">Railway</span>
+            <span class="chip g">Supabase</span>
+            <span class="chip">GitHub Pages</span>
+            <span class="chip">FastAPI</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SLIDE 3: PURPOSE ── -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="sec-head">
+          <div class="kicker">Purpose</div>
+          <h2>왜 게임을 만들었나?</h2>
+        </div>
+        <div class="grid c3">
+          <div class="card">
+            <div class="num">01</div>
+            <div class="ctitle">구성원 이해</div>
+            <div class="cdesc">발전소가 어떻게 운영되는지 게임으로 자연스럽게 체험</div>
+          </div>
+          <div class="card">
+            <div class="num">02</div>
+            <div class="ctitle">SV 관심 유도</div>
+            <div class="cdesc">미니게임에 SV사업을 자연스럽게 녹여 관심도 제고</div>
+          </div>
+          <div class="card">
+            <div class="num">03</div>
+            <div class="ctitle">아카이브 연동</div>
+            <div class="cdesc">SV 아카이브 방문을 유도하는 진입점으로 활용</div>
+          </div>
+        </div>
+        <div class="panel" style="margin-top:16px">
+          <span class="tag p">핵심 아이디어</span>
+          <p>민원 대응, LNG 계약, 전력 입찰, 탄소 배출권, SV사업…
+          <span class="highlight">실제 회사 업무를 미니게임으로</span> 만들면 재미있게 회사를 이해할 수 있다!</p>
+        </div>
+        <div class="panel alt">
+          <div style="font-size:13px;color:var(--dim);margin-bottom:8px">추가 목적</div>
+          <p style="font-size:15px;line-height:1.9">📌 AI Study 결과물 공유 · 발표 소재<br>
+          📌 "AI로 이런 것도 된다"는 구체적 사례 제시<br>
+          📌 외부 배포 가능한 PWA 앱으로 완성도 확보</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SLIDE 4: PLANNING ① ── -->
+    <section class="slide tight">
+      <div class="slide-inner">
+        <div class="sec-head">
+          <div class="kicker">Planning ①</div>
+          <h2>어떻게 기획했나</h2>
+        </div>
+        <p class="cap" style="font-size:13px;color:var(--gold);margin-bottom:14px">실제 대화 — 아이디어 → 구조 확정</p>
+        <div class="chat">
+          <div class="bubble me"><div class="who">나</div>우리 회사 직원들이 발전소 운영을 게임으로 배우면 어떨까? SV 사업도 자연스럽게 알게 되고.</div>
+          <div class="bubble ai"><div class="who">Claude</div>재밌는 아이디어네요! 어떤 형태를 생각하세요? 퍼즐형? 경영 시뮬레이션?</div>
+          <div class="bubble me"><div class="who">나</div>경영 시뮬 느낌으로. 직원들이 실제 업무를 직접 해보는 거. <b>바로 만들지 말고 나랑 상의해서 해줘.</b></div>
+          <div class="bubble ai"><div class="who">Claude</div>10년 임기 CEO 게임 어때요? 매년 미니게임 1개씩, 현금·ESG·직원사기·주주신뢰 4개 지표로 운영하는 구조요.</div>
+          <div class="bubble me"><div class="who">나</div>6년차 직원 사기진작 게임은 어떻게 할까?</div>
+          <div class="bubble ai"><div class="who">Claude</div>호빵 나눠주기 던지기 게임 어때요?</div>
+          <div class="bubble me"><div class="who">나</div>호빵은 다른 게임이랑 겹쳐. 회식 느낌으로 독특한 게 없을까?</div>
+          <div class="bubble ai"><div class="who">Claude</div>맥주 따르기 타이밍 게임은요? 잔에 맥주가 차오를 때 초록 적정선에서 탭해서 멈추는 방식이요!</div>
+          <div class="bubble me"><div class="who">나</div>오 그거 완전 좋아!</div>
+        </div>
+        <p class="chat-note">→ 이렇게 9개 게임 전부 대화로만 설계</p>
+      </div>
+    </section>
+
+    <!-- ── SLIDE 5: PLANNING ② ── -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="sec-head">
+          <div class="kicker">Planning ②</div>
+          <h2>업무를 게임으로 번역하는 과정</h2>
+        </div>
+        <p style="font-size:14px;color:var(--gold);margin-bottom:14px">실제 대화 — 실제 업무 → 게임 메카닉</p>
+        <div class="chat">
+          <div class="bubble me"><div class="who">나</div>LNG 도입 협상을 게임으로 만들고 싶어. 실제로는 가스 공급사랑 단가 협상하는 건데.</div>
+          <div class="bubble ai"><div class="who">Claude</div>묵찌빠로 3선승하면 유리한 단가로 계약하는 게임 어때요? 상대방이 혼잣말로 힌트를 주는데 그게 가끔 거짓이에요.</div>
+          <div class="bubble me"><div class="who">나</div>ㅋㅋㅋ 그거 완전 좋다. 공급사 이름은 Mr.Croc, 악어 캐릭터로 해줘.</div>
+          <div class="bubble ai"><div class="who">Claude</div>Mr.Croc 확정! "후후, 내가 질 리 없지만…" 혼잣말 힌트 넣을게요.</div>
+          <div class="bubble me"><div class="who">나</div>우리 SV 사업 중에 행복나눔반찬이 있어. 9년차 게임으로 넣고 싶은데 아파트 외벽 타고 오르며 불 켜진 가구에 반찬 전달하는 게임 어때?</div>
+          <div class="bubble ai"><div class="who">Claude</div>완전 좋아요! 탭으로 좌우 벽 이동, 실외기·고드름 회피, 불 켜진 창에 배달하는 방식으로 바로 만들게요.</div>
+        </div>
+        <p class="chat-note">→ 실제 업무·사업이 있으면 게임으로 번역하는 건 AI가 한다</p>
+      </div>
+    </section>
+
+    <!-- ── SLIDE 6: DEVELOPMENT ① ── -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="sec-head">
+          <div class="kicker">Development ①</div>
+          <h2>AI가 실제로 만드는 방식</h2>
+        </div>
+        <p style="font-size:14px;color:var(--gold);margin-bottom:14px">실제 대화 — 기술 선택 + 복잡한 구현</p>
+        <div class="chat">
+          <div class="bubble me"><div class="who">나</div>앱 설치 없이 링크 하나로 실행되게 HTML 파일 하나로 만들 수 있어?</div>
+          <div class="bubble ai"><div class="who">Claude</div>가능해요! Canvas API로 픽셀아트 직접 그리면 미니게임 9개 전부 HTML 1파일에 넣을 수 있어요. 외부 라이브러리 없이요.</div>
+          <div class="bubble me"><div class="who">나</div>게임 하다가 중간에 목록으로 빠져나가면, 게임이 뒤에서 계속 돌면서 폰이 느려질 것 같은데. 막을 수 있어?</div>
+          <div class="bubble ai"><div class="who">Claude</div>게임 중에 작동 중인 동작들을 자동으로 모아두고, 게임을 끝낼 때 한 번에 정리하는 시스템을 만들게요.</div>
+        </div>
+        <div class="code">
+          <span class="cm">// 모든 타이머 자동 추적</span><br>
+          window.setTimeout = (f,d) =&gt; {<br>
+          &nbsp;&nbsp;const id = __oST(f,d);<br>
+          &nbsp;&nbsp;<span class="hl">if(__arcTrk) __arcT.push(id);</span><br>
+          &nbsp;&nbsp;return id;<br>
+          };<br>
+          <span class="cm">// 게임 종료 시 전부 정리</span><br>
+          <span class="fn">arcadeTrkStop()</span> → clearTimeout × N
+        </div>
+        <p class="chat-note">→ 말로 문제 설명하면 Claude가 설계하고 코드까지 짠다</p>
+      </div>
+    </section>
+
+    <!-- ── SLIDE 7: DEVELOPMENT ② ── -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="sec-head">
+          <div class="kicker">Development ②</div>
+          <h2>스크린샷으로 소통하는 법</h2>
+        </div>
+        <p style="font-size:14px;color:var(--gold);margin-bottom:14px">실제 대화 — 피드백 루프 + 버그 수정</p>
+        <div class="chat">
+          <div class="bubble me"><div class="who">나 📸 스크린샷 첨부</div>미니게임 모드 화면에서 타이틀로 버튼이 잘려</div>
+          <div class="bubble ai"><div class="who">Claude</div>확인! 2열→3열 그리드로 변경하면 9개 카드가 3행으로 딱 맞고 버튼까지 한 화면에 들어와요. 수정할게요.</div>
+          <div class="bubble me"><div class="who">나</div>호빵 던지기는 다른 게임이랑 겹쳐. 맥주 따르기 타이밍 게임으로 바꿔줘. 초록 적정선에서 멈추는 방식으로.</div>
+          <div class="bubble ai"><div class="who">Claude</div>G6 전면 교체할게요! 맥주가 차오를 때 적정선에서 탭=멈춤, 8라운드 진행, 라운드 갈수록 구간 좁아지는 방식으로요.</div>
+          <div class="bubble me"><div class="who">나</div>회식 게임 7번째 잔에서 멈춰. 안 끝나.</div>
+          <div class="bubble ai"><div class="who">Claude</div>원인 찾았어요. 게임 정리하는 부분이 결과화면 띄우는 동작까지 같이 꺼버려서 7잔에서 멈춥니다. 그 부분만 보호하고, "다시하기" 누를 때 초기화도 같이 넣을게요.</div>
+        </div>
+        <p class="chat-note">→ 말로 안 되면 스크린샷, 수정은 즉시. 이걸 90번 반복</p>
+      </div>
+    </section>
+
+    <!-- ── SLIDE 8: PROMPT TIPS ── -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="sec-head">
+          <div class="kicker">Prompt Tips</div>
+          <h2>Claude와 일하는 법</h2>
+        </div>
+        <div class="grid c3">
+          <div class="card">
+            <div class="num">①</div>
+            <div class="ctitle">기획 먼저</div>
+            <div class="cdesc">코드 전에 대화로 설계.<br>"나랑 상의해서"</div>
+          </div>
+          <div class="card">
+            <div class="num">②</div>
+            <div class="ctitle">스크린샷 공유</div>
+            <div class="cdesc">폰 화면 캡처로 문제를 직접 보여주기</div>
+          </div>
+          <div class="card">
+            <div class="num">③</div>
+            <div class="ctitle">실제 맥락 주입</div>
+            <div class="cdesc">팀장 이름·부서·실제 업무를 직접 알려주기</div>
+          </div>
+        </div>
+        <div class="prompt-box">
+          <div style="color:var(--dim);font-size:13px;margin-bottom:8px">실제 요청 예시</div>
+          <span class="key bad">❌ 나쁜 예:</span> "게임 만들어줘"<br><br>
+          <span class="key good">✅ 좋은 예:</span> "6년차 직원 사기진작 미니게임인데 호빵 던지기는 다른 게임이랑 겹쳐. 맥주 따르기 타이밍 게임으로 바꿔줘. 초록 적정선에서 멈추는 방식으로."
+        </div>
+        <div class="panel alt" style="margin-top:16px">
+          <div style="font-size:13px;color:var(--gold);margin-bottom:8px">핵심 원칙</div>
+          <p style="font-size:15px;line-height:1.9">
+          🎯 <span class="highlight">구체적일수록</span> 결과가 좋다<br>
+          📸 말로 설명하기 어려우면 <span class="highlight">스크린샷으로</span><br>
+          🔄 한 번에 완성 기대 말고 <span class="highlight">반복 개선</span><br>
+          🏢 회사 고유 정보는 <span class="highlight">직접 주입</span>해야 한다</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SLIDE 9: TIMELINE ── -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="sec-head">
+          <div class="kicker">Timeline</div>
+          <h2>4일 만에 완성한 개발 스토리</h2>
+        </div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--dim)"></div>
+            <div class="tl-date">2026년 4월 말</div>
+            <div class="tl-txt">아이디어 구체화 + Claude와 기획 대화. 미니게임 라인업·캐릭터·도시명(피카시티) 모두 확정.
+            <span class="muted">→ 그런데… 실행 못 하고 잊혀짐 😅</span></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--gold)"></div>
+            <div class="tl-date">2026년 6월 12일 (D-Day)</div>
+            <div class="tl-txt"><span class="highlight">새 Claude 버전(페이블) 출시</span>를 보고 "이번엔 되겠다!" 싶어서 본격 시작. 기획은 4월에 다 해뒀으니 바로 개발 돌입.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--blue)"></div>
+            <div class="tl-date">6월 12일 ~ 14일</div>
+            <div class="tl-txt">v1 → v90까지 폭풍 개발. 하루에 수십 번씩 스크린샷 찍어 피드백 → 수정 반복. 미니게임 9개·픽셀아트·HUD·엔딩 화면 전부 완성.</div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot" style="background:var(--green)"></div>
+            <div class="tl-date">2026년 6월 15일 ← 오늘!</div>
+            <div class="tl-txt">PWA 패키징 완료. GitHub Pages 배포.
+            <span class="green">아이디어에서 완성까지 실질 개발 기간 단 4일.</span></div>
+          </div>
+        </div>
+        <div class="closing" style="margin-top:28px;padding:28px">
+          <div class="big-num">4일</div>
+          <p class="small" style="margin-top:6px">6월 12일 → 6월 15일 완성<br>(기획은 4월에 완료 — 개발만 4일)</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SLIDE 10: MINI GAMES ── -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="sec-head">
+          <div class="kicker">Mini Games</div>
+          <h2>9개 미니게임 = 실제 회사 업무</h2>
+        </div>
+        <div class="games">
+          <div class="gcell"><div class="gi">🐐</div><div class="gy">1년차</div><div class="gn">민원 팡팡</div></div>
+          <div class="gcell"><div class="gi">🦓</div><div class="gy">2년차</div><div class="gn">랜드마크 3종 건립</div></div>
+          <div class="gcell"><div class="gi">🐊</div><div class="gy">3년차</div><div class="gn">LNG 묵찌빠</div></div>
+          <div class="gcell"><div class="gi">🐘</div><div class="gy">4년차</div><div class="gn">싸와디캅! 출동!</div></div>
+          <div class="gcell"><div class="gi">🐂</div><div class="gy">5년차</div><div class="gn">전력입찰 올라올라</div></div>
+          <div class="gcell"><div class="gi">🐰</div><div class="gy">6년차</div><div class="gn">황금 건배!</div></div>
+          <div class="gcell"><div class="gi">🐯</div><div class="gy">7년차</div><div class="gn">터빈 마스터</div></div>
+          <div class="gcell"><div class="gi">🌿</div><div class="gy">8년차</div><div class="gn">탄소 헌터</div></div>
+          <div class="gcell"><div class="gi">🍱</div><div class="gy">9년차</div><div class="gn">배달의 신</div></div>
+        </div>
+        <div class="panel alt" style="margin-top:16px;text-align:center">
+          <div style="font-size:13px;color:var(--dim);margin-bottom:10px">게임에 담긴 실제 업무</div>
+          <div class="chips" style="justify-content:center">
+            <span class="chip">대관·대민</span>
+            <span class="chip g">ESG·SV</span>
+            <span class="chip b">전력거래·입찰</span>
+            <span class="chip gold">LNG도입·협상</span>
+            <span class="chip">설비정비</span>
+            <span class="chip p">탄소배출권거래</span>
+            <span class="chip pu">주주사대응</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SLIDE 11: WHAT'S NEXT + CLOSING ── -->
+    <section class="slide">
+      <div class="slide-inner">
+        <div class="sec-head">
+          <div class="kicker">What's Next</div>
+          <h2>앞으로의 계획</h2>
+        </div>
+        <div class="panel">
+          <span class="tag g">현재 목표</span>
+          <p>👥 <span class="highlight">사내 배포 → 직원 플레이 피드백 수집</span></p>
+          <p style="font-size:14px;color:var(--dim);margin-top:6px">실제 구성원들이 어떻게 느끼는지, 회사 이해도에 도움이 됐는지 확인</p>
+        </div>
+        <div class="panel alt">
+          <div style="font-size:13px;color:var(--gold);margin-bottom:8px">이후 고려사항</div>
+          <p style="font-size:15px;line-height:1.9">
+          🔗 SV 아카이브와 연동 — 게임 플레이 후 아카이브로 유도<br>
+          🏆 랭킹 시스템 고도화<br>
+          🆕 피드백 반영해서 콘텐츠 업데이트</p>
+        </div>
+
+        <div class="closing">
+          <p>기획 · 코드 · 픽셀아트 · 발표자료<br>
+          <span class="highlight">전부 Claude와 함께 만들었습니다.</span></p>
+          <p class="small" style="margin-top:10px">단, 아이디어·판단·피드백은 100% 사람이 했습니다.</p>
+          <div class="chips" style="justify-content:center;margin-top:18px">
+            <span class="chip gold">기획 AI</span>
+            <span class="chip g">코드 AI</span>
+            <span class="chip b">발표자료 AI</span>
+            <span class="chip p">아이디어 사람</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ── Navigation UI ── -->
+  <button class="nav-btn nav-prev" id="prevBtn" aria-label="이전 슬라이드">‹</button>
+  <button class="nav-btn nav-next" id="nextBtn" aria-label="다음 슬라이드">›</button>
+  <div class="counter"><span class="cur" id="curNum">1</span> / <span id="totalNum">11</span></div>
+  <div class="dots" id="dots"></div>
+  <div class="hint">← → 키 · 스페이스 · 클릭</div>
+</div>
+
+<script>
+// ── Cover stars (twinkle) ──
+(function(){
+  const el = document.getElementById('stars');
+  if(!el) return;
+  for(let i=0; i<70; i++){
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() < .55 ? 2 : (Math.random() < .85 ? 3 : 4);
+    const color = Math.random() < .15 ? '#f4d35e' : (Math.random() < .2 ? '#7fa8d0' : '#fff');
+    s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;
+      width:${size}px;height:${size}px;background:${color};
+      animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*3}s`;
+    el.appendChild(s);
+  }
+})();
+
+// ── Cover pixel art: PIKA CITY ──
+(function(){
+  const cv = document.getElementById('pikaCanvas');
+  if(!cv) return;
+  const c = cv.getContext('2d');
+  const W = 440, H = 120;
+  const draw = (x,y,w,h,col) => { c.fillStyle = col; c.fillRect(x,y,w,h); };
+  // chimney 1 (좌측 큰 굴뚝) - 좌표 2배 스케일
+  draw(40,20,24,80,'#2e3860'); draw(40,16,24,8,'#4a5480');
+  draw(44,4,6,6,'#c0cce8'); draw(48,0,6,6,'#8090bb');
+  // chimney 2 (중간 굴뚝)
+  draw(80,8,28,92,'#2e3860'); draw(80,4,28,8,'#4a5480');
+  draw(84,0,6,6,'#c0cce8');
+  // building (발전소 본관)
+  draw(32,84,84,36,'#232b50');
+  // windows (창문 - 일부는 켜져 있음)
+  [36,48,60,72,84,96].forEach((wx,i) => draw(wx,92,8,12,i%3===2?'#2a3050':'#f4d35e'));
+  // lightning bolt (번개)
+  [[152,40,16,6],[152,46,12,6],[146,52,16,6],[146,58,12,6]].forEach(([x,y,w,h]) => draw(x,y,w,h,'#f4d35e'));
+  // bigger stars in art
+  draw(200,16,8,8,'#f4d35e'); draw(280,32,8,8,'#7fa8d0');
+  draw(360,12,8,8,'#f4d35e'); draw(320,60,8,8,'#c0cce8');
+  draw(240,52,6,6,'#fff'); draw(400,40,6,6,'#f4d35e');
+  // grass line (풀밭)
+  for(let gx=0; gx<W; gx+=16) draw(gx,104,16,16,gx%32===0?'#2d5a3a':'#3a7048');
+  // city label
+  c.fillStyle = '#f4d35e';
+  c.font = 'bold 18px Consolas, D2Coding, monospace';
+  c.fillText('⚡ PIKA CITY', 188, 88);
+})();
+
+(function(){
+  const track   = document.getElementById('track');
+  const slides  = track.querySelectorAll('.slide');
+  const total   = slides.length;
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const curEl   = document.getElementById('curNum');
+  const totEl   = document.getElementById('totalNum');
+  const dotsBox = document.getElementById('dots');
+
+  let idx = 0;
+  totEl.textContent = total;
+
+  // build dots
+  for(let i=0;i<total;i++){
+    const b = document.createElement('button');
+    b.className = 'dot' + (i===0?' on':'');
+    b.setAttribute('aria-label', (i+1)+'번째 슬라이드로 이동');
+    b.addEventListener('click', ()=>go(i));
+    dotsBox.appendChild(b);
+  }
+  const dots = dotsBox.querySelectorAll('.dot');
+
+  function update(){
+    track.style.transform = `translateX(-${idx*100}vw)`;
+    curEl.textContent = idx + 1;
+    dots.forEach((d,i)=>d.classList.toggle('on', i===idx));
+    prevBtn.disabled = idx === 0;
+    nextBtn.disabled = idx === total - 1;
+    // scroll current slide to top
+    slides[idx].scrollTop = 0;
+  }
+  function go(n){
+    idx = Math.max(0, Math.min(total-1, n));
+    update();
+  }
+  function next(){ go(idx+1); }
+  function prev(){ go(idx-1); }
+
+  prevBtn.addEventListener('click', prev);
+  nextBtn.addEventListener('click', next);
+
+  // keyboard
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'ArrowRight' || e.key === 'PageDown'){ e.preventDefault(); next(); }
+    else if(e.key === 'ArrowLeft' || e.key === 'PageUp'){ e.preventDefault(); prev(); }
+    else if(e.key === ' '){ e.preventDefault(); next(); }
+    else if(e.key === 'Home'){ e.preventDefault(); go(0); }
+    else if(e.key === 'End'){ e.preventDefault(); go(total-1); }
+  });
+
+  // resize
+  window.addEventListener('resize', update);
+
+  update();
+})();
+</script>
+</body>
+</html>
