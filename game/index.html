@@ -2052,7 +2052,7 @@ function ending(){
         <button class="btn gold" id="endNext">${stg===totalStg-1?'결과 보기 ▶':'다음 ▶'}</button></div>`}`;
     if(isFinal){drawEndScene(grade);submitScore(total,grade);}
     else{const b=$('#endNext');if(b)b.onclick=()=>{stg++;renderStage();};
-      if(stg===totalStg-1){/* 랭킹은 마지막 직전 미리 로드하지 않음 */}}}
+      if(stg===totalStg-1){submitScore(total,grade);}}}
   hud(false);show('#scr-ending');renderStage();}
 function drawEndScene(g){
   const cv=$('#endCv');if(!cv)return;const x=cv.getContext('2d');x.imageSmoothingEnabled=false;
