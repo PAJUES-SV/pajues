@@ -422,7 +422,7 @@ p{margin:5px 0}
 <div id="app">
   <div id="crt"></div>
   <header id="hud">
-    <div class="hudTop"><span class="chip year">📅 <b id="hYear">1</b>년차</span><span class="chip" id="hNick" style="font-size:11px">👔 사장님</span></div>
+    <div class="hudTop"><span class="chip year">📅 <b id="hYear">1</b>년차</span><span class="chip" id="hNick" style="font-size:11px">👔 대표님</span></div>
     <div class="hudBars">
       <div class="hb"><span class="hi" id="icCash"></span><div class="gbar"><i id="bCash" style="background:#e8c050"></i></div><b id="hCash">100</b></div>
       <div class="hb"><span class="hi" id="icEsg"></span><div class="gbar"><i id="bEsg" style="background:#7ec97a"></i></div><b id="hEsg">50</b></div>
@@ -460,7 +460,7 @@ p{margin:5px 0}
   </section>
   <section id="scr-char" class="screen">
     <h2 class="center" style="font-size:20px;color:#fff;text-shadow:2px 2px 0 var(--dark)">대표이사 취임 준비</h2>
-    <p class="center dim" style="color:#fff;text-shadow:1px 1px 0 var(--dark)">나만의 동물 사장님을 선택하세요</p>
+    <p class="center dim" style="color:#fff;text-shadow:1px 1px 0 var(--dark)">나만의 동물 대표님을 선택하세요</p>
     <div class="charGrid" id="charGrid"></div>
     <input id="nickInput" maxlength="8" placeholder="닉네임 입력 (최대 8자)">
     <div class="center" style="margin-top:12px">
@@ -587,13 +587,13 @@ function pixifyDOM(root){const skip={SCRIPT:1,STYLE:1,TITLE:1,CANVAS:1};
 try{pixifyDOM(document.body);}catch(e){}
 
 /* ===================== 상태 ===================== */
-const S={year:1,cash:100,esg:50,morale:50,trust:50,charKey:null,nick:'사장님',
+const S={year:1,cash:100,esg:50,morale:50,trust:50,charKey:null,nick:'대표님',
   spa:null,hobbang:false,carbonShort:0,fails:0,landmark:false,minwonDown:false,history:[]};
 const CHARS={
-  cat:{n:'고양이 사장',t:'사기충천 리더',b:'직원사기 보상 +10%'},
-  bear:{n:'곰돌이 사장',t:'든든한 신뢰왕',b:'주주신뢰 보상 +10%'},
-  fox:{n:'여우 사장',t:'영리한 전략가',b:'현금 보상 +10%'},
-  dog:{n:'강아지 사장',t:'친근한 소통왕',b:'ESG 보상 +10%'}};
+  cat:{n:'고양이 대표',t:'사기충천 리더',b:'직원사기 보상 +10%'},
+  bear:{n:'곰돌이 대표',t:'든든한 신뢰왕',b:'주주신뢰 보상 +10%'},
+  fox:{n:'여우 대표',t:'영리한 전략가',b:'현금 보상 +10%'},
+  dog:{n:'강아지 대표',t:'친근한 소통왕',b:'ESG 보상 +10%'}};
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');window.scrollTo(0,0);}
 function hud(on){$('#hud').classList.toggle('show',on);}
 function setHUD(){$('#hYear').textContent=Math.min(S.year,10);$('#hCash').textContent=S.cash;
@@ -605,7 +605,7 @@ function setHUD(){$('#hYear').textContent=Math.min(S.year,10);$('#hCash').textCo
 function clamp(v){return Math.max(0,Math.min(100,Math.round(v)));}
 const PERK={fox:'cash',dog:'esg',cat:'morale',bear:'trust'};
 function perkBonus(stat,base){
-  // 해당 사장 특기 지표에 한해 +10%(양수일 때만), 보너스 정수액 반환
+  // 해당 대표 특기 지표에 한해 +10%(양수일 때만), 보너스 정수액 반환
   if(PERK[S.charKey]===stat&&base>0)return Math.max(1,Math.round(base*0.1));
   return 0;}
 function applyDelta(d,noPerk){
@@ -653,7 +653,7 @@ function startScene(){
     puffs.forEach(p=>{p.y-=.35;p.x+=.12;p.a-=.012;
       x.fillStyle=`rgba(255,255,255,${Math.max(p.a,0)})`;x.fillRect(p.x|0,p.y|0,p.s|0,p.s|0);});
     puffs=puffs.filter(p=>p.a>0);
-    // 걸어다니는 사장님
+    // 걸어다니는 대표님
     walker.t++;if(walker.t%4===0)walker.frame^=1;
     walker.x+=walker.dir*.5;
     if(walker.x>190){walker.dir=-1}if(walker.x<26){walker.dir=1}
@@ -730,7 +730,7 @@ function startArcadeGame(fn){
 function toModeSelect(){hud(false);show('#scr-mode');}
 function backToTitle(){hud(false);show('#scr-title');}
 window.toModeSelect=toModeSelect;
-const DEFAULT_STATE={year:1,cash:100,esg:50,morale:50,trust:50,charKey:null,nick:'사장님',
+const DEFAULT_STATE={year:1,cash:100,esg:50,morale:50,trust:50,charKey:null,nick:'대표님',
   spa:null,hobbang:false,carbonShort:0,fails:0,landmark:false,minwonDown:false,history:[]};
 function loadSaveData(){try{const sv=localStorage.getItem('pikaSave');if(!sv)return null;
   const d=JSON.parse(sv);if(d&&d.charKey&&d.year>1&&d.year<=9)return d;}catch(e){}return null;}
@@ -750,13 +750,13 @@ function goChar(){
        {t:'새로 시작',c:'gold',fn:()=>{try{localStorage.removeItem('pikaSave');}catch(e){}resetState();openCharSelect();}}]
     : [{t:'새로 시작',c:'gold',fn:()=>{resetState();openCharSelect();}}];
   const desc=d
-    ? `<b class="gold">${d.nick||'사장님'}</b> 대표님의 저장 기록이 있어요.<br>『<b class="gold">${d.year}년차</b>』부터 이어서 할 수 있어요.<br><span class="dim" style="font-size:11px">※ 새로 시작하면 기존 기록은 사라져요.</span>`
+    ? `<b class="gold">${d.nick||'대표님'}</b> 대표님의 저장 기록이 있어요.<br>『<b class="gold">${d.year}년차</b>』부터 이어서 할 수 있어요.<br><span class="dim" style="font-size:11px">※ 새로 시작하면 기존 기록은 사라져요.</span>`
     : `저장된 기록이 없어요.<br>새로 시작해서 JH에너지 대표이사로 취임하세요!`;
   const face=d?sprIMG(d.charKey,3):pixelEmoji('⚡',3);
   popup(face,'커리어 모드',desc,btns);
 }
 function confirmChar(){
-  if(!S.charKey){popup(pixelEmoji('⚠️',3),'잠깐!','동물 사장님을 먼저 골라주세요!');return;}
+  if(!S.charKey){popup(pixelEmoji('⚠️',3),'잠깐!','동물 대표님을 먼저 골라주세요!');return;}
   const nick=$('#nickInput').value.trim();
   if(!nick){popup(pixelEmoji('✍️',3),'닉네임이 필요해요!','대표이사 명패에 새길 닉네임을 입력해주세요.<br>(최종 성적표 랭킹에도 올라가요!)');return;}
   S.nick=nick;
@@ -797,7 +797,7 @@ const TUTS={
  2:{g:'<b>3개 건물 연속 완공!</b> 평균 정확도 85%↑ = 대성공',c:'층이 움직일 때 타이밍 맞춰 <b>▼ 떨어뜨리기</b> 탭',t:'2번째 건물부터 돌풍! 화살표 방향으로 블록이 밀려요. 92%+ 퍼펙트는 폭 회복!'},
  3:{g:'Mr.Croc과 묵찌빠 <b>3선승</b> → 연료 도입가 결정',c:'공격권 잡은 쪽과 같은 손을 내면 승리! Mr.Croc의 혼잣말은 참고만',t:'혼잣말은 가끔 거짓이에요. 흐름도 함께 읽으세요!'},
  4:{g:'충돌 <b>2회 이하</b>로 정문까지 달려 싸와디캅! 출동!',c:'화면(또는 점프 버튼) 탭 = 점프',t:'폐드럼은 높아요 — 한 박자 일찍 점프! 🦒 선두준 팀장이 안전을 지켜봅니다.'},
- 5:{g:'35초 동안 최대한 높이! <b>최고 고도 = 낙찰 단가</b>',c:'<b>탭 = 점프</b>. 움직이는 발판이 내 위로 올 때 점프해서 올라타기',t:'⚡전류·추락은 목숨 1개 소모(❤️3개). 빨간 선(연료비)을 넘겨야 이익!'},
+ 5:{g:'35초 동안 최대한 높이! <b>최고 고도 = 낙찰 단가</b>',c:'<b>탭 = 점프</b>. 움직이는 발판이 내 위로 올 때 점프해서 올라타기',t:'⚡전류·추락은 기회 1개 소모(❤️3개). 빨간 선(연료비)을 넘겨야 이익!'},
  6:{g:'<b>8번 건배</b> 중 적정선에서 멈춰 사기 UP (완벽 7잔↑ = 대성공)',c:'맥주가 차오를 때 <b>초록 적정선</b>에서 탭=멈춤',t:'라운드가 갈수록 적정 구간이 좁고 빨라져요!'},
  7:{g:'<b>6개 공정</b> 연속 수행 — 총 기록이 짧을수록 정비기간 단축(=보너스)',c:'공정마다 화면 안내를 따라 탭·문지르기·암기!',t:'작년 호빵 돌리기 성공 시 -8초 버프'},
  8:{g:'40초 안에 배출권 <b>6장</b>(10장+탄소발자국2↓ = S) 확보',c:'캐릭터가 자동으로 달려요. <b>탭 = 방향 전환</b>',t:'자동으로 좌우 왕복! 탭으로 방향만 바꿔 🌿 아래로, 탄소구름은 피하세요'},
@@ -885,7 +885,7 @@ function drawSawasdee(){
   heads.forEach((h,i)=>{const hx=18+i*44;x.drawImage(spr(h),hx,44,18,18);
     const c=(Math.floor(Date.now()/200)+i)%2;x.fillStyle='#fbe79a';
     x.fillRect(hx-(c?2:0),60,3,3);x.fillRect(hx+17-(c?0:2),60,3,3);});
-  // 사장 ↔ 코끼리 악수
+  // 대표 ↔ 코끼리 악수
   const ps=spr(S.charKey||'cat');
   x.drawImage(ps,74,64,28,36);
   x.drawImage(spr('thaiele2'),126,62,38,40);
@@ -1437,7 +1437,7 @@ function g6(){
     raw++;
     if(inZone){good++;$('#g6g').textContent=good;
       msg(perfectMid?'✨ 완벽한 한 잔! "위하여!!"':'🍺 좋아요! 적당한 한 잔!');}
-    else if(fill<zoneLo)msg('🥲 너무 적게 따랐어요... "사장님 짠돌이~"');
+    else if(fill<zoneLo)msg('🥲 너무 적게 따랐어요... "대표님 짠돌이~"');
     else msg('💦 넘쳤다!! "으악 과음각!"');
     idx++;$('#g6n').textContent=idx;
     if(idx>=TARGET){over=true;setTimeout(finish,500);return;}
