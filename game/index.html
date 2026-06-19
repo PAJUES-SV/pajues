@@ -1950,6 +1950,11 @@ function saveGame(){try{localStorage.setItem('pikaSave',JSON.stringify(S));}catc
 const SUPA_URL='https://qacbzixkdonoghjdhsop.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhY2J6aXhrZG9ub2doamRoc29wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjc3MTEsImV4cCI6MjA5Mjg0MzcxMX0.jczYyDVNLLPbTigTAOYCODKdRMHQKJpHc8hLti8lV5U';
 function escH(s){return String(s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));}
+function dedupeByNick(arr){
+  // score desc로 정렬된 배열 전제: 닉네임당 처음 나오는(=최고점) 것만 남김
+  const seen=new Set(),out=[];
+  for(const r of arr){if(!seen.has(r.nick)){seen.add(r.nick);out.push(r);}}
+  return out;}
 async function submitScore(total,grade){
   const box=$('#rankBox');if(!box)return;
   let rows=[],myRank=null,online=false;
@@ -1960,13 +1965,12 @@ async function submitScore(total,grade){
       await fetch(SUPA_URL+'/rest/v1/pika_scores',{method:'POST',
         headers:{...hd,'Content-Type':'application/json',Prefer:'return=minimal'},
         body:JSON.stringify({nick:S.nick.slice(0,12),score:total,grade}),signal:TO(5000)});
-      const r=await fetch(SUPA_URL+'/rest/v1/pika_scores?select=nick,score,grade&order=score.desc,created_at.asc&limit=10',{headers:hd,signal:TO(5000)});
+      const r=await fetch(SUPA_URL+'/rest/v1/pika_scores?select=nick,score,grade&order=score.desc,created_at.asc&limit=200',{headers:hd,signal:TO(5000)});
       if(!r.ok)throw 0;
-      rows=await r.json();
-      try{const rc=await fetch(SUPA_URL+'/rest/v1/pika_scores?select=id&score=gt.'+total,
-        {headers:{...hd,Prefer:'count=exact',Range:'0-0'}});
-        const cr=rc.headers.get('content-range');
-        if(cr&&cr.includes('/'))myRank=parseInt(cr.split('/')[1],10)+1;}catch(e){}
+      const all=dedupeByNick(await r.json());
+      rows=all.slice(0,10);
+      myRank=all.findIndex(x=>x.nick===S.nick)+1;
+      if(myRank<1)myRank=null;
       online=true;
     }catch(e){online=false;}}
   if(!online){
@@ -1975,14 +1979,16 @@ async function submitScore(total,grade){
       arr.push({nick:S.nick,score:total,grade});
       arr.sort((a,b)=>b.score-a.score);
       localStorage.setItem('pikaRank',JSON.stringify(arr.slice(0,30)));
-      rows=arr.slice(0,10);
-      myRank=arr.findIndex(r=>r.nick===S.nick&&r.score===total)+1;
+      const all=dedupeByNick(arr);
+      rows=all.slice(0,10);
+      myRank=all.findIndex(x=>x.nick===S.nick)+1;
+      if(myRank<1)myRank=null;
     }catch(e){rows=[{nick:S.nick,score:total,grade}];myRank=1;}}
   const offlineNote=!online?'<p class="center dim" style="font-size:10px;margin-top:6px">※ 온라인 랭킹은 인터넷 배포 환경에서 표시돼요 (현재 기기 기록만)</p>':'';
   const hanScore=Math.max(20,Math.min(99,total+Math.floor(Math.random()*16)-8));
   let mineShown=false;
   let html=rows.map((r,i)=>{
-    const me=!mineShown&&r.nick===S.nick&&r.score===total;if(me)mineShown=true;
+    const me=!mineShown&&r.nick===S.nick;if(me)mineShown=true;
     return `<div class="rankRow${me?' meR':''}"><span class="rk">${i+1}위</span><span style="flex:1">${escH(r.nick)} <span class="dim" style="font-size:11px">[${escH(r.grade)}]</span></span><b class="gold">${r.score}점</b></div>`;}).join('');
   html+=`<div class="rankRow" style="opacity:.85"><span class="rk">NPC</span><span style="flex:1;display:flex;align-items:center;gap:6px"><span style="line-height:0">${sprIMG('wolf',1.5)}</span>한대표 (한강파워)</span><b class="gold">${hanScore}점</b></div>`;
   html=`<p class="center" style="font-size:13px;color:#fff;text-shadow:1px 1px 0 var(--dark);margin-bottom:6px">${online?'🌐 글로벌 랭킹':'📱 이 기기 랭킹'}${myRank?` — 내 순위 <b class="gold">${myRank}위</b>`:''}</p>`+html;
