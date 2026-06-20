@@ -68,7 +68,7 @@ p{margin:5px 0}
   filter:drop-shadow(1px 1px 0 #000) drop-shadow(-1px -1px 0 #000)}
 .hudGear svg{width:20px!important;height:20px!important}
 /* 설정(⚙) 버튼 — 지정된 화면에서만 떠서 보임 (메인 화면은 HUD 칩 안의 작은 버튼을 따로 씀) */
-#gearBtn{position:fixed;top:10px;right:10px;z-index:60;width:30px;height:30px;background:none;border:none;
+#gearBtn{position:fixed;top:calc(10px + env(safe-area-inset-top));right:calc(10px + env(safe-area-inset-right));z-index:60;width:30px;height:30px;background:none;border:none;
   padding:0;display:none;align-items:center;justify-content:center;cursor:pointer;
   filter:drop-shadow(1px 1px 0 #000) drop-shadow(-1px -1px 0 #000)}
 #gearBtn svg{width:26px!important;height:26px!important}
@@ -802,7 +802,7 @@ function updateGearBtn(id){
   if(id==='#scr-game'){
     const atb=document.getElementById('acTopBar');
     // 미니게임 모드(◀목록 바 있음)는 그 줄에 맞춰 위로, 커리어 모드(자체 상단바만 있음)는 그 아래로
-    gb.style.top=(atb&&atb.style.display!=='none')?'12px':'48px';
+    gb.style.top=(atb&&atb.style.display!=='none')?'calc(12px + env(safe-area-inset-top))':'calc(48px + env(safe-area-inset-top))';
   }else{
     gb.style.top='';
   }
