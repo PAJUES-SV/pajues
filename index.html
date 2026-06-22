@@ -956,11 +956,6 @@ function showTab(id, btn, ac) {
       <input type="text" id="aiTitle" placeholder="예: 작은 지원이 만든 변화">
     </div>
     <div class="admin-field">
-      <label style="display:flex;align-items:center;gap:6px;font-weight:400">
-        <input type="checkbox" id="aiIsNew" checked style="width:auto;margin:0"> NEW 배지 표시
-      </label>
-    </div>
-    <div class="admin-field">
       <label>이미지 (여러 장 선택 — 선택한 순서대로 페이지가 됩니다)</label>
       <input type="file" id="aiFiles" accept="image/*" multiple>
       <div class="admin-preview" id="aiPreview"></div>
@@ -1086,6 +1081,9 @@ async function initIssues() {
   const dynamic = await fetchDynamicIssues();
   const merged = [...staticIssues, ...dynamic];
   merged.sort((a, b) => (b.year + b.month).localeCompare(a.year + a.month));
+  // NEW 배지는 항상 가장 최신 1건에만 자동으로 붙습니다.
+  // (개별 항목의 isNew 값은 더 이상 직접 신경 쓰지 않아도 됩니다)
+  merged.forEach((it, i) => { it.isNew = (i === 0); });
   issues = merged;
   const activeYear = document.querySelector('.year-btn.active');
   const year = activeYear?.textContent === '전체' ? 'all' : activeYear?.textContent.replace('년', '');
@@ -1312,7 +1310,6 @@ function openAdminPanel() {
   document.getElementById('aiYear').value = '';
   document.getElementById('aiMonth').value = '';
   document.getElementById('aiTitle').value = '';
-  document.getElementById('aiIsNew').checked = true;
   document.getElementById('aiFiles').value = '';
   document.getElementById('adminUploadStatus').textContent = '';
   document.getElementById('adminUploadStatus').className = 'admin-status';
@@ -1343,7 +1340,6 @@ async function submitNewIssue() {
   const year = document.getElementById('aiYear').value.trim();
   const monthRaw = document.getElementById('aiMonth').value.trim();
   const title = document.getElementById('aiTitle').value.trim();
-  const isNew = document.getElementById('aiIsNew').checked;
 
   if (!year || !monthRaw || !title || selectedAdminFiles.length === 0) {
     status.className = 'admin-status error';
@@ -1388,7 +1384,7 @@ async function submitNewIssue() {
         'Content-Type': 'application/json',
         Prefer: 'return=minimal'
       },
-      body: JSON.stringify({ year, month, title, folder, slides, is_new: isNew })
+      body: JSON.stringify({ year, month, title, folder, slides, is_new: false })
     });
     if (!insertRes.ok) {
       const t = await insertRes.text();
