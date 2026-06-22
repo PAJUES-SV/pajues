@@ -116,6 +116,44 @@ footer p{font-size:12px;color:var(--muted2)}
   .webtoon-topbar-title{display:none}
   .webtoon-content{padding:16px 8px 60px}
 }
+
+/* ── ADMIN ── */
+.admin-link{background:none;border:none;color:var(--muted2);font-size:11px;cursor:pointer;margin-top:6px;font-family:'Noto Sans KR',sans-serif;text-decoration:underline;text-underline-offset:2px}
+.admin-link:hover{color:var(--muted)}
+.admin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:300;align-items:center;justify-content:center;padding:20px}
+.admin-overlay.open{display:flex}
+.admin-modal{background:#fff;border-radius:16px;padding:28px;width:100%;max-width:380px;max-height:88vh;overflow-y:auto}
+.admin-modal.admin-panel{max-width:520px}
+.admin-modal h3{font-family:'NanumSquare',sans-serif;font-weight:800;font-size:17px;margin-bottom:18px;letter-spacing:-0.3px}
+.admin-modal h4{font-family:'NanumSquare',sans-serif;font-weight:800;font-size:13px;color:var(--muted);margin:18px 0 10px}
+.admin-modal input[type=password],.admin-modal input[type=text],.admin-modal input[type=number]{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;margin-bottom:6px}
+.admin-modal input[type=file]{font-size:12px;margin-top:4px}
+.admin-modal-btns{display:flex;gap:8px;margin-top:14px}
+.admin-modal-btns button{flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:#fff;font-weight:700;font-size:13px;cursor:pointer;font-family:'NanumSquare',sans-serif}
+.admin-modal-btns button:last-child{background:var(--text);color:#fff;border-color:var(--text)}
+.admin-error{color:#e0524d;font-size:11.5px;margin-top:8px;min-height:14px}
+.admin-panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.admin-panel-head h3{margin-bottom:0}
+.admin-close{background:none;border:none;font-size:16px;cursor:pointer;color:var(--muted)}
+.admin-row{display:grid;grid-template-columns:60px 1fr 60px 1fr;gap:6px;align-items:center;margin-bottom:10px}
+.admin-row label{font-size:12px;color:var(--muted);font-weight:700}
+.admin-field{margin-bottom:14px}
+.admin-field>label{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px}
+.admin-preview{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.admin-thumb{position:relative;width:56px;height:56px;border-radius:8px;overflow:hidden;border:1px solid var(--border)}
+.admin-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.admin-thumb span{position:absolute;bottom:2px;right:3px;background:rgba(0,0,0,0.6);color:#fff;font-size:9px;padding:1px 5px;border-radius:6px}
+.admin-submit{width:100%;padding:12px;border-radius:10px;border:none;background:var(--accent);color:#fff;font-weight:700;font-size:13.5px;cursor:pointer;font-family:'NanumSquare',sans-serif}
+.admin-submit:hover{opacity:0.9}
+.admin-status{font-size:12px;margin-top:10px;min-height:14px;color:var(--muted)}
+.admin-status.success{color:var(--green)}
+.admin-status.error{color:#e0524d}
+.admin-issue-list{display:flex;flex-direction:column;gap:6px}
+.admin-list-row{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:12.5px;gap:10px}
+.admin-list-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.admin-delete-btn{flex-shrink:0;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11.5px;color:#e0524d;cursor:pointer;font-family:'NanumSquare',sans-serif}
+.admin-delete-btn:hover{background:#fff5f5;border-color:#e0524d}
+.admin-empty{font-size:12.5px;color:var(--muted2);text-align:center;padding:14px 0}
 </style>
 </head>
 <body>
@@ -883,7 +921,57 @@ function showTab(id, btn, ac) {
 
 <footer>
   <p>© 파주에너지서비스 경영지원팀</p>
+  <button class="admin-link" onclick="openAdminLogin()">관리자</button>
 </footer>
+
+<!-- 관리자 로그인 -->
+<div class="admin-overlay" id="adminLoginOverlay">
+  <div class="admin-modal">
+    <h3>관리자 로그인</h3>
+    <input type="password" id="adminPasswordInput" placeholder="비밀번호" onkeydown="if(event.key==='Enter')checkAdminPassword()">
+    <p class="admin-error" id="adminLoginError"></p>
+    <div class="admin-modal-btns">
+      <button onclick="closeAdminLogin()">취소</button>
+      <button onclick="checkAdminPassword()">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- 관리자 패널 -->
+<div class="admin-overlay" id="adminPanelOverlay">
+  <div class="admin-modal admin-panel">
+    <div class="admin-panel-head">
+      <h3>카드뉴스 관리</h3>
+      <button class="admin-close" onclick="closeAdminPanel()">✕</button>
+    </div>
+
+    <div class="admin-row">
+      <label>연도</label>
+      <input type="number" id="aiYear" placeholder="2026">
+      <label>월</label>
+      <input type="number" id="aiMonth" min="1" max="12" placeholder="4">
+    </div>
+    <div class="admin-field">
+      <label>제목 (부제)</label>
+      <input type="text" id="aiTitle" placeholder="예: 작은 지원이 만든 변화">
+    </div>
+    <div class="admin-field">
+      <label style="display:flex;align-items:center;gap:6px;font-weight:400">
+        <input type="checkbox" id="aiIsNew" checked style="width:auto;margin:0"> NEW 배지 표시
+      </label>
+    </div>
+    <div class="admin-field">
+      <label>이미지 (여러 장 선택 — 선택한 순서대로 페이지가 됩니다)</label>
+      <input type="file" id="aiFiles" accept="image/*" multiple>
+      <div class="admin-preview" id="aiPreview"></div>
+    </div>
+    <button class="admin-submit" onclick="submitNewIssue()">업로드</button>
+    <p class="admin-status" id="adminUploadStatus"></p>
+
+    <h4>등록된 카드뉴스 (관리자 추가분)</h4>
+    <div class="admin-issue-list" id="adminIssueList"></div>
+  </div>
+</div>
 
 <script>
 // ════════════════════════════════════════════════════════
@@ -894,7 +982,7 @@ const SUPABASE_URL = 'https://qacbzixkdonoghjdhsop.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFhY2J6aXhrZG9ub2doamRoc29wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyNjc3MTEsImV4cCI6MjA5Mjg0MzcxMX0.jczYyDVNLLPbTigTAOYCODKdRMHQKJpHc8hLti8lV5U';
 const BASE = 'https://pajues-sv.github.io/pajues/issues';
 
-const issues = [
+const staticIssues = [
   {
     year:'2026', month:'03',
     label:'2026년 3월',
@@ -954,10 +1042,54 @@ const issues = [
 ];
 
 // ════════════════════════════════════════════════════════
+// 관리자 모드에서 추가한 카드뉴스는 Supabase(card_issues 테이블 +
+// card-issues 스토리지 버킷)에서 가져와 위 목록과 합쳐집니다.
+// 이 배열에 직접 추가할 필요는 더 이상 없습니다 (관리자 화면 이용).
+// ════════════════════════════════════════════════════════
+let issues = staticIssues.slice();
+const ADMIN_PASSWORD = 'pajues2026!';
+const STORAGE_BUCKET = 'card-issues';
+
+// ════════════════════════════════════════════════════════
 // 이하 수정 불필요
 // ════════════════════════════════════════════════════════
 function imgUrl(issue, file) {
+  if (issue.source === 'supabase') {
+    return `${SUPABASE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${issue.folder}/${file}`;
+  }
   return `${BASE}/${issue.folder}/${file}`;
+}
+
+// ── 관리자: Supabase에 등록된 카드뉴스 불러와 합치기 ──
+async function fetchDynamicIssues() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/card_issues?select=*`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.map(r => ({
+      year: r.year,
+      month: r.month,
+      label: `${r.year}년 ${parseInt(r.month, 10)}월`,
+      title: r.title,
+      isNew: !!r.is_new,
+      folder: r.folder,
+      slides: r.slides,
+      source: 'supabase',
+      _id: r.id
+    }));
+  } catch (e) { return []; }
+}
+
+async function initIssues() {
+  const dynamic = await fetchDynamicIssues();
+  const merged = [...staticIssues, ...dynamic];
+  merged.sort((a, b) => (b.year + b.month).localeCompare(a.year + a.month));
+  issues = merged;
+  const activeYear = document.querySelector('.year-btn.active');
+  const year = activeYear?.textContent === '전체' ? 'all' : activeYear?.textContent.replace('년', '');
+  await renderGrid(year || 'all');
 }
 
 // ── Supabase 하트 ──
@@ -1152,7 +1284,170 @@ document.getElementById('webtoonViewer').addEventListener('click', function(e) {
   }
 });
 
-renderGrid('all');
+// ── 관리자 모드 ──
+let selectedAdminFiles = [];
+
+function openAdminLogin() {
+  document.getElementById('adminLoginOverlay').classList.add('open');
+  const input = document.getElementById('adminPasswordInput');
+  input.value = '';
+  document.getElementById('adminLoginError').textContent = '';
+  setTimeout(() => input.focus(), 50);
+}
+function closeAdminLogin() {
+  document.getElementById('adminLoginOverlay').classList.remove('open');
+}
+function checkAdminPassword() {
+  const val = document.getElementById('adminPasswordInput').value;
+  if (val === ADMIN_PASSWORD) {
+    closeAdminLogin();
+    openAdminPanel();
+  } else {
+    document.getElementById('adminLoginError').textContent = '비밀번호가 올바르지 않습니다.';
+  }
+}
+
+function openAdminPanel() {
+  document.getElementById('adminPanelOverlay').classList.add('open');
+  document.getElementById('aiYear').value = '';
+  document.getElementById('aiMonth').value = '';
+  document.getElementById('aiTitle').value = '';
+  document.getElementById('aiIsNew').checked = true;
+  document.getElementById('aiFiles').value = '';
+  document.getElementById('adminUploadStatus').textContent = '';
+  document.getElementById('adminUploadStatus').className = 'admin-status';
+  selectedAdminFiles = [];
+  renderAdminPreview();
+  loadAdminIssueList();
+}
+function closeAdminPanel() {
+  document.getElementById('adminPanelOverlay').classList.remove('open');
+}
+
+document.addEventListener('change', e => {
+  if (e.target && e.target.id === 'aiFiles') {
+    selectedAdminFiles = Array.from(e.target.files);
+    renderAdminPreview();
+  }
+});
+
+function renderAdminPreview() {
+  const wrap = document.getElementById('aiPreview');
+  wrap.innerHTML = selectedAdminFiles.map((f, i) =>
+    `<div class="admin-thumb"><img src="${URL.createObjectURL(f)}"><span>${i + 1}</span></div>`
+  ).join('');
+}
+
+async function submitNewIssue() {
+  const status = document.getElementById('adminUploadStatus');
+  const year = document.getElementById('aiYear').value.trim();
+  const monthRaw = document.getElementById('aiMonth').value.trim();
+  const title = document.getElementById('aiTitle').value.trim();
+  const isNew = document.getElementById('aiIsNew').checked;
+
+  if (!year || !monthRaw || !title || selectedAdminFiles.length === 0) {
+    status.className = 'admin-status error';
+    status.textContent = '연도/월/제목/이미지를 모두 입력해주세요.';
+    return;
+  }
+  const month = monthRaw.padStart(2, '0');
+  const folder = `${year}-${month}`;
+
+  status.className = 'admin-status';
+  status.textContent = `업로드 중... (0/${selectedAdminFiles.length})`;
+
+  const slides = [];
+  try {
+    for (let i = 0; i < selectedAdminFiles.length; i++) {
+      const file = selectedAdminFiles[i];
+      const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+      const filename = String(i + 1).padStart(2, '0') + '.' + ext;
+      const path = `${folder}/${filename}`;
+      const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${STORAGE_BUCKET}/${path}`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`,
+          'Content-Type': file.type || 'image/jpeg'
+        },
+        body: file
+      });
+      if (!res.ok) {
+        const t = await res.text();
+        throw new Error('이미지 업로드 실패: ' + t);
+      }
+      slides.push(filename);
+      status.textContent = `업로드 중... (${i + 1}/${selectedAdminFiles.length})`;
+    }
+
+    const insertRes = await fetch(`${SUPABASE_URL}/rest/v1/card_issues`, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal'
+      },
+      body: JSON.stringify({ year, month, title, folder, slides, is_new: isNew })
+    });
+    if (!insertRes.ok) {
+      const t = await insertRes.text();
+      throw new Error('등록 실패 (폴더명이 중복되지 않았는지 확인해주세요): ' + t);
+    }
+
+    status.className = 'admin-status success';
+    status.textContent = '등록 완료! 목록에 반영되었습니다.';
+    document.getElementById('aiYear').value = '';
+    document.getElementById('aiMonth').value = '';
+    document.getElementById('aiTitle').value = '';
+    document.getElementById('aiFiles').value = '';
+    selectedAdminFiles = [];
+    renderAdminPreview();
+    await initIssues();
+    await loadAdminIssueList();
+  } catch (err) {
+    status.className = 'admin-status error';
+    status.textContent = err.message;
+  }
+}
+
+async function loadAdminIssueList() {
+  const wrap = document.getElementById('adminIssueList');
+  wrap.innerHTML = '불러오는 중...';
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/card_issues?select=*&order=year.desc,month.desc`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    const data = await res.json();
+    if (!data || data.length === 0) {
+      wrap.innerHTML = '<p class="admin-empty">관리자 화면으로 등록한 카드뉴스가 없습니다.</p>';
+      return;
+    }
+    wrap.innerHTML = data.map(r => `
+      <div class="admin-list-row">
+        <span>${r.year}년 ${parseInt(r.month, 10)}월 — ${r.title}</span>
+        <button class="admin-delete-btn" onclick="deleteIssue(${r.id})">삭제</button>
+      </div>`).join('');
+  } catch (e) {
+    wrap.innerHTML = '<p class="admin-empty">목록을 불러오지 못했습니다.</p>';
+  }
+}
+
+async function deleteIssue(id) {
+  if (!confirm('이 카드뉴스를 목록에서 삭제할까요? (스토리지의 이미지 파일은 별도로 남아있습니다)')) return;
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/card_issues?id=eq.${id}`, {
+      method: 'DELETE',
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    await initIssues();
+    await loadAdminIssueList();
+  } catch (e) {
+    alert('삭제에 실패했습니다.');
+  }
+}
+
+initIssues();
 </script>
 </body>
 </html>
