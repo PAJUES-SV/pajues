@@ -1113,11 +1113,11 @@ const TUTS={
  1:{g:'25초 안에 화난 주민 <b>18명</b> 진정',c:'화난 주민을 탭! 젖소 아주머니는 <b>3번</b> 탭',t:'시간이 갈수록 점점 빨라져요. 젖소는 점수 3배!'},
  2:{g:'<b>3개 건물 연속 완공!</b> 평균 정확도 85%↑ = 대성공',c:'층이 움직일 때 타이밍 맞춰 <b>▼ 떨어뜨리기</b> 탭',t:'2번째 건물부터 돌풍! 화살표 방향으로 블록이 밀려요. 92%+ 퍼펙트는 폭 회복!'},
  3:{g:'Mr.Croc과 묵찌빠 <b>3선승</b> → 연료 도입가 결정',c:'공격권 잡은 쪽과 같은 손을 내면 승리! Mr.Croc의 혼잣말은 참고만',t:'혼잣말은 가끔 거짓이에요. 흐름도 함께 읽으세요!'},
- 4:{g:'충돌 <b>2회 이하</b>로 정문까지 달려 싸와디캅! 출동!',c:'화면(또는 점프 버튼) 탭 = 점프',t:'폐드럼은 높아요 — 한 박자 일찍 점프! 🦒 선두준 팀장이 안전을 지켜봅니다.'},
- 5:{g:'35초 동안 최대한 높이! <b>최고 고도 = 낙찰 단가</b>',c:'<b>탭 = 점프</b>. 움직이는 발판이 내 위로 올 때 점프해서 올라타기',t:'⚡전류·추락은 기회 1개 소모(❤️3개). 빨간 선(연료비)을 넘겨야 이익!'},
+ 4:{g:'충돌 <b>2회 이하</b>로 정문까지 달려야 성공! (무충돌=퍼펙트, 3회+=실패)',c:'화면(또는 점프 버튼) 탭 = 점프',t:'폐드럼은 높아요 — 한 박자 일찍 점프! 🦒 선두준 팀장이 안전을 지켜봅니다.'},
+ 5:{g:'기회(❤️3번)가 남는 동안 최대한 높이! <b>높이 오를수록 SMP(낙찰 단가)가 올라가요</b>',c:'<b>탭 = 점프</b>. 움직이는 발판이 내 위로 올 때 점프해서 올라타기',t:'⚡전류·추락은 기회 1개 소모(❤️3개). 빨간 선(연료비)을 넘겨야 이익!'},
  6:{g:'<b>8번 건배</b> 중 적정선에서 멈춰 사기 UP (완벽 7잔↑ = 대성공)',c:'맥주가 차오를 때 <b>초록 적정선</b>에서 탭=멈춤',t:'라운드가 갈수록 적정 구간이 좁고 빨라져요!'},
  7:{g:'<b>6개 공정</b> 연속 수행 — 총 기록이 짧을수록 정비기간 단축(=보너스)',c:'공정마다 화면 안내를 따라 탭·문지르기·암기!',t:'작년 호빵 돌리기 성공 시 -8초 버프'},
- 8:{g:'40초 안에 배출권 <b>6장</b>(10장+탄소발자국2↓ = S) 확보',c:'캐릭터가 자동으로 달려요. <b>탭 = 방향 전환</b>',t:'자동으로 좌우 왕복! 탭으로 방향만 바꿔 🌿 아래로, 탄소구름은 피하세요'},
+ 8:{g:'40초 안에 배출권 <b>6장</b> 확보(B등급 기준). <b>(획득-충돌) 점수 14 이상 = S</b>',c:'캐릭터가 자동으로 달려요. <b>탭 = 방향 전환</b>',t:'자동으로 좌우 왕복! 탭으로 방향만 바꿔 🌿 아래로, 탄소구름은 피하세요'},
  9:{g:'40초 안에 <b>12가구</b>에 행복반찬 배달',c:'<b>탭 = 반대편 벽으로 점프</b>. 불 켜진 창=배달, 실외기·고드름=회피',t:'위에서 내려오는 걸 미리 보고 벽을 고르세요'}};
 function toMain(){
   if(S.year>9){ending();return;}
@@ -1223,7 +1223,7 @@ function afterYear(){
   if(y>=4&&Math.random()<0.35){randomEvent(next);return;}
   next();}
 function rivalCompare(){
-  const me=Math.round((Math.min(S.cash,300)/3+S.esg+S.morale+S.trust)/4);
+  const me=Math.round((Math.min(S.cash,1200)/12+S.esg+S.morale+S.trust)/4);
   const rv=Math.max(30,me+Math.floor(Math.random()*24)-12);
   const win=me>=rv;
   return `JH에너지 <b class="gold">${me}점</b> vs 한강파워 <b class="gold">${rv}점</b><br><br>한대표: "${win?'이...이번엔 운이 좋으셨군요!':'역시 한강파워가 한 수 위죠~'}"`;}
@@ -1568,8 +1568,6 @@ function g4(){
       res={ok:true,title:'퍼펙트 의전!',desc:meet+'무결점 달리기로 제시간 도착! 싸와디코: "사와디캅~! 어메이징 스피드! 추가 투자를 결정했어요!"'};}
     else if(hits<=2){dd=applyDelta({trust:8,cash:15});
       res={ok:true,title:'무사히 도착!',desc:meet+`충돌 ${hits}회. 싸와디코: "사와디캅~ 환영 감사해요! 옷에 묻은 건... 못 본 걸로 할게요~"`};}
-    else if(hits<=4){dd=applyDelta({trust:2,cash:5});
-      res={ok:true,title:'아슬아슬 도착...',desc:meet+`충돌 ${hits}회. 너덜너덜한 모습에 싸와디코가 살짝 당황했어요.`};}
     else{dd=applyDelta({trust:-10});
       res={ok:false,title:'의전 실패...',desc:meet+`충돌 ${hits}회... 흙투성이로 도착해 싸와디코의 신뢰가 떨어졌어요.`};}
     res.deltas=dd;finishGame(res);}}
@@ -1708,7 +1706,7 @@ function g5(){
   function settle(reason){
     if(over)return;over=true;cancelAnimationFrame(raf);
     const p=smpOf(height);const profit=Math.round((p-fuel)*0.9);
-    const beat=false;
+    const beat=profit>=70;  // S등급(입찰 대성공) 달성 시 주주신뢰 보너스
     let dd=applyDelta(profit>=0?{cash:profit,trust:beat?5:0}:{cash:0,trust:-3});
     let res;
     let gr;
@@ -1820,13 +1818,13 @@ function g6(){
     if(ended)return;ended=true;
     over=true;cancelAnimationFrame(raf);
     let res,dd;
-    if(good>=7){S.hobbang=true;dd=applyDelta({morale:16,trust:3},true);
+    if(good>=7){S.hobbang=true;dd=applyDelta({morale:34,trust:3},true);
       res={ok:true,title:'완벽한 회식! 사기 충천!',desc:`${good}/${TARGET}잔 완벽 건배! 사무실 사기가 하늘을 찔러요. 내년 정비에 숙련도 보너스!`,
         say:'"대표님과 마시는 술이 제일 답니다! 위하여!!"',sayFace:sprIMG('tiger',1)};}
-    else if(good>=5){S.hobbang=true;dd=applyDelta({morale:10},true);
+    else if(good>=5){S.hobbang=true;dd=applyDelta({morale:20},true);
       res={ok:true,title:'훈훈한 회식!',desc:`${good}/${TARGET}잔 적정 건배. 직원들이 즐거워했어요.`,
         say:'"오랜만에 좋은 자리였습니다!"',sayFace:sprIMG('rabbit',1)};}
-    else{dd=applyDelta({morale:-6},true);
+    else{dd=applyDelta({morale:-10},true);
       res={ok:false,title:'어색한 회식...',desc:`${good}/${TARGET}잔만 적정. 분위기가 살짝 가라앉았어요.`,
         say:'"대표님, 다음 회식은 좀 더... 편하게 부탁드려요."',sayFace:sprIMG('duck',1)};}
     res.deltas=dd;setTimeout(()=>finishGame(res),350);}}
@@ -2098,7 +2096,7 @@ function g7(){
     const days=Math.max(13,Math.round(14+(total-48)/6));
     const saved=Math.max(0,20-days);
     let res,dd;
-    if(days<=20){const b=saved*5+20;dd=applyDelta({cash:b,morale:5});
+    if(days<=20){const b=saved*5+20;dd=applyDelta({cash:b,morale:16});
       res={ok:true,title:saved>0?`정비 ${days}일 완료! ${saved}일 단축!!`:'정비 20일, 무사 완료!',
         desc:`총 기록 ${total.toFixed(1)}초!${bonus?' (호빵 버프 -8초 적용)':''} ${saved>0?`단축 보너스 ${saved}×5억 = +${saved*5}억!`:''} 🐯 오찬수 팀장: "대표님, 현장 감각이 보통이 아니신데요?!"`};}
     else{dd=applyDelta({cash:-15});
@@ -2321,7 +2319,7 @@ async function submitScore(total,grade){
 function ending(){
   cancelAnimationFrame(sceneRAF);
   try{localStorage.removeItem('pikaSave');}catch(e){}
-  const cN=Math.min(100,Math.round(S.cash/3));
+  const cN=Math.min(100,Math.round(S.cash/12));
   const total=Math.round((cN+S.esg+S.morale+S.trust)/4);
   let grade,title,msg,lights;
   if(total>=85&&S.landmark&&S.fails===0){grade='S';title='피카시티의 에너지 황제';
