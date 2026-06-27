@@ -1110,7 +1110,7 @@ const YEARS={
    npc:['🦒','SHE팀장 선두준','"배출권 받으세요 대표님! 탄소구름은 피하시고요!!"'],run:()=>g8()},
  9:{t:'행복반찬 나르기 대작전',dept:'경영지원팀 × SV',d:'행복나눔반찬 배달 출동! 아파트 외벽을 타고 오르며 불 켜진 가구에 반찬을 전달하세요. 탭으로 반대편 벽에 건너뛰고 실외기·고드름은 피하기!',npc:['🐰','경영지원팀장 강수진','"우리 SV 대표 사업이에요! 어르신들 따뜻한 밥 한 끼, 부탁드려요!"'],run:()=>g9()}};
 const TUTS={
- 1:{g:'25초 안에 화난 주민 <b>18명</b> 진정',c:'화난 주민을 탭! 젖소 아주머니는 <b>3번</b> 탭',t:'시간이 갈수록 점점 빨라져요. 젖소는 점수 3배!'},
+ 1:{g:'25초 안에 화난 주민 <b>18명</b> 이상 진정(30명+=S등급)',c:'화난 주민을 탭! 젖소 아주머니는 <b>3번</b> 탭',t:'시간이 갈수록 점점 빨라져요. 젖소는 점수 3배!'},
  2:{g:'<b>3개 건물 연속 완공!</b> 평균 정확도 85%↑ = 대성공',c:'층이 움직일 때 타이밍 맞춰 <b>▼ 떨어뜨리기</b> 탭',t:'2번째 건물부터 돌풍! 화살표 방향으로 블록이 밀려요. 92%+ 퍼펙트는 폭 회복!'},
  3:{g:'Mr.Croc과 묵찌빠 <b>3선승</b> → 연료 도입가 결정',c:'공격권 잡은 쪽과 같은 손을 내면 승리! Mr.Croc의 혼잣말은 참고만',t:'혼잣말은 가끔 거짓이에요. 흐름도 함께 읽으세요!'},
  4:{g:'충돌 <b>2회 이하</b>로 정문까지 달려야 성공! (무충돌=퍼펙트, 3회+=실패)',c:'화면(또는 점프 버튼) 탭 = 점프',t:'폐드럼은 높아요 — 한 박자 일찍 점프! 🦒 선두준 팀장이 안전을 지켜봅니다.'},
@@ -1276,9 +1276,13 @@ function g1(){
     if(time===12&&!rushed){rushed=true;msg('🔥 퇴근시간! 민원 러시가 시작됐다!!');}
     if(time<=0){clearInterval(tk);clearTimeout(spT);timers.forEach(t=>clearTimeout(t));
       spots.forEach(h=>{h.el.querySelectorAll('.res2').forEach(e=>e.remove());h.res=null;});
-      const ok=score>=18;if(ok)S.minwonDown=true;
-      const dd=applyDelta(ok?{esg:10,trust:5}:{esg:-8,cash:-10});
-      finishGame({ok,title:ok?'민원 진정 대성공!':'시장님의 경고 전화가...',
+      let gr;
+      if(score>=30)gr='S';else if(score>=24)gr='A';else if(score>=18)gr='B';else if(score>=12)gr='C';else gr='F';
+      const reward={S:{esg:18,trust:10},A:{esg:14,trust:8},B:{esg:10,trust:5},C:{esg:2},F:{esg:-8,cash:-10}};
+      const ok=gr!=='F';if(ok)S.minwonDown=true;
+      const dd=applyDelta(reward[gr]);
+      const gtxt={S:'S등급! 민원 진정 전설!',A:'A등급! 훌륭한 민원 대응',B:'B등급 — 목표 달성',C:'C등급 — 아슬아슬',F:'F등급... 시장님의 경고 전화가'};
+      finishGame({ok,title:gtxt[gr],
         desc:ok?`달랜 민원 ${score}건! 박할아버지: "허허, 새 대표 양반 제법이구먼~" 민원 발생 확률이 영구 감소했어요!`
               :`달랜 민원 ${score}건 (목표 18건). 주민들의 불만이 쌓이고 있어요...`,deltas:dd});}},1000);timers.push(tk);}
 
