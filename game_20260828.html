@@ -2740,7 +2740,7 @@ const FENCE_GX=3.4;   // 정문 개구부 반폭
     stage1Gate.add(box(0.85,0.18,0.85,'#c3cad0',px,0.09,ZG)); });       // 기둥 밑단
   stage1Gate.add(box(FENCE_GX*2+0.9,0.55,0.32,'#2b3a4d',0,3.05,ZG));    // 아치 간판 바
   stage1Gate.add(box(FENCE_GX*2+0.9,0.1,0.36,'#f4c14a',0,2.74,ZG));     // 간판 하단 골드 라인
-  { const lbl=textLabel('피카시티 발전소'); lbl.position.set(0,3.05,ZG+0.2); lbl.scale.setScalar(0.62);
+  { const lbl=textLabel('곰곰시티 발전소'); lbl.position.set(0,3.05,ZG+0.2); lbl.scale.setScalar(0.62);
     stage1Gate.add(lbl); }                                              // 간판 글자 (정면 고정)
   // 활짝 열린 철문 2짝 (안쪽으로 접힘)
   [[-FENCE_GX,-1],[FENCE_GX,1]].forEach(([px,sgn])=>{
@@ -2794,7 +2794,7 @@ function buildStageGate(tier){
       g.add(box(1.0,0.18,1.0,'#3d6fb4',px,2.95,ZG)); });       // 블루 밴드
     g.add(box(8.2,0.62,0.4,'#2b3a4d',0,3.95,ZG));              // 간판 바
     g.add(box(8.2,0.1,0.44,'#f4c14a',0,3.56,ZG));              // 골드 라인
-    const lbl=textLabel('피카시티 복합화력'); lbl.scale.setScalar(0.7); lbl.position.set(0,3.95,ZG+0.22); g.add(lbl);
+    const lbl=textLabel('곰곰시티 복합화력'); lbl.scale.setScalar(0.7); lbl.position.set(0,3.95,ZG+0.22); g.add(lbl);
   } else {
     // 🌐 글로벌 에너지 대기업: 대형 문주 + 이중 골드 트림 간판 + 골드 엠블럼 + 문주 위 사기(社旗)
     [-3.4,3.4].forEach(px=>{
@@ -2808,7 +2808,7 @@ function buildStageGate(tier){
     g.add(box(9.6,0.12,0.56,'#e2b93c',0,5.94,ZG));             // 골드 트림 (하)
     g.add(box(9.66,0.12,0.56,'#e2b93c',0,6.86,ZG));            // 골드 트림 (상)
     { const emb=cyl(0.3,0.3,0.06,16,'#e2b93c',0,7.16,ZG); emb.rotation.x=Math.PI/2; emb.castShadow=false; g.add(emb); }   // 골드 엠블럼
-    const lbl=textLabel('피카시티 에너지 그룹'); lbl.scale.setScalar(0.82); lbl.position.set(0,6.4,ZG+0.28); g.add(lbl);
+    const lbl=textLabel('곰곰시티 에너지 그룹'); lbl.scale.setScalar(0.82); lbl.position.set(0,6.4,ZG+0.28); g.add(lbl);
   }
 }
 const yardSteam=[];
@@ -3690,7 +3690,7 @@ function enterRoom(name){ mode='room'; yard.visible=false; roomEnterAt=performan
   }
   if(name==='reception' && patience.guest.active && patience.guest.q && rooms.reception.guest && rooms.reception.guest.visible){
     const isMin=patience.guest.special==='minister', isInv=patience.guest.special==='investor';
-    const spk=isMin?'산업통상부 장관':(isInv?'글로벌 투자자':'피카시티 시장');
+    const spk=isMin?'산업통상부 장관':(isInv?'글로벌 투자자':'곰곰시티 시장');
     if(isInv){ say(spk, patience.guest.q, 'mayor', null, 'tap'); }   // 투자자는 성향 없음 — 조건 충족 여부만 본다
     else {
       patience.guest.introPending=true;
@@ -4088,7 +4088,7 @@ const stageChapters={
   { name:'첫 출근', quests:[
       mkQ('첫 전력 입찰에 성공하세요 (전력거래실)','💰+30',()=>ST.bidsWon>=1,()=>{G.money+=30;}),
       mkQ('고장난 터빈을 정비하세요 (가스터빈실)','⚙️+10',()=>ST.repairs>=1,()=>{G.tech+=10;}),
-      mkQ('피카시티 시장을 응대하세요 (대외협력실)','🏛️+5',()=>ST.recep>=1,()=>{G.pol+=5;}),
+      mkQ('곰곰시티 시장을 응대하세요 (대외협력실)','🏛️+5',()=>ST.recep>=1,()=>{G.pol+=5;}),
       mkQ('민원을 해결하세요 (ESG소통실)','🍃+3',()=>ST.civils>=1,()=>{G.esg=clampS(G.esg+3,100);}),
       mkQ('탕비실에서 간식을 먹고 피로를 푸세요','💰+20',()=>ST.snacks>=1,()=>{G.money+=20;}),
       mkQ('전력거래실 직원을 고용하세요','💰+40',()=>staffState.control.hired,()=>{G.money+=40;}),
@@ -4097,7 +4097,7 @@ const stageChapters={
   { name:'발전소 안정화', quests:[
       mkQ('전력 입찰 5회 누적 성공','💰+60',()=>ST.bidsWon>=5,()=>{G.money+=60;}),
       mkQ('터빈 정비 5회 누적 완료','⚙️+15',()=>ST.repairs>=5,()=>{G.tech+=15;}),
-      mkQ('피카시티 시장을 2회 응대하세요 (대외협력실)','🏛️+10',()=>ST.recep>=2,()=>{G.pol+=10;}),
+      mkQ('곰곰시티 시장을 2회 응대하세요 (대외협력실)','🏛️+10',()=>ST.recep>=2,()=>{G.pol+=10;}),
       mkQ('자금 500을 달성하세요','⚙️+20',()=>G.money>=500,()=>{G.tech+=20;}),
       mkQ('기술력 50을 달성하세요','💰+40',()=>G.tech>=50,()=>{G.money+=40;}),
       mkQ('가스터빈 2호기를 증설하세요 (💰350·⚙️15·🏛️8)','📖 Chapter 3',()=>ST.turbine2,null) ] },
@@ -4121,7 +4121,7 @@ const stageChapters={
   { name:'선착장 건설', quests:[
       mkQ('바닷가 새 부지에서 전력 입찰 10회 누적','💰+50',()=>ST.bidsWon-(STAGE_BASE[2]?.bidsWon||0)>=10,()=>{G.money+=50;}),
       mkQ('복합화력 터빈 정비 8회 누적','⚙️+15',()=>ST.repairs-(STAGE_BASE[2]?.repairs||0)>=8,()=>{G.tech+=15;}),
-      mkQ('피카시티 시장을 3회 응대하세요 (대외협력실)','🏛️+10',()=>ST.recep-(STAGE_BASE[2]?.recep||0)>=3,()=>{G.pol+=10;}),
+      mkQ('곰곰시티 시장을 3회 응대하세요 (대외협력실)','🏛️+10',()=>ST.recep-(STAGE_BASE[2]?.recep||0)>=3,()=>{G.pol+=10;}),
       mkQ('자금 900을 달성하세요','💰+60',()=>G.money>=900,()=>{G.money+=60;}),
       mkQ('기술력 40을 확보하세요 (선착장 준공 준비)','💰+40',()=>G.tech>=40,()=>{G.money+=40;}),
       mkQ('📋 프로젝트: LNG 탐사선착장 준공 (💰850·⚙️55·🏛️20 투입)','⚓ 선착장 오픈',
@@ -4221,7 +4221,7 @@ function checkQuest(){ checkAchievements();   // 🏆 업적은 자유운영 포
 // TUT_MSG: 부지에서 "어디로 가라"를 알려주는 대화창 설명
 // 각 단계는 짧은 대사 여러 개로 쪼갬 — 한 번에 길게 읽히지 않게, 탭하며 넘김
 const TUT_MSG=[
-  ['에너지 도시 피카시티에 오신 걸 환영합니다! 오늘부터 당신이 이 발전소의 대표입니다.',
+  ['에너지 도시 곰곰시티에 오신 걸 환영합니다! 오늘부터 당신이 이 발전소의 대표입니다.',
    '📋 오른쪽 위 <b>스테이지 버튼</b>을 누르면 퀘스트 목록이 나와요.',
    '발전소는 <b>전력시장에 입찰</b>해서 전력을 거래하고, 그 대금으로 운영됩니다.',
    '👉 <b>바닥을 탭</b>하면 그쪽으로 걸어갑니다.',
@@ -4231,7 +4231,7 @@ const TUT_MSG=[
    '터빈을 정비해야 전력을 계속 생산할 수 있어요.',
    '👉 <b>가스터빈실</b>로 들어가세요!'],
   ['터빈이 다시 돌아갑니다! 발전 재개!',
-   '🏛️ 마침 <b>피카시티 시장님</b>이 찾아오셨네요.',
+   '🏛️ 마침 <b>곰곰시티 시장님</b>이 찾아오셨네요.',
    '시장님 성향에 맞게 응대하면 <b>협력도</b>가 오르고, 어긋난 답을 고르면 오히려 떨어질 수도 있어요.',
    '협력도는 <b>시청이 우리 발전소를 얼마나 믿어주는지</b>를 나타내요.<br>높을수록 <b>발전소 증설 시 인허가</b>를 받기 쉬워집니다.',
    '👉 <b>대외협력실</b>로 들어가세요!'],
@@ -5817,7 +5817,7 @@ function clearCivilQueue(exitAngry){
 }
 
 setDogFace(rooms.civil.civ,'angry');   // 민원인 기본: 화난 얼굴
-setDogFace(rooms.reception.guest,'smile'); // 피카시티 시장 기본: 평온한 얼굴
+setDogFace(rooms.reception.guest,'smile'); // 곰곰시티 시장 기본: 평온한 얼굴
 // 직원 dog 연결
 staffState.control.dog=rooms.control.staffDog;
 staffState.turbine.dog=rooms.turbine.staffDog;
@@ -5948,7 +5948,7 @@ function guestExpire(kind){ const p=patience[kind]; p.active=false; p.v=0; p.pre
     }
     G.pol=clampS(G.pol-5,999999);
     const isMin=p.special==='minister';
-    if(mode==='room'&&curRoom==='reception') say(isMin?'산업통상부 장관':'피카시티 시장', isMin?'시간이 없군. 다음 기회에 보지.':'너무 오래 기다렸네요… 다음에 다시 오죠.','mayor',null,'tap');
+    if(mode==='room'&&curRoom==='reception') say(isMin?'산업통상부 장관':'곰곰시티 시장', isMin?'시간이 없군. 다음 기회에 보지.':'너무 오래 기다렸네요… 다음에 다시 오죠.','mayor',null,'tap');
     addAlert('npcleft',isMin?'😡 산업통상부 장관이 그냥 돌아갔어요! 🏛️-5':'😡 시장이 화나서 돌아갔어요! 🏛️-5','warn',4000); }
   else {
     const isStu=p.special==='student';
@@ -6404,8 +6404,8 @@ function respawnVisitor(kind){ const p=patience[kind]; p.v=1; p.active=true; p.p
       setDogFace(dog, mm.face);
       if(mode==='room'&&curRoom==='reception'){
         p.introPending=true;
-        say('피카시티 시장', p.q, 'mayor', null, 'tap');
-        say('피카시티 시장', mm._hint, 'mayor', recepAutoRespond, 'tap');   // 성향 힌트 · 뜨는 즉시 선택지가 열림
+        say('곰곰시티 시장', p.q, 'mayor', null, 'tap');
+        say('곰곰시티 시장', mm._hint, 'mayor', recepAutoRespond, 'tap');   // 성향 힌트 · 뜨는 즉시 선택지가 열림
       }
     }
   }
@@ -6587,7 +6587,7 @@ function doReception(){ if(recepCool||!patience.guest.active||!rooms.reception.g
     const gp=Math.round(7*(1+achBonus('gov')));
     G.pol=clampS(G.pol+gp,999999); ST.recep++; floatText('🏛️+'+gp,'#d0b8ff');
     setDogFace(rooms.reception.guest,'smile');
-    finishRecep('협력, 적극 추진하겠습니다!','피카시티 시장',['좋습니다, 기대할게요!','역시 대표님!']);
+    finishRecep('협력, 적극 추진하겠습니다!','곰곰시티 시장',['좋습니다, 기대할게요!','역시 대표님!']);
     return; }
   patience.guest.active=false;   // 선택하는 동안 인내심 정지
   showChoices(m.opts, mood, (o, g)=>{
@@ -6615,7 +6615,7 @@ function doReception(){ if(recepCool||!patience.guest.active||!rooms.reception.g
         G.money=clampS(G.money-30,999999); G.esg=clampS(G.esg+4,100); G.pol=clampS(G.pol+3,999999);
         floatText('💰-30 🍃+4 🏛️+3','#7bc47f');
         say('안내','🤝 '+dTxt+' (💰-30 · 🍃+4 🏛️+3)','sys',null,'tap',null,true); } }
-    finishRecep(o.r, '피카시티 시장', closeLines.map(s=>s+deltaSuffix));
+    finishRecep(o.r, '곰곰시티 시장', closeLines.map(s=>s+deltaSuffix));
   });
 }
 // 대외협력실 응대 마무리 (대사 → 퇴장) — 선택지/장관 공통
@@ -7813,12 +7813,12 @@ const DOGAM_DEFS={
   ],
   업적:[
     {icon:'🏛️', name:'산업통상부 장관 방문 기념', art:['#CBD9EC','#93AAC8'], desc:'까다로운 질문 세례를 웃으며 넘겼다. 장관님도 엄지 척!', get:()=>(ST.ministerMet||0)>=1},
-    {icon:'🌐', name:'글로벌 투자 유치 성공', art:['#B6DDD6','#79BDB2'], desc:'숫자로 증명해낸 신뢰. 해외 자본이 피카시티로!', get:()=>(ST.investorMet||0)>=3},
+    {icon:'🌐', name:'글로벌 투자 유치 성공', art:['#B6DDD6','#79BDB2'], desc:'숫자로 증명해낸 신뢰. 해외 자본이 곰곰시티로!', get:()=>(ST.investorMet||0)>=3},
     {icon:'🏫', name:'어린이 견학단의 하루', art:['#D5E8B8','#A8CC7C'], desc:'\'발전소 아저씨 최고!\' 미래 꿈나무들의 견학 기념 사진.', get:()=>(ST.studentTour||0)>=1},
     {icon:'🔧', name:'CI 정비 완수', art:['#D9E4F0','#A9BFD8'], desc:'연소기를 말끔히 손본 날. 터빈이 다시 가볍게 돈다.', get:()=>(ST.ohCI||0)>=1},
     {icon:'⚙️', name:'HGPI 정비 완수', art:['#E4DCF2','#B9A9DC'], desc:'고온부까지 파고든 정밀 점검. 베테랑의 손길.', get:()=>(ST.ohHGPI||0)>=1},
     {icon:'🌀', name:'MI 대정비 완수', art:['#F6DCC4','#E0A96D'], desc:'터빈을 통째로 열어 되살린 날. 발전소가 새로 태어났다.', get:()=>(ST.ohMI||0)>=1},
-    {icon:'🥶', name:'재난을 이겨낸 발전소', art:['#BEDCF0','#7FB2D6'], desc:'한파도 폭염도 피카시티의 불을 끄지 못했다.', get:()=>!!ST.disasterCleared},
+    {icon:'🥶', name:'재난을 이겨낸 발전소', art:['#BEDCF0','#7FB2D6'], desc:'한파도 폭염도 곰곰시티의 불을 끄지 못했다.', get:()=>!!ST.disasterCleared},
   ],
 };
 let dogamTab='건물';
