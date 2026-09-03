@@ -54,6 +54,20 @@
   #questFab.on { display:flex; }
   #questFab:active { transform:translateY(2px); box-shadow:0 1px 0 rgba(200,164,90,.4); }
   #questFab svg { width:100%; height:100%; display:block; }
+  /* 🐻 3D 곰돌이 얼굴로 교체됐을 때 — 손으로 그린 SVG 대신 실제 캐릭터를 쓴다.
+     프로필 카드(.pfAv.img)가 이미 같은 방식이라 두 곳의 곰돌이가 항상 같은 옷을 입는다.
+     ⚠️ background-image를 인라인으로 넣으면 위 규칙의 금색 그라데이션이 통째로 덮인다.
+        (둘 다 background-image다) → JS에서 '곰돌이, 그라데이션' 두 겹으로 쌓고
+        여기서 각 겹의 크기·위치를 따로 준다. 첫 값이 곰돌이, 둘째가 금색 바탕이다.
+     ⚠️ 얼굴을 원에 꽉 채우면 버튼이 아니라 떠 있는 스티커로 보인다.
+        74%로 줄여 금색 테두리가 남게 하고, 흰 링을 둘러 '누르는 것'임을 분명히 한다. */
+  #questFab.img { padding:0; border:2.5px solid #FFFDF6;
+    background-size:74% auto, 100% 100%;
+    background-position:center 47%, center;
+    background-repeat:no-repeat, no-repeat;
+    box-shadow:0 3px 0 rgba(198,160,84,.6), 0 6px 14px rgba(120,100,70,.26); }
+  #questFab.img:active { box-shadow:0 1px 0 rgba(198,160,84,.5); }
+  #questFab.img svg { display:none; }
   /* 🗑️ 상점/프로필 FAB는 없앴다 — 기록실 카드가 이미 프로필 카드(.pfCard)를 달고 있어서
      부지에 버튼이 둘이면 같은 것이 두 곳에 있는 꼴이 된다. 스타일은 기록실 카드 안으로 들어간다. */
   /* 🔧 대정비 이벤트 버튼 — 도감 버튼 왼쪽, 정비 시기에만 노출 */
@@ -157,21 +171,40 @@
   .swt.on { background:#7bc47f; }
   .swt.on i { left:20px; }
 
-  /* 스탯 캡슐 — 테두리 없이 부드러운 그림자로만 (3D 월드의 무외곽선 룩과 통일) */
+  /* 스탯 캡슐 — 5개가 전부 같은 크림색이라 아이콘만 다른 '한 덩어리'로 읽혔다.
+     스탯마다 고유 색을 입혀, 위치가 아니라 색으로 찾게 한다.
+     ⚠️ 3D 월드가 무외곽선 룩이라 진한 테두리는 여전히 쓰지 않는다. 대신 퀘스트 패널이
+        이미 쓰는 흰 테두리를 둘러 배경에서 떼어낸다 (box-sizing:border-box라 크기는 그대로). */
   #statWrap { margin-top:9px; padding-left:9px; }
   .stats { display:flex; gap:8px; }
-  .stat { position:relative; flex:1; min-width:0; height:26px; background:rgba(255,253,246,.94); border-radius:999px;
-    box-shadow:0 2px 0 rgba(190,172,140,.4), 0 5px 12px rgba(120,100,70,.14);
+  .stat { position:relative; flex:1; min-width:0; height:28px; background:rgba(255,253,246,.94);
+    border:2px solid #fff; border-radius:999px;
+    box-shadow:0 2px 0 rgba(190,172,140,.42), 0 5px 12px rgba(120,100,70,.18);
     padding:0 10px 0 19px; display:flex; align-items:center; justify-content:flex-end; }
+  /* 스탯별 색 — 각 아이콘과 같은 계열로 맞춰 아이콘·캡슐이 한 몸으로 읽히게 한다 */
+  .stat.sMoney { background:#FFF1CB; } .stat.sMoney .v { color:#7E5A0B; }
+  .stat.sTech  { background:#FBE3CE; } .stat.sTech  .v { color:#82461B; }
+  .stat.sPol   { background:#DCEAF7; } .stat.sPol   .v { color:#2A5474; }
   /* 아이콘 탈출(overflow) 효과: 캡슐 왼쪽 밖으로 살짝 돌출, 박스보다 살짝 큼 */
   .stat .ic { position:absolute; left:-9px; top:50%; transform:translateY(-50%); width:30px; height:30px;
-    background:#FFFEF8; border-radius:50%; box-shadow:0 2px 6px rgba(120,100,70,.24);
+    background:#FFFEF8; border-radius:50%; box-shadow:0 2px 6px rgba(120,100,70,.28);
     display:flex; align-items:center; justify-content:center; z-index:2; }
   .stat .ic svg { width:18px; height:18px; display:block; }
-  .stat .v { position:relative; z-index:1; font-size:12px; font-weight:700; color:#5B4A3A; line-height:1; }
+  .stat .v { position:relative; z-index:1; font-size:13.5px; font-weight:800; color:#5B4A3A; line-height:1; }
   /* 게이지 캡슐: 캡슐 배경 자체가 파스텔 색으로 차오름 */
   .stat.gauge .gtrack { position:absolute; inset:0; border-radius:999px; overflow:hidden; z-index:0; }
   .gfill { height:100%; width:50%; background:linear-gradient(90deg,#C4E8B8,#9AD6A0); transition:width .4s ease, background .4s; }
+  /* 게이지 위에서는 파스텔 배경과 갈색 글자의 밝기가 붙어 숫자가 묻힌다 → 숫자 뒤에 흰 알약을 깐다.
+     (게이지 색은 구간별로 초록·노랑·빨강까지 바뀌므로, 어느 색 위에서든 읽히려면 이 방법뿐이다) */
+  .stat.gauge .v { color:#4A3A2A; background:rgba(255,255,255,.86); border-radius:999px; padding:2px 6px 3px;
+    box-shadow:0 1px 2px rgba(120,100,70,.18); }
+  /* 💤 피로도 Zzz — 모양은 고정이고 색만 단계에 따라 바뀐다.
+     구간(30 / 60)은 피로도 페널티 구간이자 게이지가 색을 바꾸는 지점과 같다.
+     아이콘과 게이지가 같은 순간에 같은 색으로 넘어가야 둘이 한 몸으로 읽힌다. */
+  .sFatig .z1 { stroke:#8A7AB0; transition:stroke .35s; }
+  .sFatig .z2 { stroke:#6E5B8F; transition:stroke .35s; }
+  .sFatig.f1 .z1 { stroke:#E0A83C; } .sFatig.f1 .z2 { stroke:#BE8218; }
+  .sFatig.f2 .z1 { stroke:#EE7A5E; } .sFatig.f2 .z2 { stroke:#CF4E36; }
 
   /* 퀘스트 패널 — 스테이지 버튼 탭 시 우측 상단에서 펼쳐짐 */
   /* 퀘스트 패널 (스테이지 버튼에서 펼쳐지는 튜토리얼 메뉴) — 화면 우측 상단, 중앙을 가리지 않음 */
@@ -314,6 +347,9 @@
   #floatLayer { position:absolute; inset:0; z-index:7; pointer-events:none; overflow:hidden; }
   .flo { position:absolute; font-size:15px; font-weight:800; animation:floUp 1s ease forwards; }
   .flIco { width:1.05em; height:1.05em; vertical-align:-0.18em; display:inline-block; }
+  /* 🐻 대표 메뉴의 항목 아이콘만 키운다. .flIco는 대화창·토스트·카드에서도 쓰이므로
+     전역으로 키우면 그쪽 줄높이가 다 틀어진다 — 이 메뉴 안으로만 한정한다. */
+  #staffCardInner.nb .scBtn .flIco { width:1.5em; height:1.5em; vertical-align:-0.36em; margin-right:2px; }
   @keyframes floUp { from{transform:translateY(0);opacity:1} to{transform:translateY(-40px);opacity:0} }
 
   /* ===== 시작 화면 (타이틀 아트 1장) ===== */
@@ -505,13 +541,15 @@
   .ohChain::before { left:7px; } .ohChain::after { right:7px; }
   .ohChainI { position:relative; width:44px; height:44px; flex:0 0 auto; border:none;
     clip-path:polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0% 50%);                        /* 육각 레시피 슬롯 */
-    background:linear-gradient(158deg,#FFFFFF 0%,#DCE5EF 34%,#A3B0C0 100%);
-    filter:drop-shadow(0 2px 3px rgba(20,30,44,.5)); }
+    /* 보드 칸(.ohCell)과 같은 이유로 어둡게 — 두 곳이 톤이 갈리면 같은 부품이
+       체인에서는 보이고 보드에서는 안 보이는(또는 그 반대) 일이 생긴다. */
+    background:linear-gradient(158deg,#6E7C8B 0%,#4E5A68 34%,#39434F 100%);
+    filter:drop-shadow(0 2px 3px rgba(8,14,22,.6)); }
   .ohChainI::after { content:''; position:absolute; inset:9%; clip-path:polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0% 50%);
-    background:linear-gradient(158deg,#7E8C9E 0%,#98A5B5 45%,#B7C3D1 100%);
-    box-shadow:inset 0 2px 4px rgba(24,34,48,.45); z-index:0; }
+    background:linear-gradient(158deg,#2F3945 0%,#3A4451 45%,#46515E 100%);
+    box-shadow:inset 0 2px 4px rgba(8,14,22,.55); z-index:0; }
   .ohChainI .ohP { z-index:1; inset:16%; }
-  .ohChainI.unk { background:linear-gradient(158deg,#C3CDDA 0%,#94A1B1 60%,#7E8C9E 100%); }
+  .ohChainI.unk { background:linear-gradient(158deg,#5A6774 0%,#48535F 60%,#39434F 100%); }
   .ohChainI.unk b { position:relative; z-index:1; display:block; width:100%; text-align:center;
     font-size:16px; line-height:44px; color:#F2F6FA; text-shadow:0 1px 2px rgba(30,42,58,.6); }
   .ohChainI.goal { width:50px; height:50px;
@@ -520,6 +558,12 @@
   .ohChainI.goal::after { background:linear-gradient(158deg,#C9662F 0%,#E08A44 50%,#EFAE63 100%); }
   .ohArw { width:8px; height:8px; flex:0 0 auto; border-right:2.5px solid #94A0AE; border-bottom:2.5px solid #94A0AE;
     transform:rotate(-45deg); margin:0 1px; }
+  /* 6단계 체인(MI)은 기본 크기로는 좁은 폰에서 잘린다 — 칸과 간격만 줄이고 위계는 그대로 둔다.
+     44+50 → 36+41, gap 3 → 2 로 약 340px → 281px. 390px 폰의 가용 폭(약 318px) 안에 들어온다. */
+  .ohChain.long { gap:2px; padding:7px 8px; }
+  .ohChain.long .ohChainI { width:36px; height:36px; }
+  .ohChain.long .ohChainI.goal { width:41px; height:41px; }
+  .ohChain.long .ohArw { margin:0; }
   /* ═══ 👔 의상 상점 · 🐻 프로필(스타일) — 도감과 같은 크림 가죽 언어 ═══
      두 화면은 껍데기가 완전히 같고 안에 든 내용만 다르다 (상점=사는 곳 / 프로필=입는 곳).
      그래서 겉틀 규칙은 선택자를 나눠 쓰지 않고 한 곳에 묶어 둔다 — 한쪽만 손대다 톤이 갈리는 일이 없게. */
@@ -531,8 +575,15 @@
     display:flex; flex-direction:column; }
   #shopCover::after, #profCover::after { content:''; position:absolute; inset:9px; z-index:4; pointer-events:none;
     border:2px dashed rgba(176,157,121,.5); border-radius:15px; }
+  /* 스크롤바는 감춘다 — 크림 가죽 표지 위에 브라우저 기본 회색 막대가 얹히면 톤이 깨진다.
+     스크롤 자체는 살려둬야 한다(내용이 조금 넘칠 때 아래가 잘리면 안 되므로).
+     터치는 그대로 되고, 데스크톱은 휠로 굴린다. 도감(#dogamPage)도 같은 이유로 함께 처리. */
+  #shopInner, #profInner, #dogamPage { scrollbar-width:none; -ms-overflow-style:none; }
+  #shopInner::-webkit-scrollbar, #profInner::-webkit-scrollbar, #dogamPage::-webkit-scrollbar {
+    width:0; height:0; display:none; }
   #shopInner, #profInner { position:relative; flex:1 1 auto; min-height:0; overflow-y:auto;
-    border-radius:22px; padding:18px 16px 22px; text-align:center;
+    -webkit-overflow-scrolling:touch;
+    border-radius:22px; padding:14px 16px 12px; text-align:center;
     background:
       repeating-linear-gradient(37deg, rgba(255,255,255,.05) 0 2px, rgba(150,128,95,.035) 2px 4px),
       linear-gradient(168deg,#F5EEDE 0%,#EDE4D0 55%,#E4D9C1 100%);
@@ -554,7 +605,7 @@
     text-shadow:0 1px 0 rgba(255,255,255,.8); }
   .shHead .shGem, .wdTop .shGem { color:#3E6A80; background:linear-gradient(180deg,#DDF0F8,#BCDFEC); }
   /* 미리보기 무대 — 음각 액자 */
-  .shStage { position:relative; margin:0 2px; border-radius:17px; aspect-ratio:2.28/1;
+  .shStage { position:relative; margin:0 2px; border-radius:17px; aspect-ratio:2.5/1;
     background:linear-gradient(168deg,#F4EDDE 0%,#EBE2CD 60%,#E3D9C1 100%);
     box-shadow:inset 0 3px 8px rgba(150,128,95,.5), inset 0 -2px 0 rgba(255,255,255,.7),
       inset 0 0 0 1px rgba(150,128,95,.3); overflow:hidden; }
@@ -572,7 +623,7 @@
     text-shadow:0 1px 0 rgba(255,255,255,.9); }
   .shName b { color:#8E6E2B; }
   /* 구매/갈아입기 버튼 — 선택자 줄이 통째로 빠져 있어서 그동안 스타일 없는 맨 버튼으로 나왔다 */
-  .shBuy { display:block; width:100%; margin:9px 0 0; padding:10px 12px 12px; border:none; cursor:pointer;
+  .shBuy { display:block; width:100%; margin:7px 0 0; padding:8px 12px 9px; border:none; cursor:pointer;
     border-radius:14px; font-family:inherit; font-size:13.5px; font-weight:700; color:#6E5A38;
     background:linear-gradient(168deg,#F8F3E6 0%,#F0E8D5 58%,#E9E0C9 100%);
     text-shadow:0 1px 0 rgba(255,255,255,.9);
@@ -593,7 +644,15 @@
     margin:2px 2px 5px; letter-spacing:1px; text-shadow:0 1px 0 rgba(255,255,255,.85); }
   .shGrid + .shGrpT { margin-top:9px; }
   /* 아이콘 탭 — 아이콘 위, 작은 글자 아래 */
-  .shTabs .dgTab { padding:5px 2px 8px; }
+  .shTabs .dgTab { padding:4px 2px 6px; }
+  /* 📏 상점·스타일은 한 화면에 딱 들어가야 한다 — 스크롤이 생기면 창이 잘려 보인다.
+     470px 카드 기준 내용이 658px이었는데 창은 최대 640px이라 조금씩 넘쳤다.
+     곰돌이 미리보기는 거의 그대로 두고 낭비되는 여백만 걷어내 약 76px을 줄였다.
+     ⚠️ .dgFolder·.dgPager·.dgPgBtn은 도감과 공유하는 규칙이라, 도감 레이아웃까지
+        같이 좁아지지 않도록 상점·스타일 안으로만 한정한다. */
+  #shopInner .dgFolder, #profInner .dgFolder { padding:11px 12px 7px; margin-bottom:4px; }
+  #shopInner .dgPager, #profInner .dgPager { padding:2px 0 0; }
+  #shopInner .dgPgBtn, #profInner .dgPgBtn { height:32px; }
   .shTi { display:block; width:20px; height:20px; margin:0 auto 1px; }
   .shTi svg { width:100%; height:100%; display:block; }
   .shTabs .dgTab b { display:block; font-size:10.5px; font-weight:700; }
@@ -677,33 +736,41 @@
     box-shadow:0 2px 6px rgba(150,120,60,.28); }
   .ohTutTxt b { color:#E8933A; }
   /* ── 빈 칸: 강판에 파인 슬롯 (레퍼런스처럼 둥근 사각형) ── */
+  /* ⚠️ 칸을 어둡게 유지하는 이유 — 부품이 안 보인다는 피드백의 근본 원인이었다.
+     부품은 크롬·스틸 같은 금속이라 렌더 결과가 명도 55~80% 대역에 몰린다.
+     예전 칸(빈 칸 #9CAFC3, 부품 놓인 칸은 #FFFFFF~#A7B5C6)이 바로 그 대역이라
+     '회색 부품을 회색 배경에 올린' 꼴이었고, 부품 색을 위아래로 조절해도 배경 근처를 지나갔다.
+     → 칸을 어두운 슬레이트로 내려 부품 전체가 한 번에 떠오르게 한다.
+     밝은 배경에서는 짙은 그림자로 음각을 냈지만, 어두운 배경에서는 반대로 아래 모서리
+     반사광을 살려야 파인 느낌이 나므로 그림자/반사광의 세기를 서로 뒤집었다. */
   .ohCell { position:relative; aspect-ratio:1/1; cursor:pointer; border:none;
     border-radius:21%;
-    background:linear-gradient(168deg,#9CAFC3 0%,#8FA2B7 45%,#8296AC 100%);
+    background:linear-gradient(168deg,#46525F 0%,#3B4653 45%,#333D48 100%);
     box-shadow:
-      inset 0 4px 8px rgba(20,32,48,.42),           /* 위에서 파고든 그림자 = 음각 */
-      inset 0 -2px 0 rgba(255,255,255,.45),         /* 아래 모서리에 반사광 */
-      inset 0 0 0 1px rgba(30,44,62,.22);
+      inset 0 4px 9px rgba(8,14,22,.6),             /* 위에서 파고든 그림자 = 음각 */
+      inset 0 -2px 0 rgba(255,255,255,.16),         /* 아래 모서리에 반사광 */
+      inset 0 0 0 1px rgba(10,16,24,.5);
     display:grid; place-items:center; transition:transform .12s ease; }
   .ohCell::before { content:''; position:absolute; inset:9%; border-radius:19%;
-    background:linear-gradient(168deg,#8FA2B8 0%,#9CAFC3 60%,#A8BBCF 100%);   /* 슬롯 바닥 */
-    box-shadow:inset 0 2px 4px rgba(20,32,48,.3); }
+    background:linear-gradient(168deg,#333D48 0%,#3B4653 60%,#434F5C 100%);   /* 슬롯 바닥 */
+    box-shadow:inset 0 2px 4px rgba(8,14,22,.45); }
   /* 빈 칸 가운데 육각 음각 자국 — 부품 체인(.ohChainI)과 같은 육각형 */
   .ohCell::after { content:''; position:absolute; width:34%; height:30%;
     clip-path:polygon(25% 2%, 75% 2%, 100% 50%, 75% 98%, 25% 98%, 0% 50%);
-    background:linear-gradient(168deg,#8195AB 0%,#8FA3B8 60%,#9AAEC2 100%);
-    box-shadow:inset 0 1px 3px rgba(20,32,48,.5), 0 1px 0 rgba(255,255,255,.42); }
-  /* ── 부품이 놓인 칸: 솟아오른 밝은 강판 ── */
-  .ohCell.has { background:linear-gradient(166deg,#FFFFFF 0%,#EAF1F8 26%,#C2CFDD 72%,#A7B5C6 100%);
+    background:linear-gradient(168deg,#2E3742 0%,#37414D 60%,#404B58 100%);
+    box-shadow:inset 0 1px 3px rgba(8,14,22,.6), 0 1px 0 rgba(255,255,255,.14); }
+  /* ── 부품이 놓인 칸: 솟아오른 강판. 밝은 은색이었지만 여기가 부품이 실제로 앉는 자리라
+       가장 어두워야 한다. 대신 위 모서리 하이라이트를 남겨 '솟아오른' 느낌은 유지한다. ── */
+  .ohCell.has { background:linear-gradient(166deg,#5A6875 0%,#4C5966 26%,#3E4A57 72%,#36414D 100%);
     box-shadow:
-      inset 0 2px 0 rgba(255,255,255,.95), inset 0 -3px 0 rgba(58,74,94,.4),
-      inset 0 0 0 1px rgba(255,255,255,.5),
-      0 3px 5px rgba(18,28,42,.42); }
+      inset 0 2px 0 rgba(255,255,255,.3), inset 0 -3px 0 rgba(10,16,24,.55),
+      inset 0 0 0 1px rgba(255,255,255,.16),
+      0 3px 5px rgba(8,14,22,.5); }
   /* 정반사 하이라이트 — 금속을 금속처럼 보이게 하는 결정적 요소 */
   .ohCell.has::before { inset:8%; border-radius:20%;
     background:linear-gradient(166deg,
-      rgba(255,255,255,.95) 0%, rgba(255,255,255,.35) 22%,
-      rgba(255,255,255,0) 42%, rgba(70,88,110,.12) 100%);
+      rgba(255,255,255,.45) 0%, rgba(255,255,255,.16) 22%,
+      rgba(255,255,255,0) 42%, rgba(10,16,24,.25) 100%);
     box-shadow:none; }
   .ohCell.has::after { display:none; }
   /* 목표 부품 칸 — 황동 도금. ⚠️ .has 뒤에 와야 한다(같은 특이도라 순서로 이긴다).
@@ -945,6 +1012,30 @@
   .pfTxt { flex:1; min-width:0; }
   .pfName { font-size:14px; font-weight:700; color:#5F5038; text-shadow:0 1px 0 rgba(255,255,255,.9); }
   .pfSub { font-size:10.5px; font-weight:700; color:#938160; margin-top:3px; }
+  /* 🏷️ 닉네임 — 이름 자체가 버튼이다. 별도 '수정' 버튼을 옆에 두면 카드가 복잡해진다.
+     ⚠️ 처음엔 연필만 흐리게 얹었더니 누를 수 있다는 걸 아무도 몰랐다.
+        → ①옅은 알약 배경 + 테두리를 상시로 깔아 '버튼'으로 읽히게 하고
+          ②아직 한 번도 설정하지 않은 사람에게만 안내 배지를 띄운다(설정하면 사라짐). */
+  .nkBtn { display:inline-flex; align-items:center; gap:6px; border:none; cursor:pointer;
+    margin:-3px 0 0 -9px; padding:4px 10px 5px; border-radius:999px;
+    background:rgba(255,255,255,.72); box-shadow:inset 0 0 0 1.5px rgba(178,156,118,.45);
+    font-family:inherit; font-size:14px; font-weight:700; color:#5F5038;
+    text-shadow:0 1px 0 rgba(255,255,255,.9); }
+  .nkBtn:active { background:rgba(150,128,95,.2); box-shadow:inset 0 2px 4px rgba(120,100,70,.28); }
+  .nkBtn .nkPen { width:12px; height:12px; display:block; flex:0 0 auto; }
+  /* 안내 배지 — 스테이지 칩과 같은 금색 계열이라 '누르라'는 신호로 이미 학습된 색이다 */
+  .nkTip { display:inline-block; padding:2px 7px 3px; border-radius:999px; margin-left:1px;
+    background:linear-gradient(180deg,#FFF3C4,#FFE39C); color:#8A6410;
+    font-size:9.5px; font-weight:800; letter-spacing:-.2px; text-shadow:none;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.7), 0 1px 2px rgba(150,128,95,.3); }
+  .pfRole { font-size:11px; font-weight:700; color:#7A6A50; margin-top:1px; }
+  /* 닉네임 입력 카드 — 전역 * 규칙이 user-select:none이라 입력칸만 다시 켜준다 */
+  .nkIn { display:block; width:100%; margin:2px 0 8px; padding:11px 13px; border-radius:14px;
+    border:2px solid #E2D6BC; background:#FFFDF6; outline:none; text-align:center;
+    font-family:inherit; font-size:15px; font-weight:700; color:#5F5038;
+    -webkit-user-select:text; user-select:text; }
+  .nkIn:focus { border-color:#D8B978; }
+  .nkHint { font-size:10.5px; font-weight:700; color:#938160; text-align:center; margin-bottom:10px; line-height:1.5; }
   .pfBar { height:9px; border-radius:99px; margin-top:7px; overflow:hidden;
     background:linear-gradient(180deg,#DDD2BA,#E8DFC9);
     box-shadow:inset 0 2px 3px rgba(130,110,80,.4); }
@@ -1222,25 +1313,33 @@
     <!-- 설정 패널은 알림 위에 떠야 하므로 #hud 밖(frame 직속)으로 이동 -->
     <div id="statWrap">
       <div class="stats">
-        <div class="stat"><div class="ic">
+        <div class="stat sMoney"><div class="ic">
           <!-- 💰 금화: 밑그림자 → 본체 → 우상단 하이라이트 → ₩ (텍스트 대신 패스) -->
           <svg viewBox="0 0 24 24"><circle cx="12" cy="13.1" r="8.3" fill="#A87516" opacity=".5"/><circle cx="12" cy="12" r="8.3" fill="url(#cGold)"/><circle cx="12" cy="12" r="5.9" fill="none" stroke="#D08F1E" stroke-width="1.1" opacity=".55"/><path d="M15.6 6.6a8.3 8.3 0 0 1 2.9 3.3" fill="none" stroke="#FFF8DC" stroke-width="2" stroke-linecap="round" opacity=".8"/><path d="M8.7 9.3 10.6 14.6 12 11.3 13.4 14.6 15.3 9.3" fill="none" stroke="#9A6A10" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M8.3 12.1h7.4" stroke="#9A6A10" stroke-width="1.3" stroke-linecap="round"/></svg>
         </div><span class="v" id="vMoney">100</span></div>
-        <div class="stat"><div class="ic">
+        <div class="stat sTech"><div class="ic">
           <!-- ⚙️ 기술력: 차가운 청회색 → 구리색 (발전소 기계 재질이자 따뜻한 팔레트) -->
           <svg viewBox="0 0 24 24"><use href="#gGear" y="1" fill="#8A4F22" opacity=".45"/><use href="#gGear" fill="url(#cCopper)"/><circle cx="12" cy="12" r="2.9" fill="#8A4F22"/><circle cx="12" cy="12" r="2.9" fill="none" stroke="#6D3D19" stroke-width="1" opacity=".5"/><path d="M15.4 7.4a6.6 6.6 0 0 1 1.9 2.4" fill="none" stroke="#FFF0DA" stroke-width="1.8" stroke-linecap="round" opacity=".75"/></svg>
         </div><span class="v" id="vTech">0</span></div>
-        <div class="stat"><div class="ic">
+        <div class="stat sPol"><div class="ic">
           <!-- 🏛️ 정책: 차가운 남색 → 밝고 따뜻한 하늘색. 기둥 4개 → 3개(작은 크기에서 뭉개짐 방지) -->
           <svg viewBox="0 0 24 24"><path d="M12 2.6 21 8.4a1.5 1.5 0 0 1-.8 2.8H3.8A1.5 1.5 0 0 1 3 8.4Z" fill="#4E7FAA" opacity=".45" transform="translate(0,1)"/><rect x="3.2" y="18.6" width="17.6" height="3.2" rx="1.5" fill="#4E7FAA" opacity=".45" transform="translate(0,1)"/><path d="M12 2.6 21 8.4a1.5 1.5 0 0 1-.8 2.8H3.8A1.5 1.5 0 0 1 3 8.4Z" fill="url(#cSky)"/><rect x="5.1" y="11.6" width="3.4" height="7.4" rx="1.5" fill="url(#cSky)"/><rect x="10.3" y="11.6" width="3.4" height="7.4" rx="1.5" fill="url(#cSky)"/><rect x="15.5" y="11.6" width="3.4" height="7.4" rx="1.5" fill="url(#cSky)"/><rect x="3.2" y="18.6" width="17.6" height="3.2" rx="1.5" fill="url(#cSky)"/><path d="M13.6 4.6 18.6 7.8" fill="none" stroke="#EAF6FD" stroke-width="1.7" stroke-linecap="round" opacity=".75"/></svg>
         </div><span class="v" id="vPol">0</span></div>
-        <div class="stat gauge"><div class="gtrack"><div class="gfill" id="gEsg"></div></div><div class="ic">
+        <div class="stat gauge sEsg"><div class="gtrack"><div class="gfill" id="gEsg"></div></div><div class="ic">
           <!-- 🌱 ESG: 형태는 유지하고 클레이 3겹(두께·그라데이션·하이라이트)만 입힘 -->
           <svg viewBox="0 0 24 24"><path d="M4 20C4 10 10 3 20 3c0 10-7 17-16 17Z" fill="#4E9159" opacity=".45" transform="translate(0,1)"/><path d="M4 20C4 10 10 3 20 3c0 10-7 17-16 17Z" fill="url(#cLeaf)"/><path d="M5.4 18.6C10 14 14.4 9.4 19 4.4" fill="none" stroke="#3C7746" stroke-width="1.6" stroke-linecap="round" opacity=".85"/><path d="M15.4 4.8a15 15 0 0 1 3.6-1.6" fill="none" stroke="#EDFAE2" stroke-width="1.9" stroke-linecap="round" opacity=".85"/></svg>
         </div><span class="v" id="vEsg">50</span></div>
-        <div class="stat gauge"><div class="gtrack"><div class="gfill" id="gFatig"></div></div><div class="ic">
-          <!-- 😴 피로: Z를 <text>가 아니라 패스로 (작은 크기에서 폰트 의존·깨짐 방지) -->
-          <svg viewBox="0 0 24 24"><circle cx="10.4" cy="14.5" r="8.1" fill="#7A64A8" opacity=".45"/><circle cx="10.4" cy="13.4" r="8.1" fill="url(#cLilac)"/><path d="M6.2 13.2q2.1-2.2 4.2 0M12.4 13.2q2.1-2.2 4.2 0" stroke="#6E5B8F" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M6.9 8a8.1 8.1 0 0 1 2.9-2.2" fill="none" stroke="#F6F0FE" stroke-width="1.8" stroke-linecap="round" opacity=".8"/><path d="M16.6 7.4h3.3l-3.3 3.6h3.3" fill="none" stroke="#8A7AB0" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M20.4 2.6h2.2l-2.2 2.5h2.2" fill="none" stroke="#8A7AB0" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/></svg>
+        <div class="stat gauge sFatig f0" id="sFatig"><div class="gtrack"><div class="gfill" id="gFatig"></div></div><div class="ic">
+          <!-- 💤 피로: 얼굴을 그리지 않는다.
+               나머지 네 아이콘(금화·톱니·건물·잎)이 전부 '단순한 오브젝트 실루엣 하나'인데
+               얼굴만 그 문법에서 벗어나 줄에서 겉돌았다. 게다가 18px로 줄면 귀·머리·주둥이·눈이
+               뭉개져 그냥 원 하나가 된다 — 기존 😴가 안 읽혔던 이유도 같다.
+               → 굵은 획 2개짜리 Zzz 기호로 대체. 뭉갤 디테일이 없어 어느 크기에서나 그대로 읽힌다.
+               단계는 모양이 아니라 색으로 표현한다(아래 .z1/.z2, 게이지와 같은 라일락→노랑→빨강). -->
+          <svg viewBox="0 0 24 24">
+            <path class="z1" d="M5 13.6h5.4l-5.4 5.6h5.4" fill="none" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+            <path class="z2" d="M12.4 3.4h7.4l-7.4 7.6h7.4" fill="none" stroke-width="2.9" stroke-linejoin="round" stroke-linecap="round"/>
+          </svg>
         </div><span class="v" id="vFatig">0</span></div>
       </div>
     </div>
@@ -1518,12 +1617,12 @@ function ccap(r,h,hex){ const grp=new THREE.Group();
 const OUTFITS=[
   // ── 얼굴 탭 ──
   {id:'furBase',  cat:'face', slot:'fur',  grp:'털색', name:'기본 털',   cur:null,    price:0,    o:{}},
-  {id:'furWhite', cat:'face', slot:'fur',  grp:'털색', name:'흰 털',     cur:'gem',   price:5,    o:{fur:'#efe3d2',furC:'#fbf4e8'}},
-  {id:'furGray',  cat:'face', slot:'fur',  grp:'털색', name:'회색 털',   cur:'gem',   price:5,    o:{fur:'#9c9188',furC:'#ded6cc'}},
+  {id:'furWhite', cat:'face', slot:'fur',  grp:'털색', name:'흰 털',     cur:'gem',   price:3,    o:{fur:'#efe3d2',furC:'#fbf4e8'}},
+  {id:'furGray',  cat:'face', slot:'fur',  grp:'털색', name:'회색 털',   cur:'gem',   price:3,    o:{fur:'#9c9188',furC:'#ded6cc'}},
   {id:'furDark',  cat:'face', slot:'fur',  grp:'털색', name:'진갈색 털', cur:'money', price:2600, o:{fur:'#8a5f3c',furC:'#c99a70'}},
   {id:'furHoney', cat:'face', slot:'fur',  grp:'털색', name:'허니 털',   cur:'money', price:3200, o:{fur:'#e0a75c',furC:'#f6d9a8'}},
   {id:'faceNone', cat:'face', slot:'face', grp:'안경', name:'없음',      cur:null,    price:0,    o:{}},
-  {id:'glasses',  cat:'face', slot:'face', grp:'안경', name:'안경',      cur:'gem',   price:5,    o:{glasses:true}},
+  {id:'glasses',  cat:'face', slot:'face', grp:'안경', name:'안경',      cur:'gem',   price:3,    o:{glasses:true}},
   // ── 의상 탭 ──
   {id:'basic',    cat:'wear', slot:'wear', name:'기본 정장',     cur:null,    price:0,    o:{}},
   {id:'charcoal', cat:'wear', slot:'wear', name:'차콜 정장',     cur:'money', price:1200, o:{suit:'#4a5058',suitLt:'#5c636d',tie:'#c9463c'}},
@@ -1534,23 +1633,33 @@ const OUTFITS=[
   {id:'casualY',  cat:'wear', slot:'wear', name:'캐주얼 · 노랑', cur:'money', price:4200, o:{tshirt:'#f4c14a',pants:'#6b7280',noStripes:true}},
   {id:'casualG',  cat:'wear', slot:'wear', name:'캐주얼 · 초록', cur:'money', price:4800, o:{tshirt:'#6fbf73',pants:'#4a5058',noStripes:true,sleeveLen:'long'}},
   {id:'work',     cat:'wear', slot:'wear', name:'작업복',        cur:'money', price:5400, o:{suit:'#c4703d',suitLt:'#d68450',noStripes:true}},
-  {id:'drCoral',  cat:'wear', slot:'wear', name:'원피스 · 코랄',   cur:'gem', price:5, o:{dress:'#e88a8a',suit:'#e88a8a',suitLt:'#f2a0a0',noStripes:true,formal:true,ribbon:'#ffffff'}},
-  {id:'drMint',   cat:'wear', slot:'wear', name:'원피스 · 민트',   cur:'gem', price:5, o:{dress:'#7fc9bb',suit:'#7fc9bb',suitLt:'#94dbcd',noStripes:true,formal:true,ribbon:'#ffffff'}},
-  {id:'drLav',    cat:'wear', slot:'wear', name:'원피스 · 라벤더', cur:'gem', price:5, o:{dress:'#b9a0dc',suit:'#b9a0dc',suitLt:'#cbb4ea',noStripes:true,formal:true,ribbon:'#fff3c4',dressHem:'#fff3c4'}},
-  {id:'drCream',  cat:'wear', slot:'wear', name:'원피스 · 크림',   cur:'gem', price:5, o:{dress:'#f2e2c0',suit:'#f2e2c0',suitLt:'#fbf0d8',noStripes:true,formal:true,ribbon:'#d9a05a',dressHem:'#d9a05a'}},
-  {id:'drSky',    cat:'wear', slot:'wear', name:'원피스 · 하늘',   cur:'gem', price:5, o:{dress:'#8fb8e0',suit:'#8fb8e0',suitLt:'#a6cbee',noStripes:true,formal:true,ribbon:'#ffffff'}},
+  /* 💎 보석 가격표 — 예전엔 14종이 전부 5개라 '무엇을 먼저 살까'라는 선택이 없었고,
+     총액 70개면 열흘이면 다 사서 모을 것이 남지 않았다. 층을 셋으로 나눈다:
+       소품(털색·안경·나비넥타이) 5 · 꽃 10 · 머리리본 20 · 원피스 20→60
+     원피스는 20/30/40/50/60으로 끝까지 올라간다 — 마지막 둘이 같은 값이면 서열이 거기서 끊긴다.
+     ⚠️ 이 빌드(사내 공개용)는 보상형 광고가 빠져 있어 보석 수급이 하루 약 3개다
+        (도장판 1.1 + 정비 1.9). 광고가 있는 _test 빌드는 하루 약 6개다.
+        → 수급이 절반이므로 가격도 절반으로 잡았다. 두 빌드의 체감 수집 속도를 맞추기 위한 것이다.
+           _test: 소품 5 · 꽃 10 · 리본 20 · 원피스 20~60 (총 285)
+           이 빌드: 소품 3 · 꽃 5 · 리본 10 · 원피스 10~30 (총 145)
+        도감 41종 일회성 약 48개를 빼면 약 32일치다. 한쪽 가격을 고치면 다른 쪽도 같이 봐야 한다. */
+  {id:'drCoral',  cat:'wear', slot:'wear', name:'원피스 · 코랄',   cur:'gem', price:10, o:{dress:'#e88a8a',suit:'#e88a8a',suitLt:'#f2a0a0',noStripes:true,formal:true,ribbon:'#ffffff'}},
+  {id:'drMint',   cat:'wear', slot:'wear', name:'원피스 · 민트',   cur:'gem', price:15, o:{dress:'#7fc9bb',suit:'#7fc9bb',suitLt:'#94dbcd',noStripes:true,formal:true,ribbon:'#ffffff'}},
+  {id:'drLav',    cat:'wear', slot:'wear', name:'원피스 · 라벤더', cur:'gem', price:20, o:{dress:'#b9a0dc',suit:'#b9a0dc',suitLt:'#cbb4ea',noStripes:true,formal:true,ribbon:'#fff3c4',dressHem:'#fff3c4'}},
+  {id:'drCream',  cat:'wear', slot:'wear', name:'원피스 · 크림',   cur:'gem', price:25, o:{dress:'#f2e2c0',suit:'#f2e2c0',suitLt:'#fbf0d8',noStripes:true,formal:true,ribbon:'#d9a05a',dressHem:'#d9a05a'}},
+  {id:'drSky',    cat:'wear', slot:'wear', name:'원피스 · 하늘',   cur:'gem', price:30, o:{dress:'#8fb8e0',suit:'#8fb8e0',suitLt:'#a6cbee',noStripes:true,formal:true,ribbon:'#ffffff'}},
   // ── 액세서리 탭 (목 / 머리 두 슬롯 — 동시 착용된다) ──
   {id:'neckNone', cat:'acc', slot:'neck', grp:'목',   name:'없음',            cur:null,  price:0, o:{}},
-  {id:'bowNavy',  cat:'acc', slot:'neck', grp:'목',   name:'나비넥타이 · 남색', cur:'gem', price:5, o:{bowtie:'#2f4570'}},
-  {id:'bowRed',   cat:'acc', slot:'neck', grp:'목',   name:'나비넥타이 · 빨강', cur:'gem', price:5, o:{bowtie:'#c9463c'}},
+  {id:'bowNavy',  cat:'acc', slot:'neck', grp:'목',   name:'나비넥타이 · 남색', cur:'gem', price:3, o:{bowtie:'#2f4570'}},
+  {id:'bowRed',   cat:'acc', slot:'neck', grp:'목',   name:'나비넥타이 · 빨강', cur:'gem', price:3, o:{bowtie:'#c9463c'}},
   {id:'headNone', cat:'acc', slot:'head', grp:'머리', name:'없음',            cur:null,  price:0, o:{}},
   /* ⚠️ 머리 장식 색은 대표 털색(#c98f5e)과 명도·채도가 붙으면 안 보인다.
      연분홍(#f2a0b8)은 갈색 털과 밝기가 비슷해서 묻혀버렸다 → 진한 빨강으로 교체.
      id는 저장값이라 그대로 두고 색·이름만 바꾼다. */
   {id:'flPink',   cat:'acc', slot:'head', grp:'머리', name:'꽃 · 빨강',       cur:'gem', price:5, o:{flower:'#dd4436',flowerC:'#ffd95e'}},
   {id:'flWhite',  cat:'acc', slot:'head', grp:'머리', name:'꽃 · 하양',       cur:'gem', price:5, o:{flower:'#fdf7ee',flowerC:'#e8992a'}},
-  {id:'hbRed',    cat:'acc', slot:'head', grp:'머리', name:'머리리본 · 빨강',  cur:'gem', price:5, o:{hairbow:'#e0607a'}},
-  {id:'hbSky',    cat:'acc', slot:'head', grp:'머리', name:'머리리본 · 하늘',  cur:'gem', price:5, o:{hairbow:'#7fbcd6'}}
+  {id:'hbRed',    cat:'acc', slot:'head', grp:'머리', name:'머리리본 · 빨강',  cur:'gem', price:10, o:{hairbow:'#e0607a'}},
+  {id:'hbSky',    cat:'acc', slot:'head', grp:'머리', name:'머리리본 · 하늘',  cur:'gem', price:10, o:{hairbow:'#7fbcd6'}}
 ];
 const SHOP_CATS=[{k:'face',n:'얼굴'},{k:'wear',n:'의상'},{k:'acc',n:'액세서리'}];
 const SLOT_DEF={wear:'basic', fur:'furBase', face:'faceNone', neck:'neckNone', head:'headNone'};
@@ -1602,7 +1711,7 @@ const STAFF_CHAR={
   control:{ name:'보리', trait:'똘똘함', tag:'🧠', fur:null,   // 기본 갈색 (작업복만 파랑)
     intro:'안녕하세요, 보리입니다! 잘 부탁드려요.',
     greet:['오셨어요? 오늘 단가 흐름은 제가 보고 있어요.',
-           '대표님, 오셨군요! 안녕하세요.',
+           '{대표}, 오셨군요! 안녕하세요.',
            '어서 오세요. 필요한 거 있으면 말씀해 주세요.'],
     idle :['음… 이 구간은 단가가 좀 아쉽네요.',
            '기록해둬야지. 나중에 쓸모 있을 거야.',
@@ -1616,7 +1725,7 @@ const STAFF_CHAR={
 
   turbine:{ name:'시루', trait:'수줍음', tag:'🌸', fur:{fur:'#efe3d2',furC:'#fbf4e8'},   // 흰 털
     intro:'아, 안녕하세요… 시, 시루라고 합니다… 잘 부탁드려요…',
-    greet:['아… 안녕하세요, 대표님…',
+    greet:['아… 안녕하세요, {대표}…',
            '어, 오셨네요… 저 열심히 하고 있었어요…',
            '(꾸벅) …안녕하세요.'],
     idle :['이거… 제대로 하는 거 맞겠죠…?',
@@ -1631,7 +1740,7 @@ const STAFF_CHAR={
 
   steam:{ name:'콩이', trait:'털털함', tag:'☀️', fur:{fur:'#4f463d',furC:'#a2968a'},   // 검은 털
     intro:'안녕하십니까! 콩이입니다! 잘 부탁드려요!',
-    greet:['오! 대표님 오셨어요?',
+    greet:['오! {대표} 오셨어요?',
            '어서 오세요! 오늘 컨디션 최고예요!',
            '왔다! 대표님!'],
     idle :['이 정도야 뭐~ 껌이죠!',
@@ -1649,7 +1758,11 @@ function staffChar(key){ return STAFF_CHAR[key] || {name:'직원',trait:'',tag:'
 function staffFace(key){ const c=staffChar(key);   // 대화창·카드에 쓸 직원 얼굴 (털색까지 반영)
   try{ return (typeof faceImg==='function') ? faceImg('worker', c.fur||{}, key) : null; }catch(e){ return null; } }
 function staffLine(key,kind){ const c=staffChar(key), a=c[kind]||[];
-  return a.length ? a[Math.floor(Math.random()*a.length)] : ''; }
+  /* {대표} → '○○ 대표님'. 대사 배열은 파싱 시점에 굳는 상수라 닉네임을 직접 박을 수 없어서,
+     토큰을 심어두고 여기서 꺼낼 때 바꾼다.
+     ⚠️ 토큰은 인사(greet) 대사에만 넣었다. 매 대사마다 이름을 부르면 정감이 아니라 로봇처럼 읽히고,
+        '왔다! 대표님!' 같은 짧은 감탄은 짧아야 맛이라 일부러 그대로 뒀다. */
+  return a.length ? a[Math.floor(Math.random()*a.length)].replace(/\{대표\}/g, ceoCall()) : ''; }
 const STAFF_BY_NAME={};   // '보리' → 'control' (대화창이 이름만 보고 얼굴을 고를 수 있게)
 for(const k in STAFF_CHAR) STAFF_BY_NAME[STAFF_CHAR[k].name]=k;
 
@@ -3534,7 +3647,7 @@ function enterRoom(name){ mode='room'; yard.visible=false; roomEnterAt=performan
   if(name==='rnd' && ST.rndCenter){
     if(!RND.cat) rndPick();
     if(!RND.introSeen){
-      say('박사','대표님, 오셨습니까! 이번에 \''+RND.name+'\' 연구를 시작하려 합니다.','staff',null,'tap');
+      say('박사',ceoCall()+', 오셨습니까! 이번에 \''+RND.name+'\' 연구를 시작하려 합니다.','staff',null,'tap');
       say('박사',rndDesc(),'staff',null,'tap',
         ()=>{ if(mode==='room' && curRoom==='rnd' && !RND.introSeen) rndIntroCard(); });
     }
@@ -3651,10 +3764,18 @@ const ST={ bidsWon:0, hired:0, turbine2:false, disasterCleared:false,
   dualPower:false, crewPower:false, ctrlLv:1, steamBuilt:false, staffLv:1, studentTour:0, ministerMet:0,
   shipUp:false, lngTerminal:false, aiCenter:false, presidentMet:0, investorMet:0, rndCenter:false, rndFunded:false, cheers:0,
   ohT:0, ohIdx:0, ohPending:0, ohGrace:0, ohDone:0, ohDue:0,   // 🔧 대정비(CI·HGPI·MI) 주기 상태 (ohDue=실시간 마감)
+  ohGemPick:0,   // 💎 이번 3회 묶음에서 보석이 터질 회차 (0~2, 묶음이 시작될 때 뽑는다)
   ohBoard:null,   // 🧩 진행 중인 머지 보드 스냅샷 — 완성 전에 나가도 그 상태 그대로 이어서 하게 (세이브에 함께 저장)
-  // 👔 의상 상점: 보석(도감 카드 보상) · 보유 의상 · 착용 중
+  // 👔 의상 상점: 보석(도감 카드·정비 보상) · 보유 의상 · 착용 중
   gems:0, outfit:'basic', furId:'furBase', acc:'faceNone', neck:'neckNone', head:'headNone',
   owned:['basic','furBase','faceNone','neckNone','headNone'], gemCards:[],
+  // 🏷️ 대표 닉네임 — 빈 문자열이면 기본값('곰돌이')으로 표시한다. 표시는 전부 ceoNick()을 거친다.
+  //    ST가 통째로 세이브에 들어가므로(saveGame의 ST:{...ST}) 저장·복원은 따로 손댈 게 없다.
+  nick:'',
+  // 🆔 기기 내 고유 ID — 닉네임과 역할이 다르다. 닉네임은 '보여주는 이름'이라 언제든 바뀌고,
+  //    uid는 '이 사람'을 가리키는 키라 한 번 발급하면 세이브가 살아있는 한 안 바뀐다.
+  //    나중에 랭킹·클라우드 세이브를 붙일 때 식별자로 닉네임을 쓰면 개명 한 번에 기록이 끊긴다.
+  uid:'',
   // 📋 오늘의 목표 — daily는 하루치(날짜·미션3·시작 스냅샷·지급여부), stamp*는 주간 도장판
   daily:null, stampWeek:'', stamps:0, stampPaid:0, dailyIntroSeen:false, dailyShownDay:'',
   tutorialSeen:false, pantryTipSeen:false, achOpened:false,   // achOpened: 🏆 업적 개방(자유운영 진입) 여부
@@ -3851,6 +3972,17 @@ function updateHUD(){
   const readyOn = (typeof bootReady!=='undefined' && bootReady) && !TUT.active;
   const fabOn = readyOn && mode==='yard';
   if(qf) qf.classList.toggle('on', fabOn);
+  /* 🐻 버튼 얼굴을 실제 3D 곰돌이로 갈아끼운다.
+     faceImg는 CHAR_THUMB에 캐시되므로 평소엔 맵 조회 한 번이고, 옷을 갈아입으면
+     그 캐시가 통째로 비워지면서(1721행) 여기서 새 URL을 받아 자동으로 따라온다.
+     3D 씬이 아직 준비 전이면 null이 오므로 그냥 넘어가고, 다음 호출에서 다시 시도한다. */
+  if(qf && fabOn && typeof faceImg==='function'){
+    const fu=faceImg('ceo');
+    // 곰돌이 위에 금색 바탕을 깔아 두 겹으로 — 한 겹만 넣으면 CSS의 금색 그라데이션이 사라진다
+    if(fu && qf._face!==fu){ qf._face=fu;
+      qf.style.backgroundImage='url('+fu+'), linear-gradient(180deg,#FFF3C4,#FFE9A0)';
+      qf.classList.add('img'); }
+  }
   // ☕ 오늘의 목표 버튼 — 스테이지2부터. 오늘 3개를 다 하면 ✓ 배지를 단다 (안 했다고 조르지는 않는다)
   { const db=document.getElementById('dqBtn');
     if(db){ const open=readyOn && typeof dailyOpen==='function' && dailyOpen();   // ☕ 목표 버튼은 기존대로 방 안에서도 보인다 (부지 한정은 🐻 대표 메뉴만)
@@ -3873,6 +4005,11 @@ function updateHUD(){
   const ge=document.getElementById('gEsg'), gf=document.getElementById('gFatig');
   if(ge){ ge.style.width=G.esg+'%'; ge.style.background=G.esg>=60?'linear-gradient(90deg,#C4E8B8,#9AD6A0)':(G.esg>=30?'linear-gradient(90deg,#FFE9AE,#F5CE7E)':'linear-gradient(90deg,#FFC9B4,#F5A08C)'); }
   if(gf){ gf.style.width=G.fatigue+'%'; gf.style.background=G.fatigue<30?'linear-gradient(90deg,#DCD0F2,#C3AFE6)':(G.fatigue<60?'linear-gradient(90deg,#FFE9AE,#F5CE7E)':'linear-gradient(90deg,#FFC9B4,#F5A08C)'); }
+  /* 💤 피로도 Zzz 색 — 바로 위 게이지와 같은 구간(30 / 60)에서 함께 넘어간다.
+     updateHUD는 자주 불리므로 구간이 실제로 바뀐 프레임에만 클래스를 건드린다. */
+  { const fs=document.getElementById('sFatig');
+    if(fs){ const ft = G.fatigue>=60?2:(G.fatigue>=30?1:0);
+      if(fs._ft!==ft){ fs.classList.remove('f0','f1','f2'); fs.classList.add('f'+ft); fs._ft=ft; } } }
   // 🍃 ESG 효과 구간 변화 안내 (2:90+, 1:80+, 0:보통, -1:30미만)
   const eTier=G.esg>=90?2:(G.esg>=80?1:(G.esg<30?-1:0));
   if(window._esgTier===undefined){ window._esgTier=eTier; }
@@ -4155,9 +4292,8 @@ function endTutorial(silent){
    ═══════════════════════════════════════════════════════════════════════ */
 // 완주 보상 — 일일치라 소액. 자유운영엔 스테이지가 안 오르므로 곱할 배수가 없어 고정 범위로 둔다
 const DAILY_MONEY_MIN=50, DAILY_MONEY_MAX=100;
-/* 도장 5개 = 주 7일 중 5일 완주. 주마다 초기화되므로 사실상 주 1회 지급이다.
-   ⚠️ v401(사내 공개용)에서 보상형 광고를 뺐으므로, 보석 수급은 도감 카드 + 이 도장판뿐이다.
-      광고를 다시 넣지 않고 배포한다면 보석 가격이나 도장 보상을 손봐야 한다. */
+/* 도장 5개 = 주 7일 중 5일 완주. 주마다 초기화되므로 사실상 주 1회 지급이고,
+   그래서 보석 수급은 광고(주 21개)가 확실히 주력으로 남는다 — 보석은 광고 재화라는 원칙 유지. */
 const DAILY_STAMP_NEED=5;
 const DAILY_GEM_MIN=5, DAILY_GEM_MAX=10;
 function bldOpen(id){ try{ const b=buildings.find(function(x){ return x.id===id; }); return !!b && !b.locked; }catch(e){ return false; } }
@@ -4356,9 +4492,64 @@ function renderQuestPanel(){
 document.getElementById('stageChip').onclick=()=>{ const p=document.getElementById('qPanel');
   dqClose();   // 두 패널이 겹쳐 뜨지 않게
   if(p.style.display==='block'){ p.style.display='none'; } else { renderQuestPanel(); p.style.display='block'; } };
-/* 🐻 대표 메뉴 — 프로필(단계·진행) + 도감 / 운영 기록 / 업적 / 스타일 진입
-   제목 줄을 따로 두지 않는다. 바로 아래 프로필 카드에 '○○ 발전소 대표'가 이미 찍히므로
-   그게 머리글 역할을 하고, 화면 이름을 굳이 붙이면 한 줄이 낭비된다. */
+/* 🏷️ 대표 닉네임
+   ───────────────────────────────────────────────────────────────────────
+   표시 이름을 만드는 곳은 ceoNick() 하나뿐이다 — 프로필 카드·엔딩 카드·공유 텍스트가
+   모두 이걸 거치므로, 기본값을 바꿔도 세 곳이 같이 따라온다.
+   ⚠️ 닉네임은 유일한 '사용자 입력 문자열'이다. innerHTML로 들어가는 자리에는 반드시
+      escHtml()을 거친다. (iconize()가 그 뒤에 돌면서 이모지를 아이콘으로 바꾸는 건 의도된 동작) */
+const NICK_MAX=8;
+function ceoNick(){ return (ST.nick||'').trim() || '곰돌이'; }
+/* 직원·박사가 부르는 호칭. 대화창은 본문을 innerHTML로 넣으므로(pumpDialogue의 dlgText.innerHTML)
+   여기서 미리 이스케이프해 둔다 — 이걸 쓰는 자리는 전부 innerHTML 경로다.
+   (그 뒤 iconize()가 돌면서 닉네임 속 이모지를 아이콘으로 바꾸는 건 의도된 동작) */
+function ceoCall(){ return escHtml(ceoNick())+' 대표님'; }
+/* 🆔 uid 발급 — 없을 때만 한 번. startPlay()에서 부르므로 새 게임·이어하기 양쪽을 다 탄다
+   (이어하기는 loadGame()이 먼저 돌아 저장된 uid가 이미 들어와 있고, 그러면 여기서 그냥 지나간다).
+   ⚠️ 지금은 어디에도 전송하지 않는다. 랭킹·클라우드 세이브를 붙이는 시점에 이 값을 쓰게 되며,
+      그때는 개인정보 처리방침(privacy.html)에 수집 항목으로 추가해야 한다. */
+function ensureUid(){
+  if(ST.uid) return ST.uid;
+  let u='';
+  try{ if(window.crypto && crypto.randomUUID) u=crypto.randomUUID(); }catch(e){}
+  if(!u){ try{ const a=new Uint8Array(16); crypto.getRandomValues(a);
+      u=Array.from(a, b=>('0'+b.toString(16)).slice(-2)).join(''); }catch(e){} }
+  if(!u) u='x'+Date.now().toString(36)+Math.random().toString(36).slice(2,10);   // 구형 WebView 최후 폴백
+  ST.uid=u;
+  return u;
+}
+function escHtml(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+/* 닉네임 입력 카드. 값은 value 속성이 아니라 JS로 넣는다 —
+   iconize()가 HTML 문자열을 통째로 split/join 하므로, 이모지가 든 닉네임이 속성 안에 있으면
+   그 자리에 SVG 마크업이 끼어들어 입력칸이 깨진다. */
+function renderNickEdit(){
+  staffCardKey=null;
+  let html='';
+  html+='<div class="dgCat">🏷️ 대표 닉네임</div>';
+  html+='<input class="nkIn" id="nkIn" type="text" maxlength="'+NICK_MAX+'" placeholder="곰돌이">';
+  html+='<div class="nkHint">최대 '+NICK_MAX+'자 · 비워두면 곰돌이로 표시됩니다</div>';
+  html+='<button class="scBtn" onclick="nickSave()">확인</button>';
+  html+='<button class="scClose" onclick="renderNotebookMenu()">취소</button>';
+  const sci=document.getElementById('staffCardInner');
+  sci.className='nb';
+  sci.innerHTML=iconize(nbParen(html));
+  document.getElementById('staffCard').style.display='flex';
+  const el=document.getElementById('nkIn');
+  if(el){ el.value=(ST.nick||'');
+    el.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); nickSave(); } });
+    try{ el.focus(); el.setSelectionRange(el.value.length, el.value.length); }catch(e){} }
+}
+function nickSave(){
+  const el=document.getElementById('nkIn');
+  // 줄바꿈·연속 공백은 카드 레이아웃을 무너뜨리므로 한 칸으로 눌러서 저장한다
+  const v=(el?el.value:'').replace(/\s+/g,' ').trim().slice(0,NICK_MAX);
+  ST.nick=v; saveGame();
+  toast(v ? '🏷️ 닉네임을 바꿨어요' : '🏷️ 닉네임을 기본값으로 되돌렸어요');
+  renderNotebookMenu();
+}
+/* 🐻 대표 메뉴 — 프로필(닉네임·단계·진행) + 도감 / 운영 기록 / 업적 / 스타일 진입
+   제목 줄을 따로 두지 않는다. 바로 아래 프로필 카드에 닉네임과 '○○ 발전소 대표'가 이미
+   찍히므로 그게 머리글 역할을 하고, 화면 이름을 굳이 붙이면 한 줄이 낭비된다. */
 function renderNotebookMenu(){
   staffCardKey=null;
   const pr=overallProgress(), t=dogamTotals();
@@ -4366,9 +4557,22 @@ function renderNotebookMenu(){
   const dNew=dogamNewCount();
   let html='';
   const pfBear=(typeof faceImg==='function')?faceImg('ceo'):null;
+  /* 🏷️ 닉네임 버튼.
+     · 연필은 이모지가 아니라 SVG로 그린다 — ✏️는 flIcons에 없어서 iconize()를 그냥 통과하고,
+       시스템 이모지 그대로 나오면 이 게임의 클레이 아이콘 톤에서 혼자 튄다.
+     · 안내 배지는 버튼 '밖'이 아니라 '안'에 넣는다. 배지를 눌러도 편집이 열려야 하는데,
+       바로 그 배지가 '눌러보라'고 말하고 있으므로 밖에 두면 헛손질이 난다. */
+  const nickSet=!!(ST.nick||'').trim();
   html+='<div class="pfCard"><div class="pfAv'+(pfBear?' img':'')+'"'
         +(pfBear?(' style="background-image:url('+pfBear+')"'):'')+'>'+(pfBear?'':'🐻')+'</div><div class="pfTxt">'+
-        '<div class="pfName">'+stageData[Math.min(STAGE.cur,3)].name+' 대표</div>'+
+        '<div class="pfName"><button class="nkBtn" onclick="renderNickEdit()">'+escHtml(ceoNick())+
+        '<svg class="nkPen" viewBox="0 0 24 24">'+
+          '<path d="M17.3 3.9a2.4 2.4 0 0 1 3.4 3.4l-1.3 1.3-3.4-3.4z" fill="#A8873F"/>'+
+          '<path d="M15.4 5.8 18.8 9.2 8.6 19.4 5.2 16z" fill="#D8B978"/>'+
+          '<path d="M5.2 16 8.6 19.4 3.6 21z" fill="#6E5B4F"/>'+
+        '</svg>'+
+        (nickSet?'':'<span class="nkTip">이름 설정</span>')+'</button></div>'+
+        '<div class="pfRole">'+stageData[Math.min(STAGE.cur,3)].name+' 대표</div>'+
         '<div class="pfSub">'+(ST.ended?'자유운영모드':'Chapter '+(PROG.ch[Math.min(STAGE.cur,3)]+1)+' 진행 중')+
         ' · '+hh+'시간 '+mm+'분 · 도감 '+t.got+'/'+t.all+'</div>'+
         '<div class="pfBar"><div class="pfBarIn" style="width:'+pr.pct+'%"></div></div>'+
@@ -4517,7 +4721,15 @@ const flIcons={   // 이모지 대신 게임 톤(점토질감·골드 포인트,
   '🏛️':'<svg viewBox="0 0 24 24" class="flIco"><path d="M12 2 L21 8 H3 Z" fill="#6a7fa8"/><rect x="4" y="9" width="2.2" height="10" fill="#8497bc"/><rect x="8.2" y="9" width="2.2" height="10" fill="#8497bc"/><rect x="12.4" y="9" width="2.2" height="10" fill="#8497bc"/><rect x="16.6" y="9" width="2.2" height="10" fill="#8497bc"/><rect x="3" y="19.4" width="18" height="2.4" rx="1" fill="#5a6d94"/></svg>',
   '🧪':'<svg viewBox="0 0 24 24" class="flIco"><rect x="9.5" y="2" width="5" height="15" rx="1" fill="none" stroke="#9aa7b2" stroke-width="1.4"/><path d="M9.5 13 a2.5 2.5 0 0 0 5 0 v-3 h-5 z" fill="#7bc4e0"/><rect x="8" y="1" width="8" height="2" rx="1" fill="#9aa7b2"/></svg>',
   '🔥':'<svg viewBox="0 0 24 24" class="flIco"><path d="M12 2 C9 7 6 8 6 13 a6 6 0 0 0 12 0 c0 -3 -2 -3 -2 -6 c-1 2 -2 2 -2 0 c0 -2 1 -3 -2 -5z" fill="#f08a3c"/><path d="M12 10 c-1 2 -2 3 -2 5 a2 2 0 0 0 4 0 c0 -2 -1 -3 -2 -5z" fill="#ffd23f"/></svg>',
-  '🏭':'<svg viewBox="0 0 24 24" class="flIco"><rect x="3" y="12" width="18" height="9" fill="#8a94a0"/><rect x="5" y="6" width="3" height="6" fill="#8a94a0"/><rect x="10" y="8" width="3" height="4" fill="#8a94a0"/><rect x="15" y="4" width="3" height="8" fill="#8a94a0"/><circle cx="6.5" cy="4" r="1.4" fill="#c9d2da"/><circle cx="16.5" cy="2" r="1.4" fill="#c9d2da"/></svg>',
+  /* 🏭 발전소 — 예전엔 차가운 회색(#8a94a0) 평면 사각형뿐이라 이 아이콘만 톤에서 겉돌았다.
+     다른 아이콘들처럼 채움색 + 진한 외곽선의 2톤으로 바꾸고, 색은 스테이지 칩(#stageIcon)이
+     이미 쓰는 발전소 갈색 계열로 맞췄다 — 같은 게임 안에서 같은 건물은 같은 색이어야 한다.
+     작은 크기에서 '건물'로 읽히도록 창문 3개를 넣고 모서리를 둥글렸다. */
+  '🏭':'<svg viewBox="0 0 24 24" class="flIco"><rect x="2.4" y="11.4" width="19.2" height="9.6" rx="1.8" fill="#c08a4e" stroke="#8d6231" stroke-width="1"/><rect x="5.2" y="4.4" width="3.4" height="7.6" rx="1" fill="#a8763f" stroke="#8d6231" stroke-width="1"/><rect x="11.3" y="6.9" width="3.4" height="5.1" rx="1" fill="#a8763f" stroke="#8d6231" stroke-width="1"/><circle cx="6.9" cy="2.5" r="1.5" fill="#f0dfc0"/><circle cx="13" cy="5" r="1.3" fill="#f0dfc0"/><rect x="5" y="14.6" width="3.2" height="3.2" rx="0.7" fill="#f4e3c4"/><rect x="10.4" y="14.6" width="3.2" height="3.2" rx="0.7" fill="#f4e3c4"/><rect x="15.8" y="14.6" width="3.2" height="3.2" rx="0.7" fill="#f4e3c4"/></svg>',
+  /* 👕 스타일 — flIcons에 없어서 시스템 이모지가 그대로 나오고 있었다(혼자 초록 티셔츠).
+     상점의 '의상' 탭 아이콘과 같은 그림을 쓴다 — 같은 것을 가리키는 두 자리가 달라 보이면 안 된다. */
+  '👕':'<svg viewBox="0 0 24 24" class="flIco"><path d="M12 3.6a1.8 1.8 0 1 0 1.4 2.9L12 7.9" fill="none" stroke="#8a6e3f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 7.8 3.8 14.6a1.4 1.4 0 0 0 .9 2.5h14.6a1.4 1.4 0 0 0 .9-2.5Z" fill="#C49A5E"/><path d="M12 9.4 5.6 14.7a.85.85 0 0 0 .55 1.5h11.7a.85.85 0 0 0 .55-1.5Z" fill="#F7EFDC"/></svg>',
+  '👕️':'<svg viewBox="0 0 24 24" class="flIco"><path d="M12 3.6a1.8 1.8 0 1 0 1.4 2.9L12 7.9" fill="none" stroke="#8a6e3f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 7.8 3.8 14.6a1.4 1.4 0 0 0 .9 2.5h14.6a1.4 1.4 0 0 0 .9-2.5Z" fill="#C49A5E"/><path d="M12 9.4 5.6 14.7a.85.85 0 0 0 .55 1.5h11.7a.85.85 0 0 0 .55-1.5Z" fill="#F7EFDC"/></svg>',
   '☕':'<svg viewBox="0 0 24 24" class="flIco"><path d="M5 9 h11 v6 a5.5 5.5 0 0 1 -11 0z" fill="#c98f5e"/><path d="M16 10 h2 a2.5 2.5 0 0 1 0 5 h-2" fill="none" stroke="#c98f5e" stroke-width="1.6"/><path d="M8 4 q1 2 0 3 M12 4 q1 2 0 3" stroke="#c9a877" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>',
   '📖':'<svg viewBox="0 0 24 24" class="flIco"><path d="M12 5 C10 3.5 6 3 4 4 V18 C6 17 10 17.5 12 19 C14 17.5 18 17 20 18 V4 C18 3 14 3.5 12 5Z" fill="#f0e4c8" stroke="#c9a877" stroke-width="1"/><path d="M12 5 V19" stroke="#c9a877" stroke-width="1"/></svg>',
   '🎓':'<svg viewBox="0 0 24 24" class="flIco"><path d="M12 4 L22 8 L12 12 L2 8 Z" fill="#3a4250"/><path d="M6 9.5 V14 C6 16 9 17.5 12 17.5 C15 17.5 18 16 18 14 V9.5" fill="none" stroke="#3a4250" stroke-width="1.4"/><circle cx="21" cy="8" r="0.9" fill="#e2b93c"/><path d="M21 8 v5" stroke="#e2b93c" stroke-width="1.1"/></svg>',
@@ -4538,7 +4750,9 @@ const flIcons={   // 이모지 대신 게임 톤(점토질감·골드 포인트,
   '🎖':'<svg viewBox="0 0 24 24" class="flIco"><path d="M8 2 L12 9 L16 2 Z" fill="#c9433a"/><circle cx="12" cy="15" r="7" fill="#e2b93c" stroke="#c9860e" stroke-width="1.2"/><circle cx="12" cy="15" r="4" fill="#f4d982"/></svg>',
   '🌊':'<svg viewBox="0 0 24 24" class="flIco"><path d="M2 14 q3 -4 6 0 q3 4 6 0 q3 -4 6 0 q3 4 6 0" fill="none" stroke="#4a8fd0" stroke-width="2" stroke-linecap="round"/><path d="M2 19 q3 -4 6 0 q3 4 6 0 q3 -4 6 0 q3 4 6 0" fill="none" stroke="#7bb8e0" stroke-width="2" stroke-linecap="round"/></svg>',
   '🤖':'<svg viewBox="0 0 24 24" class="flIco"><rect x="6" y="8" width="12" height="10" rx="2" fill="#8a9be8"/><circle cx="9.5" cy="12.5" r="1.4" fill="#fff"/><circle cx="14.5" cy="12.5" r="1.4" fill="#fff"/><rect x="9" y="15.5" width="6" height="1.4" rx="0.7" fill="#5c6bc0"/><rect x="10.5" y="3" width="3" height="4" fill="#8a9be8"/><circle cx="12" cy="2.4" r="1.3" fill="#c9433a"/></svg>',
-  '📈':'<svg viewBox="0 0 24 24" class="flIco"><path d="M3 20 H21" stroke="#7a8ba0" stroke-width="1.4"/><path d="M4 16 L9 10 L13 13 L20 5" fill="none" stroke="#4fae7a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 5 H20 V10" fill="none" stroke="#4fae7a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  /* 📈 운영 기록 — 초록(#4fae7a) + 차가운 회색(#7a8ba0)이라 메뉴에서 혼자 튀었다.
+     다른 아이콘과 같은 구리·갈색 2톤으로 맞추고, 작게 줄었을 때 선이 사라지지 않게 굵혔다. */
+  '📈':'<svg viewBox="0 0 24 24" class="flIco"><path d="M3.6 3.8 V20.2 H20.6" fill="none" stroke="#8d6231" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 16.2 L10.2 10.6 L13.8 13.4 L19.4 6.2" fill="none" stroke="#c08a4e" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M15.2 6.2 H19.8 V10.6" fill="none" stroke="#c08a4e" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   '📉':'<svg viewBox="0 0 24 24" class="flIco"><path d="M3 4 H21" stroke="#7a8ba0" stroke-width="1.4"/><path d="M4 8 L9 14 L13 11 L20 19" fill="none" stroke="#e0524a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 19 H20 V14" fill="none" stroke="#e0524a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
   '👑':'<svg viewBox="0 0 24 24" class="flIco"><path d="M3 18 L5 8 L9.5 12 L12 6 L14.5 12 L19 8 L21 18 Z" fill="#e2b93c" stroke="#c9860e" stroke-width="1"/><rect x="3" y="18" width="18" height="2.4" rx="1" fill="#c9860e"/></svg>',
   '🏫':'<svg viewBox="0 0 24 24" class="flIco"><path d="M12 2 L22 7 H2 Z" fill="#6a7fa8"/><rect x="4" y="9" width="16" height="12" fill="#8497bc"/><rect x="10.5" y="14" width="3" height="7" fill="#5a6d94"/><rect x="6" y="12" width="2.4" height="2.4" fill="#f0dfc0"/><rect x="15.6" y="12" width="2.4" height="2.4" fill="#f0dfc0"/></svg>',
@@ -4659,7 +4873,10 @@ document.addEventListener('pointerdown',function(e){
   dlgScheduleHide(120);
 }, true);
 let endingInProgress=false;   // true인 동안 시스템 알림(toast/addAlert)을 억제 — 엔딩 연출에만 집중
-function toast(msg,force){ if(endingInProgress && !force) return; say('시스템', msg, 'sys'); }
+/* dur을 넘기면 그대로 say()로 전달된다('tap'이면 탭해서 넘기는 대사가 된다).
+   길고 놓치면 안 되는 안내에 쓴다 — say()는 새 대사가 들어오면 앞 대사를 0.65초로 잘라버리는데,
+   탭 대사만 그 규칙에서 예외라 잘리지 않는다. */
+function toast(msg,force,dur){ if(endingInProgress && !force) return; say('시스템', msg, 'sys', null, dur); }
 // 😪 피로 안내 전용: '시스템'이 아니라 지친 곰(대표 본인)이 직접 말한다 — 곰돌이 타이쿤 통일감
 function fatigSay(msg){ if(endingInProgress) return; say('대표(나)', msg, 'fatig'); }
 // 괄호 안 문구는 한 줄로: 괄호 내부의 공백을 줄바꿈 불가 공백으로 치환 → "(인내심 게이지 주의!)"가 통째로 줄바꿈됨
@@ -5131,11 +5348,16 @@ function hireStaff(key){ if(staffState[key].hired) return;
   floatText('💰-60','#d98f3c');   // 💸 지출이 눈에 보이게
   const d=staffState[key].dog; if(d) d.visible=true;
   const c=staffChar(key);
-  toast('🐻 '+c.name+' 합류! '+(key==='control'?'깨어있는 동안 소액 입찰을 자동 처리 💰+1':'고장 터빈을 자동으로 수리해요'));
+  /* ⚠️ 이 두 대사는 반드시 '탭해서 넘기기'여야 한다.
+     자동 사라짐으로 두면, 뒤따르는 자기소개가 큐에 들어오는 순간 say()의
+     '새 대사가 오면 앞 대사를 0.65초로 자른다' 규칙에 걸려 합류 안내가 0.65초 만에 사라진다.
+     33자짜리 한글 문장을 0.65초에 읽을 수는 없다. 탭 대사는 그 규칙의 예외다.
+     한 판에 3번뿐인 순간이고, 직원이 무슨 일을 해주는지는 놓치면 안 되는 정보다. */
+  toast('🐻 '+c.name+' 합류! '+(key==='control'?'깨어있는 동안 소액 입찰을 자동 처리 💰+1':'고장 터빈을 자동으로 수리해요'), false, 'tap');
   /* 첫인사는 greet가 아니라 intro(자기소개)를 쓴다.
      고용한 직후엔 아직 일을 한 적이 없으므로, 방에 들어올 때 쓰는 인사말을 그대로 쓰면
      하지도 않은 일을 했다고 말하게 된다. 여기는 이름을 각인시키는 자리이기도 하다. */
-  say(c.name, c.intro || staffLine(key,'greet'), 'staff');
+  say(c.name, c.intro || staffLine(key,'greet'), 'staff', null, 'tap');
   staffState[key].greetAt=performance.now(); staffState[key].chatT=28+Math.random()*20;
   checkQuest(); updateHUD(); updateActionUI();
 }
@@ -6585,7 +6807,7 @@ function showEndingCard(){
   let html='<div class="rcHead">';
   html+= bear ? ('<i class="rcBear" style="background-image:url('+bear+')"></i>') : '<i class="rcBear"></i>';
   html+='<div><div class="rcTitle">발전소 운영평가</div>'
-      +'<div class="rcSub">'+stageData[Math.min(STAGE.cur,3)].name+'<br>플레이 '+hh+'시간 '+mm+'분 · 도감 '+dogamTotals().got+'장</div></div></div>';
+      +'<div class="rcSub">'+escHtml(ceoNick())+' 대표 · '+stageData[Math.min(STAGE.cur,3)].name+'<br>플레이 '+hh+'시간 '+mm+'분 · 도감 '+dogamTotals().got+'장</div></div></div>';
   html+='<div class="rcSeal'+(tier?' '+tier:'')+'"><b>'+grade+'</b></div>';   // 등급만 — '종합 등급' 문구는 없어도 읽힌다
   html+='<div class="rcList">';
   rcRows().forEach(r=>{
@@ -6603,7 +6825,8 @@ function showEndingCard(){
 }
 function shareEnding(){
   const gl=rcRows().map(r=>r.ico+' '+r.label+' '+gradeOf(r.s)).join(' · ');
-  const text='🏆 곰돌이 타이쿤 — 운영평가\n종합 등급 '+computeOverallGrade()+'\n'+gl;
+  // 공유 텍스트는 innerHTML이 아니라 순수 문자열이므로 escHtml을 거치지 않는다
+  const text='🏆 곰돌이 타이쿤 — '+ceoNick()+' 대표 운영평가\n종합 등급 '+computeOverallGrade()+'\n'+gl;
   if(navigator.share){ navigator.share({title:'발전소 운영평가',text}).catch(()=>{}); }
   else if(navigator.clipboard){ navigator.clipboard.writeText(text).then(()=>toast('📋 결과가 클립보드에 복사됐어요')).catch(()=>{}); }
 }
@@ -7844,7 +8067,9 @@ function renderDogamPanel(tab){
    💎 보석 · 의상 상점
    ───────────────────────────────────────────────────────────────────────
    보석은 꾸미기 전용 재화라 게임 경제(자금·기술력)와 완전히 분리돼 있다.
-   획득처: 도감 카드 수집 (사내 공개용 빌드에서 보상형 광고는 제거했다 — v401)
+   획득처: ①도감 카드 수집 ②주간 도장판 ③정비 보상
+   ⚠️ 사내 공개용 빌드라 보상형 광고(하루 3개)를 제거했다. 테스트 빌드(_test)에는 남아 있으므로
+      두 빌드의 보석 수급이 다르다 — 이쪽이 하루 3개만큼 적다.
    ═══════════════════════════════════════════════════════════════════════ */
 function today(){ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
 function addGems(n,why){
@@ -7984,7 +8209,7 @@ function shopBuyOrWear(){
     if(G.money<it.price){ toast('💰 자금 부족 — '+it.name+'은 '+it.price.toLocaleString()+' 필요'); return; }
     G.money-=it.price; updateHUD();
   } else {
-    if((ST.gems||0)<it.price){ toast('💎 보석 부족 — 도감 카드를 모으면 보석이 쌓여요'); return; }
+    if((ST.gems||0)<it.price){ toast('💎 보석 부족 — 도감 카드와 정비 보상으로 모을 수 있어요'); return; }
     ST.gems-=it.price;
   }
   ST.owned=ST.owned||[]; ST.owned.push(it.id);
@@ -8134,7 +8359,7 @@ function renderProfile(){
       +'</div>';
   }
   h+='</div>';
-  h+='<button class="wdShop" onclick="profToShop()">🛒 상점에서 사기</button>';
+  h+='<button class="wdShop" onclick="profToShop()">🛒 상점</button>';
   document.getElementById('profInner').innerHTML=iconize(h);
 }
 
@@ -8227,7 +8452,9 @@ function loadGame(){
 // ═══════════ 🔧 대정비(CI·HGPI·MI) 이벤트 + 부품 머지 미니게임 ═══════════
 // 실제 발전소 정비 주기를 그대로 가져왔다: CI(연소기 점검) → HGPI(고온부 점검) → MI(전체 분해정비) 순환.
 // 평소 고장은 기존대로 탭 수리, '대정비'만 머지 미니게임으로 처리해 반복 피로 없이 특별한 이벤트가 되게 함.
-const OH_PARTN=['볼트','너트','기어','블레이드','로터 모듈'];
+/* 부품 진화 사슬. 인덱스+1 = 티어. 6티어 '터빈 코어'는 MI 전용 목표다 —
+   HGPI와 MI가 둘 다 '로터 모듈'에서 끝나면 최대 규모 정비인 MI가 특별해 보이지 않는다. */
+const OH_PARTN=['볼트','너트','기어','블레이드','로터 모듈','터빈 코어'];
 const OH_THUMB={};
 let OH_ENV=undefined;
 function ohEnvMap(){              // 🪞 금속 반사용 간이 환경맵 (하늘→바닥 그라데이션)
@@ -8258,9 +8485,14 @@ function ohTor(r,tube,m,x,y,z){ const g=new THREE.Mesh(new THREE.TorusGeometry(r
   g.position.set(x||0,y||0,z||0); g.castShadow=true; g.receiveShadow=true; return g; }
 function ohPartModel(t){          // 레퍼런스 톤: 크롬 볼트 · 황동 너트 · 스틸 기어 · 세라믹 블레이드
   const g=new THREE.Group();
+  /* 🎨 부품 팔레트 — 칸이 어두운 슬레이트(#3B4653 계열)라, 회색 계열만 쓰면 배경 명도와 겹친다.
+     그래서 티어마다 색상 계열을 다르게 준다: 중성 크롬 → 황동 → 구리 → 하늘색 → 금색 → 청록.
+     앞 세 개는 따뜻한 금속, 뒤 세 개는 한색·금색이라 단계가 올라간 게 색으로도 읽힌다. */
   const CHROME=ohMet('#c3ccd6',0.34,0.6), CHROME_D=ohMet('#8f9aa6',0.4,0.6);
   const BRASS =ohMet('#e0aa32',0.34,0.6),  BRASS_D =ohMet('#a8741d',0.4,0.6);
-  const STEEL =ohMet('#a7b2be',0.36,0.6),  STEEL_D =ohMet('#78838f',0.42,0.6);
+  const COPPER=ohMet('#c08a4e',0.3,0.72),  COPPER_D=ohMet('#8d6231',0.36,0.72);
+  const SKY   =ohMet('#79b4e4',0.28,0.74), SKY_T   =ohMet('#a8d2f4',0.24,0.74);
+  const TEAL  =ohMet('#3fb8a8',0.28,0.76), TEAL_D  =ohMet('#2a8878',0.34,0.76);
   const disc=(rt,rb,h,seg,m,x,y,z)=>{ const o=ohCyl(rt,rb,h,seg,m,0,0,0); o.rotation.x=Math.PI/2;
     o.position.set(x||0,y||0,z||0); return o; };
   if(t===1){                      // 🔩 육각 볼트 — 두툼한 머리 + 나사산
@@ -8276,28 +8508,37 @@ function ohPartModel(t){          // 레퍼런스 톤: 크롬 볼트 · 황동 �
     g.add(disc(0.46,0.46,0.58,22,BRASS_D,0,0,0));
     g.add(disc(0.5,0.46,0.09,22,BRASS,0,0,0.26));
     for(let i=0;i<3;i++) g.add(disc(0.5,0.5,0.05,22,BRASS_D,0,0,0.16-i*0.16));
-  } else if(t===3){               // ⚙️ 스틸 기어 — 톱니 14 + 스포크 + 허브
-    g.add(disc(0.9,0.9,0.34,26,STEEL,0,0,0));
+  } else if(t===3){               // ⚙️ 구리 기어 — 톱니 14 + 스포크 + 허브
+    /* 스틸(#a7b2be)이었지만 볼트(크롬)와 색이 거의 같아 둘이 구분되지 않았다.
+       구리는 게임의 기술력 아이콘(cCopper)이 이미 쓰는 색이라 팔레트에서 겉돌지 않는다.
+       가운데 허브만 크롬으로 남겨 밝은 점을 하나 둔다. */
+    g.add(disc(0.9,0.9,0.34,26,COPPER,0,0,0));
     for(let i=0;i<14;i++){ const ang=i/14*Math.PI*2;
-      const th=ohBox(0.24,0.3,0.34,STEEL,Math.cos(ang)*1.02,Math.sin(ang)*1.02,0);
+      const th=ohBox(0.24,0.3,0.34,COPPER,Math.cos(ang)*1.02,Math.sin(ang)*1.02,0);
       th.rotation.z=ang+Math.PI/2; g.add(th); }
-    g.add(disc(0.72,0.72,0.4,26,STEEL_D,0,0,0.02));
+    g.add(disc(0.72,0.72,0.4,26,COPPER_D,0,0,0.02));
     for(let i=0;i<5;i++){ const ang=i/5*Math.PI*2+0.3;
-      const sp=ohBox(0.17,0.9,0.22,STEEL,Math.cos(ang)*0.38,Math.sin(ang)*0.38,0.08);
+      const sp=ohBox(0.17,0.9,0.22,COPPER,Math.cos(ang)*0.38,Math.sin(ang)*0.38,0.08);
       sp.rotation.z=ang+Math.PI/2; g.add(sp); }
-    g.add(disc(0.36,0.36,0.46,22,STEEL_D,0,0,0));
+    g.add(disc(0.36,0.36,0.46,22,COPPER_D,0,0,0));
     g.add(disc(0.22,0.22,0.52,18,CHROME,0,0,0));
-  } else if(t===4){               // 🍃 터빈 블레이드 — 전나무 루트 + 비틀린 익형
-    const ROOT=ohMet('#c9524a',0.4,0.6);
-    g.add(ohBox(0.9,0.26,0.54,ROOT,0,-1.0,0));
-    g.add(ohBox(0.68,0.18,0.46,ohMet('#a83f38',0.42,0.6),0,-1.2,0));
-    g.add(ohBox(0.46,0.16,0.36,ROOT,0,-1.36,0));
-    const CER=ohMet('#eef3f8',0.34,0.55);
-    for(let i=0;i<10;i++){ const w=0.64-i*0.033, th=0.21-i*0.011;
-      const seg=ohBox(w,0.25,th,CER,0,-0.78+i*0.24,0);
-      seg.rotation.y=i*0.125; seg.rotation.z=i*0.018; g.add(seg); }
-    const tip=ohBox(0.52,0.14,0.26,ohMet('#d3dde6',0.34,0.7),0,1.55,0); tip.rotation.y=1.15; g.add(tip);
-  } else {                        // 🌀 로터 모듈 — 허브 + 금색 날개 + 축
+  } else if(t===4){               // 🍃 터빈 블레이드 — 광택 전나무 루트 + 하늘색 익형
+    /* 실물 사진 기준으로 다시 그렸다. 루트는 갈아낸 스테인리스라 밝고, 날개는 어둡다 —
+       이 명암 대비가 작은 칸에서 '날개'로 읽히게 하는 핵심이다.
+       익형 색은 하늘색으로 뺐다. 회색으로 두면 어두운 칸 배경에 그대로 묻히고,
+       실제 블레이드도 열차폐 코팅·열처리에 따라 푸른빛을 띠므로 근거도 있다.
+       단면은 박스가 아니라 '눌러 납작하게 만든 원기둥'이다. 사각 단면으로는 익형이 안 보인다. */
+    const BST=ohMet('#d6dee6',0.15,0.96), BST_D=ohMet('#a9b4bf',0.2,0.96);
+    for(let i=0;i<5;i++)                                   // 전나무 루트 5단 (아래로 갈수록 좁아짐)
+      g.add(ohBox(1.0-i*0.11,0.115,0.64-i*0.055,i%2?BST_D:BST,0,-0.94-i*0.145,0));
+    g.add(ohBox(1.02,0.1,0.66,BST,0,-0.85,0));             // 루트 어깨
+    for(let i=0;i<16;i++){ const r=0.35-i*0.006;           // 익형 16단 (단당 3.6°만 꺾어 계단을 없앤다)
+      const seg=ohCyl(r,r,0.175,16,i>12?SKY_T:SKY,0,-0.7+i*0.152,0);
+      seg.scale.set(1,1,0.42);                             // 눌러서 익형 단면
+      seg.rotation.y=i*0.062; seg.rotation.z=i*0.013;
+      seg.position.x=i*i*0.0026;                           // 위로 갈수록 휘어지게
+      g.add(seg); }
+  } else if(t===5){               // 🌀 로터 모듈 — 허브 + 금색 날개 + 축
     g.add(disc(0.58,0.58,0.9,26,CHROME,0,0,0));
     g.add(disc(0.76,0.62,0.16,26,CHROME_D,0,0,0.46));
     g.add(disc(0.76,0.62,0.16,26,CHROME_D,0,0,-0.46));
@@ -8309,6 +8550,24 @@ function ohPartModel(t){          // 레퍼런스 톤: 크롬 볼트 · 황동 �
       tp.rotation.z=ang+Math.PI/2; g.add(tp); }
     g.add(disc(0.28,0.28,1.56,20,ohMet('#c9524a',0.4,0.7),0,0,0));
     g.add(disc(0.32,0.28,0.12,20,CHROME_D,0,0,0.74));
+  } else {                        // 🏆 터빈 코어 — 로터를 케이싱에 넣어 닫은 최종 조립체 (MI 전용)
+    /* 로터 모듈과 한눈에 구분되어야 한다. 로터가 '밖으로 뻗은 금색 날개'라면
+       이건 '매끈한 원통' — 실루엣이 정반대라 44px 썸네일에서도 헷갈리지 않는다.
+       가운데 금색 띠로 안에 로터가 들어 있음을 보여준다(분해정비 = 반으로 열리는 구조). */
+    /* 케이싱은 청록. 스틸(#a7b2be)이면 어두운 칸에 묻히고 기어·볼트와도 겹친다.
+       가운데 금색 띠는 남긴다 — 로터 모듈(금색)과 같은 조라는 신호이자 '최종 목표' 표시다. */
+    const GOLD=ohMet('#f0c24e',0.24,0.95);
+    g.add(disc(1.0,1.0,0.5,28,TEAL,0,0,0.34));
+    g.add(disc(1.0,1.0,0.5,28,TEAL,0,0,-0.34));
+    g.add(disc(0.94,0.94,0.22,28,GOLD,0,0,0));
+    // 앞뒤 플랜지 + 볼트 링 (전체 분해정비의 '다시 조여 닫았다'는 신호)
+    g.add(disc(1.16,1.16,0.16,28,TEAL_D,0,0,0.62));
+    g.add(disc(1.16,1.16,0.16,28,TEAL_D,0,0,-0.62));
+    for(let i=0;i<10;i++){ const ang=i/10*Math.PI*2;
+      g.add(disc(0.1,0.1,0.22,6,CHROME,Math.cos(ang)*0.96,Math.sin(ang)*0.96,0.68)); }
+    g.add(disc(0.36,0.9,0.66,26,TEAL_D,0,0,-1.02));     // 배기 콘
+    g.add(disc(0.24,0.24,2.5,20,CHROME_D,0,0,0));       // 관통 축
+    g.add(ohBox(0.14,2.0,0.12,CHROME,0,1.0,0));         // 상부 케이싱 이음선
   }
   return g;
 }
@@ -8530,11 +8789,21 @@ function ohPartHTML(t){ const u=ohPartImg(t);
 function ohPartIcon(t){ const u=ohPartImg(t);
   return u? '<i class="ohPi" style="background-image:url('+u+')"></i> ' : ''; }
 const OH_DEFS=[
-  {id:'CI',   name:'연소기 점검',    w:4,h:4, top:4, need:1, cost:50, pcost:220, ptier:3, mins:4,
+  /* gem = [최소,최대] — 보석이 터지는 회차일 때 이 범위에서 무작위로 준다 (ohGemRoll 참조).
+     mins = 이 정비가 오기까지의 플레이 시간(분).
+     ⚠️ 원래 4/6/8이었다. 4분마다 알림이 뜨면 '특별한 이벤트'가 아니라 일상 업무가 된다.
+        15/30/60으로 올려 한 바퀴가 18분 → 105분이 됐다(시간당 10회 → 1.7회).
+        간격을 2배씩 벌린 것도 의도다 — 4:6:8은 셋이 거의 붙어 있어 CI가 가벼운 정기점검이고
+        MI가 드문 대공사라는 위계가 느껴지지 않았다. 1:2:4면 간격만으로 그게 드러난다.
+        정비 수입은 시간당 약 55,700 → 9,500으로 줄지만, 정비는 수입원이 아니라
+        이벤트라는 결정에 따른 의도된 결과다. */
+  {id:'CI',   name:'연소기 점검',    w:4,h:4, top:4, need:1, cost:50, pcost:220, ptier:3, mins:15, gem:[1,1],
    rew:{money:2500,tech:200,pol:30,esg:2},  grace:300, desc:'연소기와 라이너를 열어 살펴보는 정기 정비.'},
-  {id:'HGPI', name:'고온부 점검',    w:4,h:5, top:5, need:1, cost:100, pcost:420, ptier:3, mins:6,
+  {id:'HGPI', name:'고온부 점검',    w:4,h:5, top:5, need:1, cost:100, pcost:420, ptier:3, mins:30, gem:[1,2],
    rew:{money:5200,tech:420,pol:90,esg:4},  grace:600, desc:'고온가스가 지나는 블레이드·베인을 정밀 점검한다.'},
-  {id:'MI',   name:'전체 분해정비',  w:5,h:5, top:5, need:2, cost:150, pcost:600, ptier:4, mins:8,
+  /* MI만 6티어까지 간다. '로터 모듈 2개'와 '터빈 코어 1개'는 필요한 볼트 수가 32개로 똑같아서
+     난이도·시간·자재비는 그대로인데, 목표가 HGPI와 겹치지 않고 최종 조립이라는 맛이 생긴다. */
+  {id:'MI',   name:'전체 분해정비',  w:5,h:5, top:6, need:1, cost:150, pcost:600, ptier:4, mins:60, gem:[2,3],
    rew:{money:9000,tech:760,pol:180,esg:8}, grace:900, desc:'터빈을 통째로 분해해 수명을 되돌리는 최대 규모 정비.'}
 ];
 let ohCur=null, ohTutStep=0;
@@ -8586,6 +8855,34 @@ function ohExpireCheck(){             // 기한이 지나면 조용히 종료 (�
   toast('🔧 이번 정비 기간이 지났어요 — 다음 정비 때 다시 만나요');
 }
 function ohDef(){ return OH_DEFS[(ST.ohIdx||0)%OH_DEFS.length]; }
+/* ═══ 💎 정비 보석 보상 — 완료하면 준다. 등급은 없다 ═══
+   ⚠️ '잘하면 더 주기'를 한 번 만들었다가 걷어냈다. 이 머지 게임에는 잘하고 못하고가 없다:
+     · ohDragUp()이 인접 여부를 보지 않는다 — 아무 칸에서 아무 칸으로나 합쳐진다.
+       보드는 격자로 생겼지만 실제로는 그냥 주머니이고, 배치 실력이라는 게 존재하지 않는다.
+     · 목표까지 필요한 1티어 개수가 8/16/32로 고정이고 머지에 손실이 없다. 부품을 낭비할
+       방법이 없어서, 쓰는 자재량은 플레이어가 아니라 스폰 주사위(22% 2티어)가 정한다.
+     · 머지 세션에는 타이머가 없다(mins는 다음 정비까지의 주기, ohDue는 신청 마감).
+   → 자재비로 등급을 매기면 CI는 항상 만점, HGPI·MI는 운으로 등급이 갈린다.
+      실력이 아니라 주사위를 보상하게 되므로 등급 자체를 두지 않는다.
+   ⚠️ 대신 상한은 반드시 필요하다. 정비는 4~8분마다 돌아온다(시간당 약 10회).
+      상한이 없으면 상점 보석 아이템 14종(각 5개, 총 70개)을 두세 시간에 다 사버려
+      광고·도감 카드가 무의미해진다. */
+const OH_GEM_EVERY=3;        // 정비 몇 회당 한 번 나오는가
+/* ⚠️ '3회마다'를 (ohDone % 3 === 0)으로 구현하면 안 된다.
+   ohDef()가 OH_DEFS[ohIdx % 3]이라 정비 순서가 CI→HGPI→MI로 고정이므로,
+   3의 배수 회차는 항상 MI가 된다 — CI·HGPI의 지급량이 영원히 안 쓰인다.
+   → 3회를 한 묶음으로 보고, 묶음이 시작될 때 '그 안에서 몇 번째에 터질지'를 무작위로 뽑는다.
+     지급 빈도는 정확히 3회당 1번으로 유지되면서 어떤 정비에서 나올지는 매번 달라진다.
+   상한은 두지 않는다. 시간당 정비 약 3.3회 → 지급 약 1.1회 → 보석 약 1.8개이고
+   상점 전체가 70개라 30시간을 모아야 다 산다. 상한을 두면 '조용히 안 주는' 회차가 생겨
+   랜덤 이벤트라는 성격만 해친다. */
+function ohGemRoll(d){
+  const i=((ST.ohDone||1)-1)%OH_GEM_EVERY;                                  // 이번 묶음에서 몇 번째인가
+  if(i===0) ST.ohGemPick=Math.floor(Math.random()*OH_GEM_EVERY);            // 묶음 시작에서 당첨 회차를 뽑는다
+  if(i!==ST.ohGemPick) return 0;
+  const g=d.gem; if(!g) return 0;
+  return g[0]+Math.floor(Math.random()*(g[1]-g[0]+1));                      // [최소,최대] 사이 무작위
+}
 function ohTopCount(){ return ohCur? ohCur.cells.filter(v=>v===ohCur.def.top).length : 0; }
 function ohAnnounce(){ const d=ohDef(); updateHUD();
   toast('🔧 '+d.id+' 대정비 시기 — 3일 안에 🧰 버튼으로 신청하세요');
@@ -8706,7 +9003,9 @@ function ohRender(){ const c=ohCur; if(!c) return; const d=c.def;
   h+='<div class="ohBub">'+line+'</div>';
   h+='</div>';
   // 🔗 부품 진화 체인 — 무엇을 만들어야 하는지 한눈에
-  h+='<div class="ohChain">';
+  /* 6칸(MI)은 기본 크기로 그리면 390px 폰에서 약 340px이 되어 체인이 잘린다
+     (#ohInner가 overflow:hidden이고 .ohChain은 flex-wrap:nowrap). → 6칸부터는 칸을 줄인다. */
+  h+='<div class="ohChain'+(goal>=6?' long':'')+'">';
   for(let t=1;t<=goal;t++){
     if(t>1) h+='<i class="ohArw"></i>';
     const known=c.seen[t]||t===1||t===goal;                        // 목표는 항상 공개, 나머지는 만들면 공개
@@ -8829,6 +9128,9 @@ function ohComplete(){ const c=ohCur; if(!c) return; const d=c.def, r=d.rew;
   ST.ohPending=0; ST.ohDue=0; ST.ohT=0; ST.ohIdx=(ST.ohIdx||0)+1; ST.ohDone=(ST.ohDone||0)+1;
   ST['oh'+d.id]=(ST['oh'+d.id]||0)+1;        // 📔 도감 카드 해금용 (CI/HGPI/MI 각각)
   ST.ohGrace=d.grace;                       // 한동안 무고장
+  const gemGot=ohGemRoll(d);                // 💎 3회에 한 번 (ohDone을 올린 뒤에 판정해야 한다)
+  // addGems는 why를 넘기면 토스트를 띄운다 — 완료 카드가 이미 떠 있으므로 숫자만 튀게 하고 만다
+  if(gemGot>0) addGems(gemGot);
   removeAlert('oh'); ohClearBoard(); updateHUD();   // 🔧 이벤트 버튼도 자동으로 사라짐 (진행 스냅샷도 함께 정리)
   try{ saveGame(); }catch(e){}
   let h='<div class="ohTitle">✅ '+d.id+' 정비 완료!</div>';
@@ -8838,6 +9140,9 @@ function ohComplete(){ const c=ohCur; if(!c) return; const d=c.def, r=d.rew;
     +'<div class="ohRew"><b>💰+'+r.money+'</b> · <b>⚙️+'+r.tech+'</b>'
       +(r.pol?' · <b>🏛️+'+r.pol+'</b>':'')+(r.esg?' · <b>🌱+'+r.esg+'</b>':'')+'</div>'
     +'<div class="ohChips"><span class="ohChip">🛡️ '+ohGraceTxt(d.grace)+'간 무고장</span>'
+      /* 하루 상한에 걸린 회차엔 아무 말도 하지 않는다 — 정비 완료는 축하하는 자리라
+         '오늘은 못 받아요' 같은 문구로 찬물을 끼얹지 않는다. 보석은 덤이지 본 보상이 아니다. */
+      +(gemGot>0 ? '<span class="ohChip">💎 <b>+'+gemGot+'</b> 정비 보상</span>' : '')
       +(ST['oh'+d.id]===1?'<span class="ohChip">📔 <b>'+d.id+' 정비 완수</b> 카드 획득</span>':'')+'</div>'
     +'</div>';
   h+='<div class="ohBar"><button class="ohBtn gen" onclick="ohClose()">확인</button></div>';
@@ -8896,6 +9201,7 @@ function setPause(reason,on){
 }
 function startPlay(){
   bootReady=true;
+  ensureUid();        // 🆔 첫 실행이면 여기서 발급 — bootReady 뒤라 곧 이어지는 자동저장에 함께 실린다
   document.getElementById('intro').style.display='none';
   exitToYard();       // 부지에서 시작 (내부에서 refreshTutorial() 호출 → 튜토리얼 첫 대사가 큐에 쌓임)
   t0=performance.now(); requestAnimationFrame(tick);
