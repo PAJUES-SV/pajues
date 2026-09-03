@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>곰돌이 타이쿤</title>
 <style>
   /* 게임 폰트: NEXON Lv1 Gothic 단일 패밀리 (임베드) — 제목·숫자는 굵기로 위계
@@ -24,6 +24,16 @@
     { font-family:'NEXON Lv1 Gothic','Jua','Gowun Dodum','Apple SD Gothic Neo',sans-serif; font-weight:700; }
   /* 3D 부지 화면은 화면 전체를 채워야 넓은 화면(발표용 PC 등)에서 원근감이 살고 더 많은 건물이 보임.
      HUD 상단바·대화창처럼 텍스트가 있는 2D 오버레이만 별도로 폭을 제한(아래 #hud, #dialogue). */
+  /* ═══ 📱 세이프에어리어 ═══
+     앱으로 감싸면 전체화면이 되면서, 브라우저 주소창이 가려주던 자리가 노출된다.
+     아이폰 노치·다이내믹아일랜드(위)와 홈 인디케이터(아래, 약 34px)가 UI와 겹친다 —
+     특히 '← 부지로 나가기'(bottom:14px)는 홈 인디케이터와 정면으로 부딪혀
+     누르려다 홈으로 나가버린다.
+     3D 화면(#frame)은 가장자리까지 꽉 채운 채 두고(잘려도 배경뿐이라 손해가 없다),
+     화면 끝에 붙는 2D UI만 이 값들만큼 안쪽으로 밀어준다.
+     ⚠️ <meta viewport>에 viewport-fit=cover가 있어야 env()가 0이 아닌 값을 준다. */
+  :root { --sat:env(safe-area-inset-top, 0px);    --sab:env(safe-area-inset-bottom, 0px);
+          --sal:env(safe-area-inset-left, 0px);   --sar:env(safe-area-inset-right, 0px); }
   #frame { position:fixed; inset:0; width:100vw; height:100vh; background:#cfe0ea; overflow:hidden; }
   /* 모바일 브라우저 툴바가 보일 때 100vh가 실제 화면보다 커서 하단 버튼이 밀려나는 문제 보정 (dvh 지원 브라우저만 적용) */
   @supports (height: 100dvh){ #frame { height:100dvh; } }
@@ -31,7 +41,7 @@
   #c:active { cursor:grabbing; }
 
   /* HUD — 코지 파스텔 캡슐 스타일 (고양이와 스프풍) */
-  #hud { position:absolute; top:8px; left:50%; transform:translateX(-50%); width:min(100% - 16px, 480px); z-index:6; pointer-events:none; }
+  #hud { position:absolute; top:calc(8px + var(--sat)); left:50%; transform:translateX(-50%); width:min(100% - 16px, 480px); z-index:6; pointer-events:none; }
   #hud, #alerts, #actwrap { text-shadow:0 1px 0 rgba(255,255,255,.35); }
   #topbar { display:flex; justify-content:space-between; align-items:center; }
   #roomName { background:rgba(255,253,246,.94); color:#6E5B4F; border-radius:999px; padding:8px 15px; font-size:12.5px; font-weight:700; white-space:nowrap;
@@ -45,7 +55,7 @@
 
 
   /* ── 📔 기록실(도감·통계) 버튼: 설정 톱니와 동일한 골드 톤 · 게임 시작 후에만 표시 ── */
-  #questFab { position:absolute; bottom:24px; right:10px; z-index:19; display:none;
+  #questFab { position:absolute; bottom:calc(24px + var(--sab)); right:calc(10px + var(--sar)); z-index:19; display:none;
     pointer-events:auto; cursor:pointer; border:none;
     width:44px; height:44px; border-radius:50%; padding:8px;
     background:linear-gradient(180deg,#FFF3C4,#FFE9A0);
@@ -71,7 +81,7 @@
   /* 🗑️ 상점/프로필 FAB는 없앴다 — 기록실 카드가 이미 프로필 카드(.pfCard)를 달고 있어서
      부지에 버튼이 둘이면 같은 것이 두 곳에 있는 꼴이 된다. 스타일은 기록실 카드 안으로 들어간다. */
   /* 🔧 대정비 이벤트 버튼 — 도감 버튼 왼쪽, 정비 시기에만 노출 */
-  #ohFab { position:absolute; bottom:24px; right:62px; z-index:19; display:none;
+  #ohFab { position:absolute; bottom:calc(24px + var(--sab)); right:calc(62px + var(--sar)); z-index:19; display:none;
     pointer-events:auto; cursor:pointer; border:none;
     width:44px; height:44px; border-radius:50%; padding:8px;
     background:linear-gradient(180deg,#FFE3A8,#F6C868);
@@ -82,13 +92,13 @@
   #ohFab svg { width:100%; height:100%; display:block; }
   @keyframes ohPulse { 0%,100%{ box-shadow:0 3px 0 rgba(190,140,50,.5), 0 0 0 0 rgba(232,147,58,.55); }
     70%{ box-shadow:0 3px 0 rgba(190,140,50,.5), 0 0 0 11px rgba(232,147,58,0); } }
-  #ohFabTag { position:absolute; bottom:57px; right:54px; z-index:20; display:none;
+  #ohFabTag { position:absolute; bottom:calc(57px + var(--sab)); right:calc(54px + var(--sar)); z-index:20; display:none;
     background:#E8933A; color:#fff; font-size:8px; font-weight:900; letter-spacing:.4px;
     padding:2px 5px; border-radius:6px; box-shadow:0 2px 5px rgba(0,0,0,.2); }
   #ohFabTag.on { display:block; }
   #ohFabTag.urgent { background:#E8503C; animation:ohTagBlink 1s ease-in-out infinite; }
   @keyframes ohTagBlink { 0%,100%{ opacity:1; } 50%{ opacity:.55; } }
-  #questFabDot { position:absolute; bottom:57px; right:6px; z-index:20; display:none;
+  #questFabDot { position:absolute; bottom:calc(57px + var(--sab)); right:calc(6px + var(--sar)); z-index:20; display:none;
     background:#E8503C; color:#fff; font-size:8px; font-weight:900; letter-spacing:.4px;
     padding:2px 5px; border-radius:6px; pointer-events:none;
     box-shadow:0 2px 5px rgba(0,0,0,.28); border:1.5px solid #FFF3C4; }
@@ -125,7 +135,7 @@
     background:linear-gradient(180deg,#FFF3C4,#FFE9A0); border-radius:99px; padding:3px 9px; }
   #dqClose { margin-left:auto; border:none; background:none; cursor:pointer; font-size:15px; font-weight:900; color:#b3a184; line-height:1; }
   /* 💬 응대 선택지 카드 */
-  #choiceBox { position:absolute; left:50%; transform:translateX(-50%); width:min(100% - 16px, 480px); bottom:142px; z-index:11; display:none; }
+  #choiceBox { position:absolute; left:50%; transform:translateX(-50%); width:min(100% - 16px, 480px); bottom:calc(142px + var(--sab)); z-index:11; display:none; }
   #choiceBox.on { display:block; animation:choiceUp .26s cubic-bezier(.34,1.4,.64,1); }
   @keyframes choiceUp { from{ opacity:0; transform:translateX(-50%) translateY(16px) scale(.96); } to{ opacity:1; transform:translateX(-50%) translateY(0) scale(1); } }
   .chHead { display:flex; align-items:center; gap:9px; margin-bottom:8px;
@@ -154,7 +164,7 @@
     transition:width .12s linear, background .2s; }
 
   /* ── 설정 패널: frame 직속, 알림보다 위 ── */
-  #setPanel { position:absolute; top:52px; right:8px; z-index:60; display:none; pointer-events:auto;
+  #setPanel { position:absolute; top:calc(52px + var(--sat)); right:calc(8px + var(--sar)); z-index:60; display:none; pointer-events:auto;
     background:rgba(255,253,246,.97); border-radius:14px; padding:11px 13px; min-width:178px;
     box-shadow:0 2px 0 rgba(190,172,140,.4), 0 10px 24px rgba(120,100,70,.24); }
   #setPanel.on { display:block; animation:apop .18s ease-out; }
@@ -163,6 +173,13 @@
   #setPanel .setIc { width:21px; height:21px; flex:0 0 auto; }
   #setPanel .setIc svg { width:100%; height:100%; display:block; }
   #setPanel .setLbl { flex:1; font-size:12.5px; font-weight:700; color:#6E5B4F; }
+  #setPanel .setSep { height:1px; margin:7px 0 3px; background:rgba(150,128,95,.28); }
+  /* 바깥(브라우저)으로 나가는 항목임을 알리는 홑화살표 — 토글 행과 눈으로 구분되게 */
+  #setPanel .setGo { width:7px; height:7px; flex:0 0 auto; margin-right:3px; opacity:.5;
+    border-right:2px solid #6E5B4F; border-top:2px solid #6E5B4F; transform:rotate(45deg); }
+  #setPanel .setLink:active { opacity:.6; }
+  #setPanel .setVer { margin-top:8px; text-align:center; font-size:10.5px; font-weight:700;
+    color:#a2917a; letter-spacing:.5px; }
   /* 토글 스위치 (CSS로 직접 그림) */
   .swt { position:relative; width:40px; height:22px; border-radius:99px; background:#d8cfc0; flex:0 0 auto;
     transition:background .18s; box-shadow:inset 0 1px 3px rgba(120,100,70,.3); }
@@ -208,7 +225,7 @@
 
   /* 퀘스트 패널 — 스테이지 버튼 탭 시 우측 상단에서 펼쳐짐 */
   /* 퀘스트 패널 (스테이지 버튼에서 펼쳐지는 튜토리얼 메뉴) — 화면 우측 상단, 중앙을 가리지 않음 */
-  #qPanel { position:absolute; top:52px; right:8px; left:auto; width:min(88%,340px); z-index:52; display:none;
+  #qPanel { position:absolute; top:calc(52px + var(--sat)); right:calc(8px + var(--sar)); left:auto; width:min(88%,340px); z-index:52; display:none;
     background:linear-gradient(180deg,#fffdf4,#fbf0da); border-radius:24px; padding:13px 13px 11px;
     box-shadow:0 8px 0 #d8c5a0, 0 16px 30px rgba(60,45,25,.35); border:3px solid #fff; }
   #qpHead { display:flex; align-items:center; font-size:13.5px; font-weight:900; color:#5b4632; margin-bottom:9px; white-space:nowrap; }
@@ -245,7 +262,7 @@
   .dqRew small { display:block; font-size:10px; font-weight:800; color:#a89066; letter-spacing:1px; margin-bottom:2px; }
 
   /* 알림 스택 — 말랑 젤리 배너 */
-  #alerts { position:absolute; top:118px; right:8px; z-index:45; display:flex; flex-direction:column; gap:6px; align-items:flex-end; pointer-events:none; max-width:72%; }
+  #alerts { position:absolute; top:calc(118px + var(--sat)); right:calc(8px + var(--sar)); z-index:45; display:flex; flex-direction:column; gap:6px; align-items:flex-end; pointer-events:none; max-width:72%; }
   .alert { background:#e8574a; color:#fff; border-radius:999px; padding:8px 14px; font-size:11.5px; font-weight:700; line-height:1.3; letter-spacing:0.015em;
     text-shadow:0 1px 2px rgba(0,0,0,.22); box-shadow:0 3px 10px rgba(0,0,0,.16); border:none; max-width:100%;
     animation:apop .3s cubic-bezier(.34,1.56,.64,1), ashake 2.6s ease-in-out .3s infinite; display:flex; align-items:center; gap:5px; }
@@ -289,7 +306,7 @@
   #tabs button.on { background:#ffd66b; color:#5b4632; transform:translateY(-2px); }
 
   /* 액션 버튼 (방마다) */
-  #actwrap { position:absolute; bottom:62px; left:50%; transform:translateX(-50%); z-index:6; text-align:center; }
+  #actwrap { position:absolute; bottom:calc(62px + var(--sab)); left:50%; transform:translateX(-50%); z-index:6; text-align:center; }
   #actBtn { pointer-events:auto; border:none; border-radius:16px; padding:11px 20px; font-size:14px; font-weight:800; color:#5B4632;
     background:linear-gradient(180deg,#FFD964,#F4B93A); box-shadow:0 4px 0 #C98F22,0 6px 14px rgba(120,100,70,.22); cursor:pointer; display:none; }
   #actBtn:active { transform:translateY(3px); box-shadow:0 1px 0 #C98F22; }
@@ -310,7 +327,7 @@
   .bidCard .tm>i { display:block; height:100%; background:#e0714a; width:100%; }
 
   /* 하단 대화창 — 시스템 메시지 + NPC 대사를 한 곳에 모아 표시 (동물의숲풍 말풍선) */
-  #dialogue { position:absolute; bottom:142px; left:50%; transform:translateX(-50%); width:min(100% - 16px, 480px); z-index:9;
+  #dialogue { position:absolute; bottom:calc(142px + var(--sab)); left:50%; transform:translateX(-50%); width:min(100% - 16px, 480px); z-index:9;
     background:#fffdf6; border-radius:20px; border:none;
     box-shadow:0 4px 16px rgba(60,45,25,.18);
     padding:9px 14px 10px; display:flex; align-items:flex-start; gap:10px;
@@ -405,7 +422,7 @@
   /* ✍️ 한글 줄 균형: 마지막 단어 하나만 다음 줄로 뚝 떨어지는 것 방지 (지원 브라우저에서 자동 적용) */
   #dlgText, .scStam, .scCond, .scHint, .scPromoT, .dgDesc, .dgLabel, .qTxt, .stLbl, #toast { text-wrap:balance; }
   /* 🔧 대정비(CI·HGPI·MI) 머지 미니게임 */
-  #ohWrap { display:none; position:absolute; inset:0; z-index:86; padding:14px;
+  #ohWrap { display:none; position:absolute; inset:0; z-index:86; padding:calc(14px + var(--sat)) calc(14px + var(--sar)) calc(14px + var(--sab)) calc(14px + var(--sal));
     align-items:flex-start; justify-content:center; overflow:hidden;
     background:linear-gradient(180deg,#BFE4F5 0%,#DCEFF8 46%,#EFE4CB 78%,#E4D6B4 100%); }
   /* ☀️ 은은한 햇살 */
@@ -570,8 +587,8 @@
   #shopWrap, #profWrap { display:none; position:absolute; inset:0; z-index:88; font-family:inherit;
     background:rgba(58,44,26,.5); backdrop-filter:blur(3px); }
   #shopWrap.on, #profWrap.on { display:block; }
-  #shopCover, #profCover { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    width:min(100% - 16px, 470px); height:min(calc(100% - 20px), 640px);
+  #shopCover, #profCover { position:absolute; top:calc(50% + (var(--sat) - var(--sab)) / 2); left:50%; transform:translate(-50%,-50%);
+    width:min(100% - 16px, 470px); height:min(calc(100% - 20px - var(--sat) - var(--sab)), 640px);
     display:flex; flex-direction:column; }
   #shopCover::after, #profCover::after { content:''; position:absolute; inset:9px; z-index:4; pointer-events:none;
     border:2px dashed rgba(176,157,121,.5); border-radius:15px; }
@@ -863,8 +880,8 @@
   /* 높이 고정 — 탭을 옮길 때마다 책이 커졌다 작아졌다 하면 산만하다.
      가장 내용이 많은 탭(도감 9칸+페이저 ≈ 650px)에 맞춰 한 번만 정하고, 화면이 더 낮으면 화면에 맞춘다.
      화면 높이를 꽉 채우지는 않으므로 운영 기록처럼 짧은 탭에서도 아래가 허전하게 길지 않다. */
-  #dogamCover { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    width:min(100% - 16px, 470px); height:min(calc(100% - 20px), 660px);
+  #dogamCover { position:absolute; top:calc(50% + (var(--sat) - var(--sab)) / 2); left:50%; transform:translate(-50%,-50%);
+    width:min(100% - 16px, 470px); height:min(calc(100% - 20px - var(--sat) - var(--sab)), 660px);
     display:flex; flex-direction:column; }
   /* 운영 기록은 한 탭에 3~4줄뿐이라 도감과 같은 높이를 쓰면 아래가 텅 빈다.
      이 패널만 짧은 높이로 고정 — 수익·운영·성장 탭 사이에서는 크기가 변하지 않는다. */
@@ -1381,6 +1398,32 @@
       <span class="setLbl">배경음악</span>
       <span class="swt" id="swBgm"><i></i></span>
     </div>
+    <!-- ⚙️ 바깥으로 나가는 항목 — 주소(SUPPORT_URL·PRIVACY_URL)가 비어 있으면 JS가 통째로 숨긴다.
+         없는 곳으로 보내는 버튼을 유저에게 보여주지 않기 위해서다. -->
+    <div class="setSep"></div>
+    <div class="setRow setLink" id="rowSupport" style="display:none">
+      <span class="setIc">
+        <!-- 문의: 봉투 -->
+        <svg viewBox="0 0 24 24">
+          <rect x="2.6" y="5" width="18.8" height="14" rx="2.6" fill="none" stroke="#6E5B4F" stroke-width="2"/>
+          <path d="M3.6 7 12 13 20.4 7" fill="none" stroke="#6E5B4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="setLbl">문의하기</span>
+      <span class="setGo"></span>
+    </div>
+    <div class="setRow setLink" id="rowPrivacy" style="display:none">
+      <span class="setIc">
+        <!-- 개인정보처리방침: 방패 -->
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2.8 20 6v6.2c0 4.6-3.3 7.6-8 9-4.7-1.4-8-4.4-8-9V6Z" fill="none" stroke="#6E5B4F" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M8.6 11.8 11.2 14.4 15.6 10" fill="none" stroke="#6E5B4F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="setLbl">개인정보처리방침</span>
+      <span class="setGo"></span>
+    </div>
+    <div class="setVer" id="setVer"></div>
   </div>
 
   <div id="bidBox"><div class="bidCard">
@@ -1395,7 +1438,7 @@
   </div>
 
   <div id="tabs" style="display:none;"></div>
-  <button id="exitBtn" style="position:absolute; bottom:14px; left:10px; z-index:6; display:none; border:none; border-radius:12px; padding:8px 14px; font-size:12px; font-weight:800; background:rgba(255,253,246,.94); color:#6E5B4F; box-shadow:0 2px 0 rgba(190,172,140,.4), 0 6px 14px rgba(120,100,70,.16); cursor:pointer;">← 부지로 나가기</button>
+  <button id="exitBtn" style="position:absolute; bottom:calc(14px + var(--sab)); left:calc(10px + var(--sal)); z-index:6; display:none; border:none; border-radius:12px; padding:8px 14px; font-size:12px; font-weight:800; background:rgba(255,253,246,.94); color:#6E5B4F; box-shadow:0 2px 0 rgba(190,172,140,.4), 0 6px 14px rgba(120,100,70,.16); cursor:pointer;">← 부지로 나가기</button>
   <!-- 🥵 탈진 중 입력 차단막: 모든 UI 버튼·나가기 탭을 삼켜서 조작 불가로 만든다 (알림 배너는 이 위 z-index) -->
   <div id="downBlocker" style="position:absolute; inset:0; z-index:40; display:none; background:rgba(20,14,8,0.44); cursor:not-allowed; backdrop-filter:blur(2px); align-items:center; justify-content:center;">
     <div style="text-align:center; color:#fff; padding:0 24px;">
@@ -4792,7 +4835,10 @@ function say(name,text,tone,cb,dur,after,roomCtx){
     drop.forEach(d=>{ if(d.cb){ try{d.cb();}catch(e){} } }); }
   if(dlgBusy && !pumpDialogue._tap){ // 탭 대기 중인 대사는 새 메시지가 와도 자르지 않음 (플레이어가 읽는 중)
     const remain=(pumpDialogue._hideAt||0)-performance.now();
-    if(remain>750) dlgScheduleHide(650); }
+    /* 새 대사가 들어오면 지금 대사를 잘라 넘긴다. 다만 650ms는 한 문장을 읽기엔 너무 짧아서
+       (고용 안내 33자가 0.65초 만에 사라지던 원인) 950ms로 늘렸다. 밀림 방지라는 목적은
+       그대로 지켜지고, 잘린 대사도 눈으로 훑을 시간은 남는다. */
+    if(remain>1100) dlgScheduleHide(950); }
   pumpDialogue(); }
 function dlgScheduleHide(ms){ const el=document.getElementById('dialogue');
   clearTimeout(pumpDialogue._t); pumpDialogue._hideAt=performance.now()+ms;
@@ -4844,8 +4890,12 @@ function pumpDialogue(){ if(typeof stageBannerActive!=='undefined' && stageBanne
   pumpDialogue._tap=false;
   // 대기 중 메시지가 있으면 빠른 템포로 소화 (메시지 밀림 방지) · dur 지정 시 그 시간만큼 유지
   const dur = m.dur ? m.dur
-            : dlgQueue.length ? Math.max(1000,Math.min(1700,plain.length*36))
-                              : Math.max(1300,Math.min(2400,plain.length*46));
+            /* ⏱️ 예전 값(46ms/자, 상한 2400)은 초당 21.7자였다. 한글을 편하게 읽는 속도가
+               초당 7~10자이므로 2~3배 빨랐고, 한 문장 넘는 안내는 대부분 못 읽고 사라졌다.
+               95ms/자 = 초당 약 10.5자로 낮추고 상한도 함께 올린다.
+               대기 중인 대사가 있으면(첫 줄) 밀리지 않게 조금 빠르게 넘긴다. */
+            : dlgQueue.length ? Math.max(1200,Math.min(3000,plain.length*70))
+                              : Math.max(1500,Math.min(5000,plain.length*95));
   dlgScheduleHide(dur);
 }
 // 💬 '탭해서 넘기는 대사'가 지금 떠 있거나 큐에 남아 있는가?
@@ -7307,6 +7357,19 @@ function tickRoom(t,dt){
 
    우선순위: ① 네이티브 저장소(Capacitor Preferences) ② IndexedDB ③ localStorage ④ 메모리
    ═══════════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════
+   ⚙️ 배포 설정 — 여기 세 줄만 채우면 설정 패널이 알아서 따라온다
+   ───────────────────────────────────────────────────────────────────────
+   SUPPORT_URL / PRIVACY_URL이 비어 있으면 해당 버튼을 아예 숨긴다.
+   주소가 없는데 버튼만 보이면 유저를 빈 곳으로 보내게 되므로.
+   문의는 구글 폼 같은 웹 폼을 1순위로 본다 — 무료이고 서버가 필요 없으며,
+   개인 메일 주소가 앱에 박히지 않아 스팸을 안 받고, 문의가 한 곳에 정리된다.
+   폼 주소가 없고 메일 주소만 있으면 mailto로 대신 연다.
+   ═══════════════════════════════════════════════════════════════════════ */
+const APP_VERSION='1.00';
+const SUPPORT_URL='';     // 문의 폼 주소 (구글 폼 등). App Store Connect의 Support URL로도 같은 주소를 쓰면 된다
+const SUPPORT_EMAIL='';   // 폼이 없을 때 쓰는 대체 수단. 개인 메일 대신 게임 전용 주소를 권함
+const PRIVACY_URL='';     // 개인정보처리방침 주소 (게임 저장소와 분리된 곳에 올릴 것 — 소스가 같이 공개된다)
 const SAVE_KEY='pika_save_v2';
 let memSave=null;                 // 최후의 폴백 (세션 내에서만 유지)
 let idbCache=null;                // IndexedDB는 비동기라, 부팅 시 읽어둔 값을 캐시
@@ -8068,8 +8131,8 @@ function renderDogamPanel(tab){
    ───────────────────────────────────────────────────────────────────────
    보석은 꾸미기 전용 재화라 게임 경제(자금·기술력)와 완전히 분리돼 있다.
    획득처: ①도감 카드 수집 ②주간 도장판 ③정비 보상
-   ⚠️ 사내 공개용 빌드라 보상형 광고(하루 3개)를 제거했다. 테스트 빌드(_test)에는 남아 있으므로
-      두 빌드의 보석 수급이 다르다 — 이쪽이 하루 3개만큼 적다.
+   ⚠️ 사내 공개용 빌드라 보상형 광고(하루 3개)를 제거했다. _test 빌드에는 남아 있으므로
+      두 빌드의 보석 수급이 다르다 — 이쪽이 하루 3개만큼 적고, 그래서 가격도 절반이다.
    ═══════════════════════════════════════════════════════════════════════ */
 function today(){ const d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
 function addGems(n,why){
@@ -9616,6 +9679,57 @@ document.getElementById('btnContinue').onclick=()=>{
   if(rowBgm) rowBgm.onclick=function(e){ e.stopPropagation();
     if(window.setBgmMuted) window.setBgmMuted(!window.isBgmMuted());
     paintSw(); if(!sfxMuted) SFX.tap(); };
+  /* ── 버전 표기 ── 유저가 버그를 신고할 때 어느 빌드인지 알 수 있어야 한다 */
+  { const v=document.getElementById('setVer'); if(v) v.textContent='v'+APP_VERSION; }
+  /* ── 📮 문의하기 ──
+     진단 정보를 자동으로 실어 보낸다. 유저가 '게임이 안 돼요' 한 줄만 써도
+     버전·기기ID·진행상황이 같이 오므로, 되묻는 왕복이 사라진다.
+     ST.uid는 같은 사람의 문의를 이어서 추적하는 용도다(어디에도 전송되지 않던 값을 여기서 처음 쓴다). */
+  function supportInfo(){
+    const sec=Math.floor(ST.playSec||0);
+    return ['버전: '+APP_VERSION,
+            '기기ID: '+(ST.uid||'-'),
+            '진행: 스테이지 '+STAGE.cur+' · '+((PROG.ch[Math.min(STAGE.cur,3)]||0)+1)+'장'
+              +(ST.ended?' · 자유운영':''),
+            '플레이: '+Math.floor(sec/3600)+'시간 '+Math.floor((sec%3600)/60)+'분',
+            '화면: '+innerWidth+'x'+innerHeight,
+            '기기: '+navigator.userAgent].join('\n');
+  }
+  const rowSup=document.getElementById('rowSupport');
+  if(rowSup && (SUPPORT_URL||SUPPORT_EMAIL)){
+    rowSup.style.display='flex';
+    rowSup.onclick=function(e){ e.stopPropagation();
+      const info=supportInfo();
+      if(SUPPORT_URL){
+        /* 구글 폼은 ?usp=pp_url&entry.<필드ID>=<값> 으로 항목을 미리 채울 수 있다.
+           폼을 만든 뒤 진단 정보를 받을 항목의 entry ID를 아래 SUPPORT_FIELD에 적으면
+           유저가 손대지 않아도 채워진 채로 열린다. 비워두면 그냥 폼만 연다. */
+        const SUPPORT_FIELD='';   // 예: 'entry.123456789'
+        let u=SUPPORT_URL;
+        if(SUPPORT_FIELD) u+=(u.indexOf('?')<0?'?':'&')+'usp=pp_url&'+SUPPORT_FIELD+'='+encodeURIComponent(info);
+        window.open(u,'_blank');
+      } else {
+        const body='(문의 내용을 적어주세요)\n\n---- 아래는 지원용 정보입니다. 지우지 말아주세요 ----\n'+info;
+        window.location.href='mailto:'+SUPPORT_EMAIL
+          +'?subject='+encodeURIComponent('[곰돌이 타이쿤] 문의')
+          +'&body='+encodeURIComponent(body);
+        /* 메일 앱이 없는 기기(일부 태블릿·안드로이드)에서는 위 이동이 아무 일도 일으키지 않는다.
+           그때를 대비해 주소를 클립보드에 넣어두고 알려준다 — 유저가 막다른 길에 서지 않게. */
+        setTimeout(function(){
+          try{ navigator.clipboard.writeText(SUPPORT_EMAIL).then(function(){
+            toast('📮 문의 주소를 복사했어요 — '+SUPPORT_EMAIL); }).catch(function(){}); }catch(err){}
+        },1200);
+      }
+      openPanel(false);
+    };
+  }
+  /* ── 🛡️ 개인정보처리방침 ── 앱에 넣지 않고 웹으로 연다.
+     방침을 고칠 때 앱을 다시 심사받지 않아도 되기 때문이다. */
+  const rowPriv=document.getElementById('rowPrivacy');
+  if(rowPriv && PRIVACY_URL){
+    rowPriv.style.display='flex';
+    rowPriv.onclick=function(e){ e.stopPropagation(); window.open(PRIVACY_URL,'_blank'); openPanel(false); };
+  }
   // 패널 밖 터치 시 닫기 (+일시정지 해제)
   document.addEventListener('pointerdown',function(e){
     if(setPanel.classList.contains('on') && !e.target.closest('#setPanel') && !e.target.closest('#setBtn'))
