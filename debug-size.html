@@ -9,13 +9,14 @@
         manifest.json · icon-180.png · icon-192.png · icon-512.png
      ⚠️ manifest.json의 start_url이 이 파일 이름과 같아야 한다. 파일명을 바꾸면 그쪽도 고칠 것.
      apple-touch-icon이 없으면 iOS가 페이지 스크린샷을 아이콘으로 쓴다 — 이 한 줄이 가장 체감이 크다. -->
-<link rel="manifest" href="manifest.json">
+<!-- 진단용: manifest를 빼야 한다. start_url이 게임 파일을 가리켜서 홈 화면 추가 시 이 페이지 대신 게임이 뜬다.
+     standalone 전환은 아래 apple-mobile-web-app-capable 만으로 충분하다. -->
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <meta name="theme-color" content="#cfe0ea">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="곰돌이 타이쿤">
+<meta name="apple-mobile-web-app-title" content="진단">
 <meta name="mobile-web-app-capable" content="yes">
 <style>
   /* 게임 폰트: NEXON Lv1 Gothic 단일 패밀리 (임베드) — 제목·숫자는 굵기로 위계
