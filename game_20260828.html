@@ -14,7 +14,11 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <meta name="theme-color" content="#cfe0ea">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- ⚠️ black-translucent를 쓰면 안 된다. 내용은 상태바 아래(y=0)부터 그려지는데
+     iOS가 innerHeight는 상태바를 뺀 값으로 보고해서, 화면 맨 아래에 상태바 높이만큼
+     빈 띠가 생긴다(아이폰16프로 기준 874-812=62px). default는 상태바 자리를 비워두고
+     뷰포트를 그 아래에 정확히 앉히므로 틈이 생기지 않는다. -->
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="곰돌이 타이쿤">
 <meta name="mobile-web-app-capable" content="yes">
 <style>
