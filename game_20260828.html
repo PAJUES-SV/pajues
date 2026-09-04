@@ -4211,12 +4211,23 @@ function updateQuest(){
 function checkQuest(){ checkAchievements();   // 🏆 업적은 자유운영 포함 항상 검사
   dailyCheck();          // 📋 오늘의 목표는 스테이지2부터 자유운영까지 계속 판정 (dailyCheck 안에서 개방 여부를 본다)
   if(ST.ended) return;   // 자유운영모드: 더 이상 강제 퀘스트 없음
-  const list=curQuests(); let hit=false;
-  for(const q of list){   // 순서 진행: 첫 미완료 퀘스트만 판정, 그 뒤는 잠금 (조건이 이미 충족돼 있으면 연쇄 완료)
+  const list=curQuests(); let hit=false; const justDone=[];
+  /* 조건을 만족한 퀘스트는 순서에 상관없이 그 자리에서 완료 처리한다.
+     ⚠️ 예전엔 첫 미완료 퀘스트만 판정하고 뒤는 break로 잠갔다(순서 진행). 그래서 튜토리얼을
+        건너뛰고 대관을 먼저 하면 그 순간엔 아무 일도 안 일어나다가, 나중에 입찰이 끝나는
+        순간 밀려 있던 퀘스트들이 한꺼번에 터졌다. 방금 하지도 않은 일의 완료 알림이
+        뒤늦게 쏟아지니 오작동으로 보인다.
+        한 일은 한 순간에 완료되는 게 맞다 — 잠금을 없앴다. */
+  for(const q of list){
     if(q.done) continue;
     if(q.check()){ q.done=true; if(q.reward) q.reward();
-      toast('🎯 퀘스트 완료! '+q.txt+' ('+q.rew+')'); hit=true; continue; }
-    break; }
+      justDone.push(q); hit=true; } }
+  /* 🎯 잠금을 없앤 뒤에도 한 번에 여럿이 끝나는 경우는 남는다 — 세이브를 불러왔을 때나,
+     새 챕터로 넘어갔는데 그 조건이 이미 충족돼 있을 때다.
+     그럴 땐 토스트를 하나씩 쌓지 않고 묶어서 한 번만 알린다.
+     say()가 '새 대사가 오면 앞 대사를 0.95초로 자른다'라서, 여러 개면 스쳐 지나가 버린다. */
+  if(justDone.length===1){ const q0=justDone[0]; toast('🎯 퀘스트 완료! '+q0.txt+' ('+q0.rew+')'); }
+  else if(justDone.length>1){ toast('🎯 퀘스트 '+justDone.length+'개 완료! '+justDone.map(q0=>q0.rew).join(' · ')); }
   if(list.every(q=>q.done)){
     const st=Math.min(STAGE.cur,3), chapters=stageChapters[st];
     if(PROG.ch[st] < chapters.length-1){
